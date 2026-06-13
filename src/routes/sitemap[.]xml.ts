@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { TOPICS } from "@/lib/topic-catalog";
 
-const BASE_URL = "https://load-all-joy.lovable.app";
+const BASE_URL = "https://smartsqlaimentor.lovable.app";
 
 interface SitemapEntry {
   path: string;

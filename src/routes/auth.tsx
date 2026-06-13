@@ -37,9 +37,9 @@ export const Route = createFileRoute("/auth")({
         property: "og:description",
         content: "Sign in to your adaptive SQL practice account and resume your daily curriculum.",
       },
-      { property: "og:url", content: "https://clever-sql-coach.lovable.app/auth" },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/auth" },
     ],
-    links: [{ rel: "canonical", href: "https://clever-sql-coach.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
