@@ -1,0 +1,547 @@
+// Curated bank of 100+ GCP Data Engineer interview questions asked at
+// top MNCs (Google, Meta, Amazon, Microsoft, Netflix, Uber, Stripe,
+// Goldman Sachs, JPMorgan, Walmart Labs, Accenture, TCS, Infosys, Wipro,
+// Capgemini, Cognizant, Deloitte). Each entry includes a model answer
+// and a short explanation that an interviewer would expect.
+
+export type GcpDifficulty = "beginner" | "intermediate" | "advanced" | "professional";
+
+export interface GcpQuestion {
+  id: number;
+  topic: string;
+  difficulty: GcpDifficulty;
+  companies: string[];
+  question: string;
+  answer: string;
+  explanation: string;
+  follow_ups?: string[];
+}
+
+const C_FAANG = ["Google", "Meta", "Amazon", "Microsoft", "Netflix"];
+const C_FIN = ["Goldman Sachs", "JPMorgan", "Stripe", "American Express"];
+const C_IND = ["TCS", "Infosys", "Wipro", "Cognizant", "Accenture", "Capgemini", "Deloitte"];
+const C_RET = ["Walmart Labs", "Target", "Uber", "Airbnb"];
+
+export const GCP_BANK: GcpQuestion[] = [
+  // ---------------- BigQuery ----------------
+  { id: 1, topic: "BigQuery", difficulty: "beginner", companies: ["Google", ...C_IND],
+    question: "What is BigQuery and what makes it different from a traditional RDBMS?",
+    answer: "BigQuery is Google Cloud's serverless, fully-managed, petabyte-scale analytical data warehouse. It separates storage (Colossus) from compute (Dremel/Borg), so they scale independently; uses a columnar storage format (Capacitor) and a tree-architecture massively-parallel SQL engine.",
+    explanation: "Unlike a traditional RDBMS (row-store, fixed compute, OLTP-friendly), BigQuery is OLAP-only, columnar, distributed and stateless. You pay for storage and queried bytes, not for provisioned servers. No indexes — partitioning + clustering give the speedup.",
+    follow_ups: ["What is Dremel?", "What does serverless mean in BigQuery?"]
+  },
+  { id: 2, topic: "BigQuery", difficulty: "beginner", companies: C_IND,
+    question: "Difference between partitioning and clustering in BigQuery?",
+    answer: "Partitioning physically splits a table into segments based on a column (date/timestamp/integer-range/ingestion-time). Clustering sorts data within each partition by up to 4 columns. Partitioning reduces bytes scanned by pruning whole partitions; clustering improves filter and aggregation performance within a partition.",
+    explanation: "A query that filters on the partition column scans only matching partitions. Adding cluster keys further reduces blocks read inside that partition. Common combo: PARTITION BY DATE(event_ts) CLUSTER BY user_id, event_type." },
+  { id: 3, topic: "BigQuery", difficulty: "intermediate", companies: ["Google", "Stripe", "Uber"],
+    question: "How does BigQuery pricing work and how do you optimize cost?",
+    answer: "Two cost dimensions: storage (active vs long-term, $/GB/month) and compute (on-demand at $/TB scanned OR flat-rate slots). Optimizations: (1) SELECT only needed columns (columnar storage), (2) partition + cluster, (3) use --dry_run to estimate bytes, (4) materialize repeated heavy joins, (5) use BI Engine / cached results, (6) avoid SELECT * and LIMIT on huge tables (LIMIT does NOT reduce bytes scanned), (7) move cold data to long-term storage tier automatically after 90 days.",
+    explanation: "Interviewers expect you to know LIMIT does not save money — bytes scanned are determined by columns + partitions touched, not rows returned.",
+    follow_ups: ["What is BI Engine?", "When to use flat-rate vs on-demand?"] },
+  { id: 4, topic: "BigQuery", difficulty: "intermediate", companies: C_FAANG,
+    question: "Explain BigQuery slots.",
+    answer: "A slot is a virtual CPU used by BigQuery to execute SQL queries. Each query is broken into stages and each stage is executed by parallel workers consuming slots. On-demand uses a shared pool (default 2000 slots/project); flat-rate reserves a fixed number you can split across reservations.",
+    explanation: "Slot starvation shows as long queue / 'Pending' state. Use INFORMATION_SCHEMA.JOBS_BY_PROJECT to inspect total_slot_ms per job." },
+  { id: 5, topic: "BigQuery", difficulty: "advanced", companies: ["Google", "Netflix"],
+    question: "How do you handle slowly changing dimensions (SCD Type 2) in BigQuery?",
+    answer: "Use MERGE: when target row matches source but attributes differ, UPDATE the existing row to set valid_to = CURRENT_TIMESTAMP() and is_current = FALSE, then INSERT a new row with valid_from = now, valid_to = NULL, is_current = TRUE. For very large dims, partition by valid_from date and cluster by surrogate_key to keep MERGEs efficient.",
+    explanation: "MERGE on huge dimensions is expensive — common pattern is to write a daily 'changes' staging table and MERGE only the delta." },
+  { id: 6, topic: "BigQuery", difficulty: "advanced", companies: ["Google", "Stripe"],
+    question: "What are materialized views in BigQuery and when would you use them?",
+    answer: "Pre-computed views that incrementally refresh as base tables change. Best for repeated aggregations on append-mostly tables. Limitations: cannot use OUTER JOIN, non-deterministic functions, or self-joins; refresh cost is charged.",
+    explanation: "Interviewer wants you to differentiate from a regular view (no storage, recomputed each query) and from a scheduled query (full recompute)." },
+  { id: 7, topic: "BigQuery", difficulty: "advanced", companies: C_FAANG,
+    question: "What is a BigQuery external table and what are its trade-offs?",
+    answer: "A table that references data stored outside BigQuery (GCS, Drive, Bigtable, Cloud SQL). Queryable via SQL but no BigQuery-managed storage. Pros: query data in place, no ingest cost, supports federated formats (Parquet, ORC, Avro, JSON, CSV). Cons: slower (no Capacitor format), no streaming, limited DML, no clustering.",
+    explanation: "Use external tables for ad-hoc exploration of GCS data lakes; materialize to native tables when query patterns become stable." },
+  { id: 8, topic: "BigQuery", difficulty: "intermediate", companies: C_IND,
+    question: "How do you load data into BigQuery? List the methods.",
+    answer: "(1) Batch load from GCS via bq load or LOAD DATA SQL, (2) Streaming inserts via tabledata.insertAll API or Storage Write API, (3) BigQuery Data Transfer Service (SaaS connectors), (4) Dataflow / Dataproc / Spark connector, (5) Federated query over external tables, (6) Datastream for CDC from operational DBs.",
+    explanation: "Storage Write API is the modern streaming path — cheaper and exactly-once vs legacy insertAll." },
+  { id: 9, topic: "BigQuery", difficulty: "advanced", companies: ["Google"],
+    question: "Difference between Storage Write API and legacy streaming insertAll?",
+    answer: "Storage Write API uses gRPC, supports exactly-once delivery via stream offsets, has higher throughput, lower latency, and is cheaper. insertAll is REST-based, at-least-once, no offset commit, more expensive per row.",
+    explanation: "Storage Write API has 3 stream types: default (at-least-once, cheap), buffered (exactly-once, flushed on commit), pending (exactly-once, atomic batch commit)." },
+  { id: 10, topic: "BigQuery", difficulty: "advanced", companies: ["Stripe", "Goldman Sachs"],
+    question: "How would you implement row-level and column-level security in BigQuery?",
+    answer: "Column-level: attach policy tags from Data Catalog to columns; grant fine-grained reader role on the policy tag. Row-level: CREATE ROW ACCESS POLICY <name> ON <table> GRANT TO ('group:x@co') FILTER USING (region = 'EMEA'). Audit via INFORMATION_SCHEMA.ROW_ACCESS_POLICIES.",
+    explanation: "Senior expectation: combine with authorized views / authorized datasets when sharing across projects." },
+  { id: 11, topic: "BigQuery", difficulty: "professional", companies: ["Google", "Netflix"],
+    question: "A query suddenly takes 10x longer. How do you debug it?",
+    answer: "Open the Query Plan tab → look at stage timing, shuffled bytes, slot utilization. Check INFORMATION_SCHEMA.JOBS for total_slot_ms, total_bytes_processed, error_result. Compare with previous runs. Common causes: data skew on JOIN key, missing partition filter (full scan), recently dropped clustering, schema change, slot contention from another workload, hot partition.",
+    explanation: "Mention reservations: contention on shared slots is a frequent silent regression." },
+  { id: 12, topic: "BigQuery", difficulty: "intermediate", companies: C_IND,
+    question: "What is denormalization and why is it preferred in BigQuery?",
+    answer: "Combining related tables into a single wide table (often with STRUCT/ARRAY columns) to avoid JOINs. BigQuery's columnar engine handles wide tables efficiently; JOINs across huge tables trigger expensive shuffles. Nested+repeated fields preserve the relational meaning without join cost.",
+    explanation: "Show RECORD/REPEATED example: orders table with items ARRAY<STRUCT<sku, qty, price>>." },
+  { id: 13, topic: "BigQuery", difficulty: "advanced", companies: ["Uber", "Airbnb"],
+    question: "Explain UNNEST in BigQuery.",
+    answer: "UNNEST flattens an ARRAY column into rows, allowing you to join nested values back to the parent. Syntax: SELECT o.order_id, i.sku FROM orders o, UNNEST(o.items) AS i WHERE i.qty > 1.",
+    explanation: "It's a CROSS JOIN against the array; key technique for working with nested+repeated schemas." },
+  { id: 14, topic: "BigQuery", difficulty: "intermediate", companies: C_IND,
+    question: "What are window functions and give a BigQuery example.",
+    answer: "Functions that compute a value across a row set related to the current row without collapsing rows. Example: SELECT user_id, event_ts, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_ts DESC) AS rn FROM events — gives the most recent event per user with rn = 1.",
+    explanation: "Window funcs are the BigQuery-idiomatic way to do top-N per group, sessionization, running totals." },
+  { id: 15, topic: "BigQuery", difficulty: "advanced", companies: ["Netflix", "Uber"],
+    question: "How do you sessionize events in BigQuery?",
+    answer: "Use LAG to compute time gap, mark a new session when gap > threshold, then SUM the indicator over a window to get a session_id: WITH t AS (SELECT user_id, ts, TIMESTAMP_DIFF(ts, LAG(ts) OVER w, MINUTE) AS gap FROM events WINDOW w AS (PARTITION BY user_id ORDER BY ts)) SELECT user_id, ts, SUM(CASE WHEN gap > 30 OR gap IS NULL THEN 1 ELSE 0 END) OVER (PARTITION BY user_id ORDER BY ts) AS session_id FROM t.",
+    explanation: "Classic gap-and-island pattern; very common interview question." },
+  { id: 16, topic: "BigQuery", difficulty: "professional", companies: ["Google"],
+    question: "What is BigLake?",
+    answer: "A storage engine that unifies data lakes (GCS, S3, Azure Blob) and warehouses by exposing them as BigLake tables with fine-grained security, governance, and ACID via Iceberg/Delta/Hudi. Lets BigQuery, Spark, Trino query the same files with consistent permissions.",
+    explanation: "Solves the 'two copies of data' problem: lakehouse without copying out of GCS." },
+  { id: 17, topic: "BigQuery", difficulty: "advanced", companies: ["Walmart Labs"],
+    question: "How do you handle late-arriving facts in a BigQuery warehouse?",
+    answer: "Partition fact tables by event_ts (not ingestion_ts) so late events land in correct partition. Use MERGE on (event_id, event_date). For dimension lookups that may also be late, keep an SCD2 dim and join on the event timestamp to retrieve the dim row valid at event time.",
+    explanation: "Senior point: keep a separate watermark table to know which partitions are still 'open' for late updates." },
+
+  // ---------------- Dataflow / Beam ----------------
+  { id: 18, topic: "Dataflow", difficulty: "beginner", companies: C_IND,
+    question: "What is Dataflow and Apache Beam?",
+    answer: "Apache Beam is a unified batch+streaming programming model. Dataflow is Google's serverless, autoscaling runner for Beam pipelines. You write the pipeline once (Java/Python/Go), and Dataflow handles workers, autoscaling, shuffling, and exactly-once semantics.",
+    explanation: "Beam = model; Dataflow = managed runner. Other runners: Spark, Flink, Direct." },
+  { id: 19, topic: "Dataflow", difficulty: "intermediate", companies: ["Google", "Stripe"],
+    question: "Explain PCollection, PTransform, and DoFn.",
+    answer: "PCollection = distributed, immutable dataset (bounded or unbounded). PTransform = operation applied to a PCollection that returns one or more PCollections. DoFn = element-wise processing function used inside ParDo, with lifecycle methods (setup, startBundle, processElement, finishBundle, teardown).",
+    explanation: "DoFn lifecycle matters for resource init — open DB connections in setup, not processElement." },
+  { id: 20, topic: "Dataflow", difficulty: "advanced", companies: C_FAANG,
+    question: "Windowing strategies in Beam — name and explain.",
+    answer: "Fixed (tumbling): non-overlapping equal-duration windows. Sliding: overlapping windows of fixed size and period. Session: windows close after a gap of inactivity (key-based). Global: a single window for the whole pipeline (default for batch).",
+    explanation: "Session windows are key for user-activity analytics; pair with EventTime triggers." },
+  { id: 21, topic: "Dataflow", difficulty: "advanced", companies: ["Google"],
+    question: "Difference between event time and processing time. Why does it matter?",
+    answer: "Event time = when the event actually happened (encoded in payload). Processing time = when Dataflow processes it. They differ due to network/buffering delay. Streaming aggregations should use event time so windowed results are correct even when events arrive late or out of order. Use watermarks + triggers to decide when to emit.",
+    explanation: "Watermark = Dataflow's estimate of 'we've seen all events with timestamp <= X'." },
+  { id: 22, topic: "Dataflow", difficulty: "advanced", companies: ["Netflix", "Uber"],
+    question: "What is a watermark and what are triggers?",
+    answer: "Watermark: a monotonic estimate of event-time progress; tells the runner that no more events with smaller timestamp are expected. Trigger: rule that decides when a window's result is emitted — default fires at watermark; AfterProcessingTime, AfterCount, AfterWatermark with allowed lateness, repeated triggers for refinements.",
+    explanation: "Combine: AfterWatermark.withEarlyFirings(AfterProcessingTime.pastFirstElementInPane().plusDelayOf(1 min)) for incremental low-latency results plus a final on-time pane." },
+  { id: 23, topic: "Dataflow", difficulty: "intermediate", companies: ["Stripe", "Goldman Sachs"],
+    question: "How does Dataflow handle exactly-once?",
+    answer: "Source: deterministic record IDs (Pub/Sub message_id) deduplicated by the runner. Shuffle: checkpointed, idempotent writes. Sink: idempotent writers (e.g., BigQuery Storage Write API in pending mode, GCS file finalization is atomic). End-to-end exactly-once requires source + sink to cooperate; Dataflow gives exactly-once within the pipeline by default.",
+    explanation: "Caveat: side effects in DoFns (HTTP calls) are at-least-once unless made idempotent." },
+  { id: 24, topic: "Dataflow", difficulty: "advanced", companies: ["Google", "Uber"],
+    question: "What is Dataflow Shuffle service?",
+    answer: "A managed, serverless shuffle that offloads intermediate data from worker VMs to a separate service. Frees worker memory/disk, enables faster autoscaling and worker restart without redoing work. Default for new Dataflow batch jobs.",
+    explanation: "Streaming Engine is the streaming equivalent — moves windowing state out of workers." },
+  { id: 25, topic: "Dataflow", difficulty: "professional", companies: ["Google"],
+    question: "How do you tune a slow Dataflow pipeline?",
+    answer: "Check the Dataflow UI: look for stages with high wall time, high system lag (streaming), or skew. Common fixes: (1) increase max workers, (2) use larger machine types or n2 SSD for shuffle, (3) fuse hot keys via Combine.perKey vs GroupByKey, (4) use combiner lifting / withFanout for skewed keys, (5) use Streaming Engine, (6) checkpoint state size, (7) ensure sources/sinks aren't the bottleneck (Pub/Sub backlog, BQ quota).",
+    explanation: "Combine.perKey is dramatically cheaper than GBK followed by reduce when associative." },
+
+  // ---------------- Pub/Sub ----------------
+  { id: 26, topic: "Pub/Sub", difficulty: "beginner", companies: C_IND,
+    question: "What is Cloud Pub/Sub?",
+    answer: "A globally distributed, durable, at-least-once messaging service. Publishers send messages to a topic; one or more subscriptions deliver messages to subscribers. Decouples producers from consumers, used as the backbone for event streams, change data capture, and triggering serverless workloads.",
+    explanation: "Delivery: at-least-once by default; exactly-once delivery option per subscription (2022)." },
+  { id: 27, topic: "Pub/Sub", difficulty: "intermediate", companies: ["Google", "Stripe"],
+    question: "Difference between pull and push subscriptions?",
+    answer: "Pull: subscriber actively calls Pull/StreamingPull; better throughput, you control flow control, lets you scale consumers independently. Push: Pub/Sub sends messages via HTTPS to an endpoint (Cloud Run, Cloud Functions); simpler but limited by endpoint throughput and requires HTTPS with valid cert.",
+    explanation: "Push is great for serverless triggers; pull for high-throughput streaming consumers." },
+  { id: 28, topic: "Pub/Sub", difficulty: "advanced", companies: ["Google", "Netflix"],
+    question: "How does message ordering work in Pub/Sub?",
+    answer: "Enable 'message ordering' on the subscription and publish with an orderingKey. Pub/Sub delivers messages with the same orderingKey in the order they were published, within a region. Without orderingKey, no ordering guarantee.",
+    explanation: "Trade-off: ordering reduces throughput for that key — a single subscriber processes that key serially." },
+  { id: 29, topic: "Pub/Sub", difficulty: "advanced", companies: ["Stripe"],
+    question: "How do you guarantee exactly-once processing with Pub/Sub?",
+    answer: "Enable exactly-once delivery on the subscription (single region only). Combined with idempotent consumer logic and storage of processed message_id, you get effective exactly-once. With Dataflow, the runner deduplicates via message_id automatically.",
+    explanation: "True exactly-once across the stack requires idempotent sink writes." },
+  { id: 30, topic: "Pub/Sub", difficulty: "intermediate", companies: C_IND,
+    question: "What is a dead-letter topic?",
+    answer: "A topic that receives messages a subscription has failed to ack after N delivery attempts. Configured on the subscription with max_delivery_attempts. Used to inspect poison messages without blocking the main pipeline.",
+    explanation: "Always pair with monitoring on the DLQ topic — silent DLQs hide upstream bugs." },
+
+  // ---------------- Dataproc / Spark ----------------
+  { id: 31, topic: "Dataproc", difficulty: "beginner", companies: C_IND,
+    question: "What is Dataproc?",
+    answer: "Managed Hadoop/Spark/Flink/Presto service on GCP. Lets you spin up clusters in ~90s, run jobs, and tear them down. Supports ephemeral clusters per job (cheaper) or long-running.",
+    explanation: "Dataproc Serverless (Spark) removes cluster management entirely — submit Spark batch and Spark SQL without provisioning." },
+  { id: 32, topic: "Dataproc", difficulty: "intermediate", companies: ["Walmart Labs", "Uber"],
+    question: "When to use Dataproc vs Dataflow?",
+    answer: "Dataproc: lift-and-shift existing Spark/Hadoop code, ecosystem libraries (HBase, Hive, Spark MLlib). Dataflow: greenfield batch+streaming with autoscaling and exactly-once. Dataflow is more serverless and unified; Dataproc gives you the OSS ecosystem.",
+    explanation: "Choose Dataproc for migration, Dataflow for new pipelines." },
+  { id: 33, topic: "Dataproc", difficulty: "advanced", companies: ["Netflix"],
+    question: "How do you make a Dataproc cluster cost-efficient?",
+    answer: "(1) Use ephemeral clusters per job, (2) Preemptible / Spot VMs for workers (up to 80% cheaper), (3) Autoscaling policies, (4) Custom images to skip init time, (5) Persistent External Hive metastore (Dataproc Metastore) so clusters stay stateless, (6) Right-size machine types, (7) Use Dataproc Serverless when no custom infra needed.",
+    explanation: "Spot VMs require resilient jobs — Spark handles task retries; HDFS NameNode should not run on preemptibles." },
+
+  // ---------------- Composer / Airflow ----------------
+  { id: 34, topic: "Composer", difficulty: "beginner", companies: C_IND,
+    question: "What is Cloud Composer?",
+    answer: "Managed Apache Airflow on GCP. Provides web UI, scheduler, workers, and metadata DB out of the box. Pipelines defined as Python DAGs.",
+    explanation: "Composer 2 runs on GKE Autopilot; Composer 3 (preview) is even more serverless." },
+  { id: 35, topic: "Composer", difficulty: "intermediate", companies: C_IND,
+    question: "Explain DAG, Task, Operator in Airflow.",
+    answer: "DAG: Directed Acyclic Graph of tasks with schedule and dependencies. Task: instance of an Operator with parameters. Operator: template defining what work to do (BigQueryInsertJobOperator, DataflowStartFlexTemplateOperator, BashOperator, PythonOperator).",
+    explanation: "TaskGroup organizes UI; Sensor is a special Operator that waits for a condition." },
+  { id: 36, topic: "Composer", difficulty: "advanced", companies: ["Stripe"],
+    question: "Idempotency in Airflow tasks — why and how?",
+    answer: "Airflow retries failed tasks; non-idempotent tasks cause duplicates. Make tasks idempotent: use MERGE not INSERT, write to date-partitioned paths keyed by execution_date, use WRITE_TRUNCATE on partition, register external job IDs derived from run_id.",
+    explanation: "Use {{ ds }} / {{ ts }} macros for deterministic naming." },
+
+  // ---------------- Cloud Storage ----------------
+  { id: 37, topic: "Cloud Storage", difficulty: "beginner", companies: C_IND,
+    question: "Storage classes in GCS and when to use each?",
+    answer: "Standard (frequently accessed), Nearline (1x/month, 30d min), Coldline (1x/quarter, 90d min), Archive (1x/year, 365d min). Lower class = cheaper storage, higher retrieval cost and min duration.",
+    explanation: "Use Object Lifecycle Management to auto-transition objects by age." },
+  { id: 38, topic: "Cloud Storage", difficulty: "intermediate", companies: ["Google", "Walmart Labs"],
+    question: "How to design a data lake on GCS?",
+    answer: "Bucket-per-zone: raw / curated / consumption. Use Parquet/ORC for analytics, with date= partitioning in the path (event_date=2026-05-24/). Apply Object Lifecycle for tiering, retention policies for compliance, CMEK for encryption, IAM at bucket+folder level via uniform bucket-level access. Catalog via Dataplex.",
+    explanation: "Avoid millions of tiny files — they explode list latency and query overhead. Compact regularly." },
+  { id: 39, topic: "Cloud Storage", difficulty: "advanced", companies: ["Stripe"],
+    question: "What is requester-pays and when do you use it?",
+    answer: "A bucket setting that charges egress/operation costs to the project of the requester instead of the bucket owner. Used when distributing public datasets or shared data where the owner doesn't want to pay for consumer access.",
+    explanation: "Requesters must include billing project in the request (-u flag in gsutil)." },
+
+  // ---------------- IAM / Security ----------------
+  { id: 40, topic: "Security", difficulty: "intermediate", companies: C_FIN,
+    question: "Explain IAM roles, service accounts, and least-privilege on GCP.",
+    answer: "IAM grants Principals (users, groups, service accounts) Roles (sets of permissions) on Resources. Use predefined roles like roles/bigquery.dataEditor; create custom roles when granularity is needed. Service accounts are non-human identities used by workloads; impersonation > key downloads.",
+    explanation: "Least privilege: grant on lowest scope possible (dataset > project), avoid Owner/Editor at project level." },
+  { id: 41, topic: "Security", difficulty: "advanced", companies: C_FIN,
+    question: "How do you encrypt data at rest on GCP and what is CMEK?",
+    answer: "All GCS/BQ/PD data is encrypted at rest by default with Google-managed keys (GMEK). CMEK = Customer-Managed Encryption Keys stored in Cloud KMS; you control rotation, destruction, and access. CSEK = customer-supplied keys, you bring your own AES-256 keys (rare).",
+    explanation: "Compliance requirement: CMEK gives auditable key lifecycle, integrates with HSM (Cloud HSM)." },
+  { id: 42, topic: "Security", difficulty: "advanced", companies: ["Google", "Goldman Sachs"],
+    question: "What is VPC Service Controls?",
+    answer: "A perimeter that prevents data exfiltration from managed services (GCS, BQ, Pub/Sub). Defines which projects can communicate with each other and from which IP ranges/identities. Blocks even authorized users from copying data outside the perimeter.",
+    explanation: "Combine with Private Google Access + Access Context Manager for full data-perimeter defense." },
+
+  // ---------------- Modeling / Architecture ----------------
+  { id: 43, topic: "Modeling", difficulty: "intermediate", companies: C_IND,
+    question: "Star schema vs Snowflake schema. Which works better in BigQuery?",
+    answer: "Star: one fact table joined to denormalized dimensions. Snowflake: dimensions are further normalized into sub-dimensions. BigQuery prefers wide denormalized tables (even flatter than star) using STRUCT/ARRAY because JOINs are expensive at scale.",
+    explanation: "Snowflake is rare in BQ; if used, ensure dim joins are small enough to broadcast." },
+  { id: 44, topic: "Modeling", difficulty: "advanced", companies: ["Walmart Labs"],
+    question: "Design a data warehouse for a real-time e-commerce analytics dashboard on GCP.",
+    answer: "Ingest: app events → Pub/Sub → Dataflow (streaming) → BigQuery (Storage Write API, partition by event_date, cluster by user_id). Operational data: Cloud SQL → Datastream (CDC) → BigQuery raw. Transform: Dataform / dbt scheduled queries to build curated marts. Serve: Looker / Looker Studio over BigQuery + BI Engine for sub-second dashboards.",
+    explanation: "Add: schema registry on Pub/Sub for evolution; DLQ topic for bad messages." },
+  { id: 45, topic: "Modeling", difficulty: "professional", companies: ["Netflix", "Uber"],
+    question: "Lambda vs Kappa architecture — which would you pick on GCP?",
+    answer: "Lambda: parallel batch + speed layer, two codebases. Kappa: single streaming pipeline, batch is just a replay. On GCP, Kappa is preferred because Beam unifies batch+stream, Pub/Sub retains messages, and BigQuery handles both batched and streamed inserts uniformly.",
+    explanation: "Kappa drawback: reprocessing historical data needs source retention (Pub/Sub Snapshots, GCS archive)." },
+
+  // ---------------- Performance ----------------
+  { id: 46, topic: "Performance", difficulty: "intermediate", companies: C_IND,
+    question: "Why is SELECT * bad in BigQuery?",
+    answer: "Columnar storage means each column is a separate file. SELECT * reads every column → maximum bytes scanned → maximum cost. Always project only the columns you need.",
+    explanation: "Easy interview win — always explicitly list columns." },
+  { id: 47, topic: "Performance", difficulty: "advanced", companies: ["Google"],
+    question: "Your BigQuery query says it scanned 5 TB but the table is only 200 GB. Why?",
+    answer: "Multiple reasons: querying a partitioned view with no partition filter on the underlying tables; cross joining; UNION ALL across many tables (use wildcard with _TABLE_SUFFIX); window function over the entire table; expensive UDFs that prevent pruning; outer query removes partition pruning of inner.",
+    explanation: "Check the EXPLAIN/Execution Details; total bytes processed is the source of truth." },
+  { id: 48, topic: "Performance", difficulty: "advanced", companies: ["Stripe"],
+    question: "How do you handle data skew on a JOIN key in BigQuery?",
+    answer: "(1) Pre-aggregate skewed keys before JOIN; (2) Salt the skewed key (append random N) and JOIN on (key, salt) plus a CROSS JOIN UNNEST(GENERATE_ARRAY(0,N-1)) on the small side; (3) Broadcast join the small side; (4) Filter NULLs separately.",
+    explanation: "Hot-key skew shows as one stage where wait time >> active time in the plan." },
+
+  // ---------------- CDC / Streaming ingest ----------------
+  { id: 49, topic: "CDC", difficulty: "advanced", companies: ["Stripe", "Goldman Sachs"],
+    question: "What is Datastream?",
+    answer: "Serverless CDC service that streams changes from MySQL/PostgreSQL/Oracle/SQL Server to BigQuery, GCS, or Spanner with low latency. Uses native DB logs (binlog, redo log).",
+    explanation: "Datastream → BigQuery handles MERGE automatically into a target table for near-real-time replication." },
+  { id: 50, topic: "CDC", difficulty: "professional", companies: ["Uber", "Airbnb"],
+    question: "Design a CDC pipeline from MySQL to BigQuery with sub-minute freshness.",
+    answer: "MySQL binlog → Datastream → Pub/Sub or direct to BigQuery. Stage raw changes into a CDC table partitioned by change_ts. A scheduled BigQuery MERGE every minute applies inserts/updates/deletes into the analytical target table, using SCD2 if history is needed.",
+    explanation: "Alternative: Datastream→GCS→Dataflow→BQ if you need transformations in flight." },
+
+  // ---------------- Cost / Governance ----------------
+  { id: 51, topic: "Cost", difficulty: "intermediate", companies: ["Stripe", "Walmart Labs"],
+    question: "How do you set up cost controls in BigQuery?",
+    answer: "(1) Project-level + user-level custom query quotas (max bytes billed/day), (2) Reservations with slots assignment, (3) Labels on queries/datasets to attribute spend via Billing export to BigQuery, (4) Budget alerts in Billing, (5) Require partition filter on tables (require_partition_filter = TRUE).",
+    explanation: "require_partition_filter is the simplest guard against runaway full scans." },
+  { id: 52, topic: "Governance", difficulty: "advanced", companies: ["Goldman Sachs"],
+    question: "What is Dataplex?",
+    answer: "Unified data governance and management layer across GCS, BQ, and lakes. Lakes → zones → assets. Provides automatic discovery, metadata harvesting, data quality, lineage, and policy enforcement.",
+    explanation: "Replaces stitching together Data Catalog + manual lineage; integrates with Dataform and BigLake." },
+
+  // ---------------- Coding / SQL practical ----------------
+  { id: 53, topic: "SQL Practical", difficulty: "intermediate", companies: ["Google", ...C_IND],
+    question: "Write a BigQuery query for the 2nd highest salary per department.",
+    answer: "SELECT department, salary FROM (SELECT department, salary, DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS rk FROM employees) WHERE rk = 2;",
+    explanation: "Use DENSE_RANK to handle ties consistently; RANK leaves gaps; ROW_NUMBER picks one arbitrarily on ties." },
+  { id: 54, topic: "SQL Practical", difficulty: "advanced", companies: ["Uber", "Stripe"],
+    question: "Detect users who placed an order in 3 consecutive months.",
+    answer: "WITH m AS (SELECT user_id, DATE_TRUNC(order_date, MONTH) AS mo FROM orders GROUP BY 1,2), g AS (SELECT user_id, mo, DATE_SUB(mo, INTERVAL DENSE_RANK() OVER (PARTITION BY user_id ORDER BY mo) MONTH) AS grp FROM m) SELECT user_id FROM g GROUP BY user_id, grp HAVING COUNT(*) >= 3;",
+    explanation: "Classic gap-and-island: subtracting a sequence from the actual month groups consecutive months into the same bucket." },
+  { id: 55, topic: "SQL Practical", difficulty: "advanced", companies: ["Netflix"],
+    question: "Calculate 7-day rolling DAU.",
+    answer: "SELECT day, COUNT(DISTINCT user_id) OVER (ORDER BY UNIX_DATE(day) RANGE BETWEEN 6 PRECEDING AND CURRENT ROW) AS dau_7d FROM (SELECT DISTINCT DATE(event_ts) AS day, user_id FROM events);",
+    explanation: "BigQuery supports COUNT(DISTINCT) inside a window via APPROX_COUNT_DISTINCT for performance; exact count requires self-join." },
+
+  // ---------------- Bigtable / Spanner / Firestore ----------------
+  { id: 56, topic: "Bigtable", difficulty: "intermediate", companies: ["Google", "Stripe"],
+    question: "When to use Cloud Bigtable?",
+    answer: "Wide-column NoSQL, petabyte scale, single-digit ms latency at scale. Use for time-series (IoT, financial ticks), user profile storage, fraud detection feature serving, ad-tech click streams. Single-row ACID only; no SQL.",
+    explanation: "Key design is critical: sequential keys → hot tablets. Use reversed timestamps or salted keys." },
+  { id: 57, topic: "Spanner", difficulty: "advanced", companies: ["Google", "Stripe"],
+    question: "What is Cloud Spanner and how does it scale?",
+    answer: "Globally distributed, strongly consistent, horizontally scalable relational DB with SQL and ACID. Uses TrueTime (atomic clocks + GPS) for external consistency. Tables are sharded into splits across nodes automatically; interleaved tables keep parent-child rows co-located.",
+    explanation: "Trade-off: more expensive per node than Cloud SQL, but only system that gives strong consistency at multi-region scale." },
+  { id: 58, topic: "Spanner", difficulty: "professional", companies: ["Google"],
+    question: "How do you avoid hotspots in Spanner?",
+    answer: "Don't use monotonically increasing keys (timestamp, AUTO_INCREMENT). Use UUIDv4, hash a column, or reverse a timestamp. Interleave child tables under parent for locality. Monitor with split metrics.",
+    explanation: "Spanner shards by lexical key range — sequential writes go to one split." },
+
+  // ---------------- Looker / Analytics ----------------
+  { id: 59, topic: "Looker", difficulty: "intermediate", companies: ["Stripe", "Walmart Labs"],
+    question: "What is LookML?",
+    answer: "Looker's modeling language; defines dimensions, measures, joins, derived tables as code. Lets analysts produce explores that business users query via the Looker UI without writing SQL. Version-controlled in git.",
+    explanation: "LookML decouples semantic layer from BI tool — single source of truth for metric definitions." },
+
+  // ---------------- ETL/ELT philosophy ----------------
+  { id: 60, topic: "Philosophy", difficulty: "intermediate", companies: C_IND,
+    question: "ETL vs ELT — which fits BigQuery and why?",
+    answer: "ELT: extract, load raw data into BigQuery, transform inside it using SQL/dbt/Dataform. BigQuery's serverless compute makes in-warehouse transforms cheap and parallel. ETL (transform-before-load) made sense when warehouses had fixed, expensive compute; in cloud DWs ELT is now standard.",
+    explanation: "Modern stack: Fivetran/Datastream/Airbyte (EL) + dbt/Dataform (T) on BigQuery." },
+
+  // ---------------- Dataform / dbt ----------------
+  { id: 61, topic: "Dataform", difficulty: "intermediate", companies: ["Google"],
+    question: "What is Dataform?",
+    answer: "GCP-native, dbt-like SQL workflow tool. Define tables as SQLX files (SELECT statements with config), declare dependencies via ${ref(\"x\")}, schedule via Cloud Composer or Dataform's own scheduler. Native lineage and assertions.",
+    explanation: "Reduces glue code; in 2023+ recommended over Apache Beam for SQL-only transformations." },
+
+  // ---------------- Misc / scenario ----------------
+  { id: 62, topic: "Scenario", difficulty: "advanced", companies: ["Walmart Labs"],
+    question: "Design a pipeline that aggregates 1B clicks/day into hourly user-level features.",
+    answer: "Click producers → Pub/Sub (sharded) → Dataflow streaming with hourly tumbling windows, COMBINE per user_id (associative aggregates: clicks, distinct domains via HLL++). Output to BigQuery clustered by user_id, partitioned by hour. Use Streaming Engine, autoscale to handle traffic spikes. Backup raw events to GCS for replay.",
+    explanation: "HLL++ for distinct counts keeps state size manageable for billion-key aggregates." },
+  { id: 63, topic: "Scenario", difficulty: "professional", companies: ["Netflix"],
+    question: "Your nightly Dataflow batch job is failing intermittently after running 4 hours. How do you debug?",
+    answer: "Check Dataflow logs (worker logs in Cloud Logging) — look for OOMs, container restarts, sink quota errors (BQ insert quotas). Inspect the failing stage in UI: skew, throughput. Add metrics + dead-letter side outputs for bad records. Reduce blast radius with --enableStreamingEngine and --diskSizeGb. Consider chunking the job by partition.",
+    explanation: "Senior expectation: design for resumability — partition by date so retry only re-runs the failed slice." },
+
+  // ---------------- Quick-fire conceptual ----------------
+  { id: 64, topic: "Concepts", difficulty: "beginner", companies: C_IND,
+    question: "Difference between OLTP and OLAP?",
+    answer: "OLTP: row-store, small txns, high concurrency, ms latency (Cloud SQL, Spanner). OLAP: column-store, large scans, low concurrency, optimized for aggregations (BigQuery, BigLake).",
+    explanation: "GCP map: OLTP → Cloud SQL/Spanner; OLAP → BigQuery; hybrid OLTP+light analytics → AlloyDB." },
+  { id: 65, topic: "Concepts", difficulty: "intermediate", companies: C_IND,
+    question: "What is a fact and a dimension?",
+    answer: "Fact: measurable event with foreign keys to dims (e.g., orders, page_views). Dimension: descriptive attributes (user, product, date, geography). Facts are large and additive; dimensions are smaller and descriptive.",
+    explanation: "Date dimension is special: pre-built calendar table joined to ts." },
+  { id: 66, topic: "Concepts", difficulty: "intermediate", companies: C_IND,
+    question: "What are SCD types?",
+    answer: "Type 0: never changes. Type 1: overwrite. Type 2: keep history with valid_from/valid_to/is_current. Type 3: keep previous value in a separate column. Type 4: history table. Type 6: hybrid of 1+2+3.",
+    explanation: "Type 2 is the default for analytical history." },
+  { id: 67, topic: "Concepts", difficulty: "beginner", companies: C_IND,
+    question: "What is a data lake vs data warehouse vs lakehouse?",
+    answer: "Lake: raw files in object storage, any format, schema-on-read (GCS). Warehouse: curated structured tables, schema-on-write (BigQuery). Lakehouse: lake storage + warehouse semantics (BigLake/Iceberg) — ACID, schema, governance on files.",
+    explanation: "Lakehouse goal: avoid the two-copy problem and let multiple engines query the same files securely." },
+
+  // ---------------- DLP / privacy ----------------
+  { id: 68, topic: "Privacy", difficulty: "advanced", companies: ["Stripe", "Goldman Sachs"],
+    question: "How would you mask PII in a BigQuery pipeline?",
+    answer: "(1) Use Cloud DLP to inspect+de-identify (format-preserving encryption, masking) on ingest, (2) For static tables, use Authorized Views that exclude PII columns, (3) Column-level security with policy tags, (4) Hash with HMAC and a Cloud KMS-protected key for joinable pseudo-IDs.",
+    explanation: "Senior nuance: salt/key rotation policy and access logs on the key." },
+
+  // ---------------- Vertex / ML ----------------
+  { id: 69, topic: "ML", difficulty: "intermediate", companies: C_FAANG,
+    question: "What is BigQuery ML?",
+    answer: "Run ML training and prediction with SQL inside BigQuery. Supports linear/logistic regression, k-means, matrix factorization, boosted trees, ARIMA+, AutoML, DNN, and import of TensorFlow / ONNX / XGBoost models. CREATE MODEL ... AS SELECT ...; ML.PREDICT.",
+    explanation: "Killer feature: train on a billion-row table without moving data." },
+  { id: 70, topic: "ML", difficulty: "advanced", companies: ["Google"],
+    question: "How would you serve features for online inference?",
+    answer: "Vertex AI Feature Store (managed) or self-built: stream features via Dataflow into Bigtable (low-latency lookup) for online; mirror to BigQuery for offline training. Feature definitions versioned; point-in-time correct joins for training prevent leakage.",
+    explanation: "Vertex AI Feature Store now writes both online (Bigtable-backed) and offline (BigQuery) automatically." },
+
+  // ---------------- More BigQuery deep cuts ----------------
+  { id: 71, topic: "BigQuery", difficulty: "advanced", companies: ["Google"],
+    question: "What is a wildcard table and _TABLE_SUFFIX?",
+    answer: "Wildcard table queries: SELECT * FROM `proj.dataset.events_*` WHERE _TABLE_SUFFIX BETWEEN '20240101' AND '20240131'. Lets you query many similarly-named tables in one statement. _TABLE_SUFFIX is a pseudo-column for filtering which tables match.",
+    explanation: "Modern preference: a single partitioned table. Wildcards are legacy patterns from before native partitioning." },
+  { id: 72, topic: "BigQuery", difficulty: "intermediate", companies: C_IND,
+    question: "Difference between APPROX_COUNT_DISTINCT and COUNT(DISTINCT)?",
+    answer: "APPROX_COUNT_DISTINCT uses HyperLogLog++ — bounded memory, ~1% error, much faster on huge cardinalities. COUNT(DISTINCT) is exact but expensive (requires shuffle of all distinct values).",
+    explanation: "Use APPROX for dashboards on > 100M rows where 1% error is acceptable." },
+  { id: 73, topic: "BigQuery", difficulty: "advanced", companies: ["Google", "Uber"],
+    question: "What is BI Engine?",
+    answer: "In-memory caching layer for BigQuery. Reserved memory holds hot partitions; subsequent queries on cached data complete in <1s with no slot consumption.",
+    explanation: "Best for dashboard queries on small-to-medium aggregated tables — Looker Studio integration is automatic." },
+  { id: 74, topic: "BigQuery", difficulty: "professional", companies: ["Google"],
+    question: "Explain BigQuery's tree architecture (Dremel).",
+    answer: "A query is parsed into a multi-stage execution tree. The root coordinates leaves (workers) that scan storage in parallel; intermediate nodes shuffle and aggregate. Each stage's output streams into the next. This MPP design plus columnar I/O gives the speed.",
+    explanation: "Slots map to stage workers; total_slot_ms = slots * wall time across stages." },
+
+  // ---------------- Dataflow deep ----------------
+  { id: 75, topic: "Dataflow", difficulty: "advanced", companies: ["Google"],
+    question: "What is a side input?",
+    answer: "A small auxiliary PCollection broadcast to every worker of the main PCollection's ParDo. Used for lookup tables and config that doesn't fit through normal flow.",
+    explanation: "Use sparingly; side inputs are materialized per-window — large ones eat memory." },
+  { id: 76, topic: "Dataflow", difficulty: "advanced", companies: ["Stripe"],
+    question: "Difference between Combine.perKey and GroupByKey.then reduce?",
+    answer: "Combine.perKey performs partial aggregation on the mapper side before shuffle (combiner lifting). GroupByKey shuffles ALL values for a key, then you reduce on the receiver — much more network traffic.",
+    explanation: "Always prefer Combine when the operation is associative+commutative (sum, count, min, max, HLL)." },
+
+  // ---------------- Pub/Sub deep ----------------
+  { id: 77, topic: "Pub/Sub", difficulty: "advanced", companies: ["Google"],
+    question: "What is a Pub/Sub snapshot?",
+    answer: "Captures a subscription's ack state at a point in time. Lets you seek a subscription back to that snapshot to reprocess messages — useful for pipeline bug recovery without re-publishing.",
+    explanation: "Snapshots have a 7-day retention by default." },
+  { id: 78, topic: "Pub/Sub", difficulty: "professional", companies: ["Netflix"],
+    question: "How do you handle a Pub/Sub backlog spike of 100M messages?",
+    answer: "Increase subscriber concurrency (Dataflow worker count or push endpoint scale). Use StreamingPull with high flow control limits. Temporarily switch to a larger machine type. If the consumer is slow, add a fan-out: Pub/Sub → multiple shard subscriptions → parallel downstream sinks. Monitor undelivered count metric.",
+    explanation: "Keep ack deadline > processing time + buffer; use modifyAckDeadline if you need more time per message." },
+
+  // ---------------- IAM ----------------
+  { id: 79, topic: "Security", difficulty: "intermediate", companies: C_IND,
+    question: "What is workload identity federation?",
+    answer: "Lets external workloads (AWS, Azure, on-prem) impersonate a GCP service account using their native credentials (OIDC/SAML) — no service-account-key download required. Pool maps external identities to GCP roles.",
+    explanation: "Eliminates the #1 GCP key-leak risk." },
+
+  // ---------------- More SQL practical ----------------
+  { id: 80, topic: "SQL Practical", difficulty: "intermediate", companies: C_IND,
+    question: "Find duplicate emails in a users table in BigQuery.",
+    answer: "SELECT email, COUNT(*) AS c FROM users GROUP BY email HAVING c > 1;",
+    explanation: "Follow-up: keep the earliest signup and delete others — use QUALIFY ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at)." },
+  { id: 81, topic: "SQL Practical", difficulty: "advanced", companies: ["Uber"],
+    question: "Median order value per city in BigQuery.",
+    answer: "SELECT city, APPROX_QUANTILES(order_value, 100)[OFFSET(50)] AS median FROM orders GROUP BY city;",
+    explanation: "Exact median: PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY order_value) — but more expensive." },
+  { id: 82, topic: "SQL Practical", difficulty: "advanced", companies: ["Stripe"],
+    question: "Cohort retention: % of users who signed up in month M and were active in month M+N.",
+    answer: "WITH cohort AS (SELECT user_id, DATE_TRUNC(DATE(signup_ts), MONTH) AS cohort_mo FROM users), act AS (SELECT DISTINCT user_id, DATE_TRUNC(DATE(event_ts), MONTH) AS active_mo FROM events) SELECT c.cohort_mo, DATE_DIFF(a.active_mo, c.cohort_mo, MONTH) AS month_n, COUNT(DISTINCT a.user_id) / (SELECT COUNT(*) FROM cohort WHERE cohort_mo = c.cohort_mo) AS retention FROM cohort c JOIN act a USING (user_id) GROUP BY 1,2;",
+    explanation: "Often the trickiest interview SQL — focus on the join key (user_id) and the cohort definition." },
+
+  // ---------------- More architecture ----------------
+  { id: 83, topic: "Architecture", difficulty: "professional", companies: ["Google"],
+    question: "Design end-to-end real-time fraud detection on GCP.",
+    answer: "Transactions → Pub/Sub → Dataflow (streaming) enriches with features from Bigtable / Vertex Feature Store → calls Vertex AI Online Prediction with the model → writes score back to Pub/Sub for downstream consumers and to BigQuery for analytics. Composer for offline retraining nightly. Alerts via Pub/Sub → Cloud Functions → PagerDuty.",
+    explanation: "Key constraints: <100ms p99 score latency, exactly-once for ledger updates." },
+
+  // ---------------- Operations / Monitoring ----------------
+  { id: 84, topic: "Operations", difficulty: "intermediate", companies: ["Stripe"],
+    question: "How do you monitor a data pipeline on GCP?",
+    answer: "Cloud Monitoring dashboards on Dataflow (system lag, throughput, watermark age) and Pub/Sub (undelivered count, oldest unacked age). BigQuery INFORMATION_SCHEMA for query metrics, costs. Alerts via Cloud Monitoring policies → email/PagerDuty. Logs in Cloud Logging with log-based metrics. SLOs in Cloud Monitoring.",
+    explanation: "Senior: define SLOs (e.g., 99% of events processed within 5 min) and alert on burn rate, not on absolute lag." },
+
+  // ---------------- Hands-on commands ----------------
+  { id: 85, topic: "Hands-on", difficulty: "beginner", companies: C_IND,
+    question: "Show the bq command to load a JSON file from GCS into a BigQuery table.",
+    answer: "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect dataset.table gs://bucket/path/file.json",
+    explanation: "Use --schema for production loads; --autodetect is for ad-hoc." },
+  { id: 86, topic: "Hands-on", difficulty: "intermediate", companies: C_IND,
+    question: "How would you schedule a daily BigQuery query?",
+    answer: "Three options: (1) BigQuery scheduled queries (built-in, cron-style), (2) Cloud Composer DAG with BigQueryInsertJobOperator, (3) Dataform with cron release config. Choose Composer when dependencies span systems; scheduled queries for pure SQL.",
+    explanation: "Use service-account based auth and parameterize date with @run_date." },
+
+  // ---------------- Misc ----------------
+  { id: 87, topic: "Networking", difficulty: "advanced", companies: ["Goldman Sachs"],
+    question: "What is Private Google Access and why do you need it?",
+    answer: "Lets VMs without external IPs reach Google APIs (BigQuery, GCS) over Google's private network. Enabled per subnet. Avoids egress through NAT/internet → cheaper, faster, more secure.",
+    explanation: "Combine with VPC SC to restrict which Google services a VPC can talk to at all." },
+  { id: 88, topic: "Architecture", difficulty: "intermediate", companies: C_IND,
+    question: "What is the difference between Cloud Functions and Cloud Run for data jobs?",
+    answer: "Cloud Functions: single-purpose, event-driven, language runtimes, simpler but limited. Cloud Run: any container, HTTP or event-driven (Eventarc), longer max request (60min), more control. For data ETL glue, Cloud Run is more flexible.",
+    explanation: "Cloud Run jobs (batch mode) are great for one-off data processing without a server." },
+  { id: 89, topic: "Architecture", difficulty: "advanced", companies: ["Stripe"],
+    question: "When would you choose Cloud SQL vs Spanner vs AlloyDB?",
+    answer: "Cloud SQL (managed Postgres/MySQL): single-region OLTP, vertical scale, simplest. AlloyDB: Postgres-compatible, 4x faster on OLTP, columnar engine for HTAP, multi-region read replicas. Spanner: global, horizontal, strong consistency, multi-region writes — for planet-scale OLTP.",
+    explanation: "Cost rises Cloud SQL → AlloyDB → Spanner; pick the cheapest that meets scale + consistency requirements." },
+
+  // ---------------- Round 2 of practical SQL ----------------
+  { id: 90, topic: "SQL Practical", difficulty: "intermediate", companies: C_IND,
+    question: "Find the running total of sales per day per region.",
+    answer: "SELECT region, day, SUM(sales) OVER (PARTITION BY region ORDER BY day) AS running_total FROM daily_sales;",
+    explanation: "Frame defaults to RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW with ORDER BY." },
+  { id: 91, topic: "SQL Practical", difficulty: "advanced", companies: ["Uber", "Netflix"],
+    question: "Find the top-3 products by revenue per category.",
+    answer: "SELECT * FROM products QUALIFY ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) <= 3;",
+    explanation: "QUALIFY is BigQuery's idiomatic way to filter on a window result — no need for an inner query." },
+  { id: 92, topic: "SQL Practical", difficulty: "advanced", companies: ["Stripe"],
+    question: "Calculate month-over-month growth %.",
+    answer: "SELECT month, revenue, ROUND(SAFE_DIVIDE(revenue - LAG(revenue) OVER (ORDER BY month), LAG(revenue) OVER (ORDER BY month)) * 100, 2) AS mom_pct FROM monthly_revenue;",
+    explanation: "Use SAFE_DIVIDE to avoid div-by-zero errors at the boundary." },
+
+  // ---------------- DR / multi-region ----------------
+  { id: 93, topic: "DR", difficulty: "professional", companies: ["Goldman Sachs"],
+    question: "How do you design DR for a BigQuery warehouse?",
+    answer: "Use multi-region locations (US, EU) which already replicate across regions. For cross-region DR, schedule a daily CROSS-REGION dataset copy to a secondary region. Snapshot critical tables daily. Use time-travel (7 days) for accidental delete recovery, and table snapshots for longer retention.",
+    explanation: "RPO/RTO targets dictate frequency of cross-region copies (which cost network egress)." },
+
+  // ---------------- Schema design ----------------
+  { id: 94, topic: "Modeling", difficulty: "advanced", companies: ["Walmart Labs"],
+    question: "How would you model a transaction line-items table for ad-hoc analytics in BigQuery?",
+    answer: "Single transactions table partitioned by DATE(tx_ts), clustered by store_id, customer_id. Line items as ARRAY<STRUCT<sku STRING, qty INT64, unit_price NUMERIC, discount NUMERIC>>. Avoids JOIN on line_items and preserves transactional grouping.",
+    explanation: "Mention BIGNUMERIC for currency where NUMERIC precision (38 digits, 9 scale) is insufficient." },
+
+  // ---------------- Cost story ----------------
+  { id: 95, topic: "Cost", difficulty: "advanced", companies: ["Stripe"],
+    question: "Our BQ bill jumped 3x last week. How do you find the cause?",
+    answer: "Query INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION for last 7 days: rank by total_bytes_billed grouped by user, project, label. Look for new scheduled queries, missing partition filters, repeated SELECT *. Compare against historical baseline. Set query quota and require_partition_filter on hot tables.",
+    explanation: "Billing export to BQ dataset is the most reliable way to query historical cost." },
+
+  // ---------------- Mixed / behavioral-tech ----------------
+  { id: 96, topic: "Scenario", difficulty: "professional", companies: ["Google", "Meta"],
+    question: "You inherit a slow nightly ELT taking 6 hours. How do you approach it?",
+    answer: "(1) Map dependency DAG. (2) Profile each step with INFORMATION_SCHEMA timings — find the long tail (often one query). (3) For the bottleneck: check partition pruning, clustering, JOIN strategy, materializing intermediate CTEs. (4) Parallelize independent branches. (5) Replace LAG/window full scans with incremental MERGE on a partitioned target. (6) Use scheduled queries with date params so only the latest partition is reprocessed.",
+    explanation: "Senior framing: 'shrink the work' before 'add compute'." },
+
+  // ---------------- Streaming sinks ----------------
+  { id: 97, topic: "Streaming", difficulty: "advanced", companies: ["Stripe"],
+    question: "How do you stream to BigQuery without hitting quota limits?",
+    answer: "Use Storage Write API (>100MB/s per stream, multiple streams), batch rows in commits, separate streams per partition to keep ordering, and shard high-throughput tables. Watch concurrent-writes-per-table and slots-for-streaming quotas. Use exactly-once with offsets.",
+    explanation: "Avoid the legacy insertAll for >1k rows/sec sustained — quota and cost are worse." },
+
+  // ---------------- Misc orchestration ----------------
+  { id: 98, topic: "Composer", difficulty: "advanced", companies: ["Walmart Labs"],
+    question: "Best practice for DAG file structure in Composer?",
+    answer: "One DAG per file, no business logic at module scope (it runs on every scheduler heartbeat). Use TaskGroups for clarity. Externalize SQL into separate files. Use environment variables / Airflow Variables / Secret Manager for config; never hard-code. Tag DAGs with owner & domain.",
+    explanation: "Heavy import at top level → scheduler CPU saturation; very common pitfall." },
+
+  // ---------------- DLP ----------------
+  { id: 99, topic: "Privacy", difficulty: "advanced", companies: ["Goldman Sachs"],
+    question: "Walk through using Cloud DLP to discover PII in a BQ dataset.",
+    answer: "Create a DLP inspection template (infoTypes: EMAIL_ADDRESS, CREDIT_CARD_NUMBER, etc.). Run a DLP job pointed at the dataset; results land in a BigQuery findings table. Optionally apply de-identification transformations (mask, FPE, tokenization) writing to a sanitized output table. Schedule recurring scans.",
+    explanation: "Tie findings to Data Catalog policy tags automatically for governance enforcement." },
+
+  // ---------------- Final big-picture ----------------
+  { id: 100, topic: "Architecture", difficulty: "professional", companies: ["Google"],
+    question: "Compare BigQuery, Snowflake, and Redshift at a high level.",
+    answer: "BigQuery: serverless, no cluster mgmt, separate storage/compute by default, columnar Capacitor, on-demand or slot reservations, billed per TB scanned. Snowflake: virtual warehouses (clusters) per workload, multi-cloud, billed per credit (compute time). Redshift: AWS-native, cluster-based (RA3 separates storage), serverless option, billed per node-hour or RPU.",
+    explanation: "Strengths: BigQuery = simplest ops + Google ecosystem; Snowflake = workload isolation + multi-cloud; Redshift = tight AWS integration." },
+
+  // ---------------- A few more to break 100 ----------------
+  { id: 101, topic: "BigQuery", difficulty: "intermediate", companies: C_IND,
+    question: "What is a scheduled query in BigQuery?",
+    answer: "Built-in BQ feature to run a SQL query on a cron schedule and write results to a destination table. Supports parameters (@run_date). Managed under Data Transfer Service.",
+    explanation: "Simpler than Composer for SQL-only pipelines; no separate Airflow infra." },
+  { id: 102, topic: "BigQuery", difficulty: "advanced", companies: ["Google"],
+    question: "What is time travel in BigQuery?",
+    answer: "Query a table as it was up to 7 days ago: FOR SYSTEM_TIME AS OF TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR). Used for accidental delete recovery, audit, debugging.",
+    explanation: "Hard limit: 7 days. For longer history, use table snapshots." },
+  { id: 103, topic: "BigQuery", difficulty: "advanced", companies: ["Stripe"],
+    question: "Difference between TABLE SNAPSHOT, CLONE, and COPY?",
+    answer: "SNAPSHOT: read-only point-in-time view; storage cost only for changed bytes (cheap). CLONE: writable copy; storage cost only for diffs (CoW). COPY: full physical copy, full storage cost.",
+    explanation: "Snapshots for backups; clones for safe experimentation; copies for cross-region/project moves." },
+  { id: 104, topic: "Dataflow", difficulty: "intermediate", companies: C_IND,
+    question: "What is a Dataflow template?",
+    answer: "A pre-built, parameterized Dataflow pipeline you can launch without the SDK. Classic templates: pipeline graph + metadata. Flex templates: containerized, more flexible — parameters affect graph construction.",
+    explanation: "Google provides 50+ ready templates (Pub/Sub→BQ, GCS→BQ, JDBC→BQ)." },
+  { id: 105, topic: "Pub/Sub", difficulty: "intermediate", companies: C_IND,
+    question: "What is Pub/Sub Lite and when to use it?",
+    answer: "Zonal, low-cost variant of Pub/Sub with capacity-based pricing (you provision partitions and throughput). Cheaper for high-throughput / low-fan-out workloads. Trade-off: zonal (no multi-region), less feature-rich (no push, no exactly-once).",
+    explanation: "Use for log/metric ingestion at large scale where the standard Pub/Sub price would be prohibitive." },
+];
+
+export const GCP_TOPICS = Array.from(new Set(GCP_BANK.map((q) => q.topic))).sort();
+export const GCP_COMPANIES = Array.from(new Set(GCP_BANK.flatMap((q) => q.companies))).sort();
+
+export function pickGcpQuestion(opts: {
+  askedIds: number[];
+  difficulty?: GcpDifficulty | "any";
+  topic?: string | "any";
+  company?: string | "any";
+}): GcpQuestion {
+  const pool = GCP_BANK.filter((q) => {
+    if (opts.askedIds.includes(q.id)) return false;
+    if (opts.difficulty && opts.difficulty !== "any" && q.difficulty !== opts.difficulty) return false;
+    if (opts.topic && opts.topic !== "any" && q.topic !== opts.topic) return false;
+    if (opts.company && opts.company !== "any" && !q.companies.includes(opts.company)) return false;
+    return true;
+  });
+  const arr = pool.length ? pool : GCP_BANK.filter((q) => !opts.askedIds.includes(q.id));
+  if (!arr.length) return GCP_BANK[Math.floor(Math.random() * GCP_BANK.length)];
+  return arr[Math.floor(Math.random() * arr.length)];
+}
