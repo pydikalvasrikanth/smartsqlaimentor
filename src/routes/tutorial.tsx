@@ -10,14 +10,16 @@ export const Route = createFileRoute("/tutorial")({
       {
         name: "description",
         content:
-          "Learn MySQL visually from basics to advanced: DDL, DML, DCL, TCL, joins, window functions, CTEs, indexes and more — with animated, step-by-step explanations.",
+          "Learn MySQL visually: DDL, DML, joins, window functions, CTEs and indexes with animated, step-by-step explanations.",
       },
       { property: "og:title", content: "MySQL Visual Learning" },
       {
         property: "og:description",
         content: "Interactive, animated MySQL tutorials covering every topic from basics to advanced.",
       },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/tutorial" },
     ],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/tutorial" }],
   }),
   component: TutorialPage,
 });
