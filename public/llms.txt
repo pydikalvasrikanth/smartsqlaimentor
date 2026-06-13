@@ -1,0 +1,13 @@
+# Smart SQL AI Mentor
+
+> AI-powered interview practice for SQL, Python, and GCP Data Engineering with adaptive questions, semantic grading, and visual tutorials.
+
+## Pages
+
+- [Home](/): Pick a subject — SQL, Python, or GCP — and start practicing with an AI mentor.
+- [SQL Practice](/practice): MySQL practice with AI-generated schemas, ERDs, and semantic evaluation across 50-question sessions.
+- [Python Practice](/python): Coding interviews graded by an AI mentor — data structures, algorithms, OOP, system design.
+- [GCP Data Engineer](/gcp): 100+ curated MNC interview questions on BigQuery, Dataflow, Pub/Sub, Composer, IAM and cost optimization.
+- [SQL Engine](/engine): Run, evaluate, and visualize SQL queries with an AI feedback loop.
+- [Tutorials](/tutorial): Interactive, animated MySQL tutorials covering DDL, DML, joins, window functions, CTEs and indexes.
+- [AI Chat](/chat): Chat with an AI mentor and attach images, screenshots, or files for instant answers.

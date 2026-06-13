@@ -10,10 +10,10 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Pick a subject and practice with an AI mentor: SQL, Python, or GCP Data Engineer interview questions from top MNCs." },
       { property: "og:title", content: "Interview Intelligence Engine" },
       { property: "og:description", content: "AI-powered interview practice for SQL, Python and GCP Data Engineering." },
-      { property: "og:url", content: "https://load-all-joy.lovable.app/" },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/" },
     ],
     links: [
-      { rel: "canonical", href: "https://load-all-joy.lovable.app/" },
+      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/" },
     ],
   }),
   component: SubjectPicker,

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/topic/$slug")({
     const topic = TOPIC_BY_SLUG[params.slug];
     const name = topic?.name ?? "Topic";
     const desc = topic?.description ?? "Adaptive MySQL practice on this topic.";
-    const url = `https://clever-sql-coach.lovable.app/topic/${params.slug}`;
+    const url = `https://smartsqlaimentor.lovable.app/topic/${params.slug}`;
     const title = `${name} — SQL practice & mastery`;
     const description = `${desc} Practice ${name} with AI-generated schemas, semantic evaluation, hints, and tier-based mastery progression.`;
     return {

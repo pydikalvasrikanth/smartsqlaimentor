@@ -22,7 +22,11 @@ export const Route = createFileRoute("/chat")({
     meta: [
       { title: "AI Chat — Interview Intelligence" },
       { name: "description", content: "Chat with an AI mentor. Attach images, code screenshots, or files and get instant answers. Generate images on demand." },
+      { property: "og:title", content: "AI Chat — Interview Intelligence" },
+      { property: "og:description", content: "Chat with an AI mentor. Attach images, code screenshots, or files and get instant answers." },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/chat" },
     ],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/chat" }],
   }),
   component: ChatPage,
 });

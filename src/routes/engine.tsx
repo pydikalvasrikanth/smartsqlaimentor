@@ -24,10 +24,10 @@ export const Route = createFileRoute("/engine")({
       { name: "description", content: "Senior data engineering practice: 1000-row dataset, AI text-to-SQL with EXPLAIN, BigQuery shift, data quality dashboard, and advanced labs." },
       { property: "og:title", content: "MySQL Intelligence Engine — AI SQL Lab" },
       { property: "og:description", content: "Text-to-SQL with EXPLAIN, BigQuery shift, data quality checks, and advanced window/CTE/index labs on a realistic dataset." },
-      { property: "og:url", content: "https://clever-sql-coach.lovable.app/engine" },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/engine" },
     ],
     links: [
-      { rel: "canonical", href: "https://clever-sql-coach.lovable.app/engine" },
+      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/engine" },
     ],
     scripts: [
       {
