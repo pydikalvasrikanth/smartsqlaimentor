@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { runSqlEngine } from "@/lib/sql-engine.functions";
+import { ThemeToggle, useTheme } from "@/hooks/use-theme";
 import { ErdDiagram } from "@/components/sql/ErdDiagram";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import {
@@ -51,6 +52,7 @@ type Tab = "preview" | "ai" | "quality" | "lab";
 function EnginePage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
@@ -59,7 +61,7 @@ function EnginePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster theme="dark" position="top-right" richColors />
+      <Toaster theme={theme} position="top-right" richColors />
 
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
@@ -72,9 +74,12 @@ function EnginePage() {
               {TOTAL_ROWS} rows · CUSTOMERS · ORDERS · ORDER_ITEMS
             </p>
           </div>
-          <Link to="/" className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-3 w-3" /> Practice mode
-          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
+            <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-3 w-3" /> Practice mode
+            </Link>
+          </div>
         </div>
         <nav className="max-w-[1400px] mx-auto px-4 flex gap-1 text-xs font-mono">
           <TabBtn active={tab === "preview"} onClick={() => setTab("preview")} icon={<Database className="h-3.5 w-3.5" />}>Data Preview</TabBtn>

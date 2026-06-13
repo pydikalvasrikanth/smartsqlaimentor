@@ -56,6 +56,74 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
+function parseMarkdownTable(text: string): { headers: string[]; rows: string[][] } | null {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const pipeLines = lines.filter((l) => l.startsWith("|"));
+  if (pipeLines.length < 2) return null;
+  const split = (l: string) =>
+    l.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+  const headers = split(pipeLines[0]);
+  const sepIdx = pipeLines.findIndex((l) => /^\|?\s*:?-{2,}/.test(l));
+  const bodyStart = sepIdx >= 0 ? sepIdx + 1 : 1;
+  const rows = pipeLines.slice(bodyStart).map(split);
+  if (!headers.length) return null;
+  return { headers, rows };
+}
+
+function ResultTable({ text }: { text?: string }) {
+  if (!text || !text.trim()) {
+    return (
+      <div className="font-mono text-[11px] bg-background rounded p-3 text-muted-foreground border border-border">—</div>
+    );
+  }
+  const parsed = parseMarkdownTable(text);
+  if (!parsed) {
+    return (
+      <pre className="font-mono text-[11px] bg-background rounded p-3 overflow-auto whitespace-pre-wrap leading-relaxed border border-border text-foreground">
+        {text}
+      </pre>
+    );
+  }
+  const { headers, rows } = parsed;
+  return (
+    <div className="overflow-auto rounded-md border border-border bg-background">
+      <table className="w-full text-[11px] font-mono border-collapse">
+        <thead className="bg-surface-2">
+          <tr>
+            {headers.map((h, i) => (
+              <th
+                key={i}
+                className="text-left px-2.5 py-1.5 font-semibold text-foreground border-b border-border whitespace-nowrap"
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 ? (
+            <tr>
+              <td colSpan={headers.length} className="px-2.5 py-2 text-muted-foreground text-center">
+                No rows
+              </td>
+            </tr>
+          ) : (
+            rows.map((r, ri) => (
+              <tr key={ri} className="odd:bg-background even:bg-surface-2/40 border-t border-border/40">
+                {headers.map((_, ci) => (
+                  <td key={ci} className="px-2.5 py-1 text-foreground/90 whitespace-nowrap">
+                    {r[ci] ?? ""}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Evaluation({ data }: { data: any }) {
   const ok = data?.is_correct;
   const Icon = ok ? CheckCircle2 : XCircle;
@@ -78,15 +146,11 @@ function Evaluation({ data }: { data: any }) {
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Your output</div>
-              <pre className="font-mono text-[11px] bg-background rounded p-3 overflow-auto whitespace-pre-wrap leading-relaxed">
-                {data?.user_result_preview || "—"}
-              </pre>
+              <ResultTable text={data?.user_result_preview} />
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Expected output</div>
-              <pre className="font-mono text-[11px] bg-background rounded p-3 overflow-auto whitespace-pre-wrap leading-relaxed">
-                {data?.expected_result_preview || "—"}
-              </pre>
+              <ResultTable text={data?.expected_result_preview} />
             </div>
           </div>
         </Section>

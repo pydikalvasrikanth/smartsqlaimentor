@@ -25,6 +25,7 @@ import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
 import { AiAssistant } from "@/components/AiAssistant";
+import { ThemeToggle, useTheme } from "@/hooks/use-theme";
 import {
   SQL_TOPICS,
   SQL_TOPIC_BY_SLUG,
@@ -185,6 +186,7 @@ function Workspace() {
   const analyzeFocusFn = useServerFn(analyzeFocus);
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const planQ = useQuery({
     queryKey: ["plan-state", user?.id],
@@ -934,7 +936,7 @@ function Workspace() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster theme="dark" position="top-right" richColors />
+      <Toaster theme={theme} position="top-right" richColors />
 
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
@@ -967,6 +969,7 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <ThemeToggle />
               <button
                 onClick={() => signOut()}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
@@ -984,6 +987,7 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <ThemeToggle />
               <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">
                 {user.email}
               </span>
