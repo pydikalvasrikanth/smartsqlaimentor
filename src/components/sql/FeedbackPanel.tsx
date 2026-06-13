@@ -78,15 +78,11 @@ function Evaluation({ data }: { data: any }) {
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Your output</div>
-              <pre className="font-mono text-[11px] bg-background rounded p-3 overflow-auto whitespace-pre-wrap leading-relaxed">
-                {data?.user_result_preview || "—"}
-              </pre>
+              <ResultTable text={data?.user_result_preview} />
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Expected output</div>
-              <pre className="font-mono text-[11px] bg-background rounded p-3 overflow-auto whitespace-pre-wrap leading-relaxed">
-                {data?.expected_result_preview || "—"}
-              </pre>
+              <ResultTable text={data?.expected_result_preview} />
             </div>
           </div>
         </Section>
