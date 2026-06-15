@@ -26,7 +26,6 @@ import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
 import { AiAssistant } from "@/components/AiAssistant";
 import { PythonModePanel } from "@/components/sql/PythonModePanel";
-import { PythonToggle } from "./topic.$slug";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
 import {
   SQL_TOPICS,
