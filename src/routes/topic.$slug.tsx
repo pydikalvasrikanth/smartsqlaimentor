@@ -150,6 +150,7 @@ function TopicPage() {
   >([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [liveStats, setLiveStats] = useState<{ attempted: number; correct: number } | null>(null);
+  const [pythonMode, setPythonMode] = useState(false);
 
 
   useEffect(() => {
