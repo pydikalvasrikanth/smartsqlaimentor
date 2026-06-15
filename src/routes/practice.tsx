@@ -1162,6 +1162,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onPickTopic={startTopic}
             onSetSql={setUserSql}
             onRun={handleRun}
@@ -1189,6 +1192,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onStart={handleFocusStart}
             onSetSql={setUserSql}
             onRun={handleRun}
@@ -1216,6 +1222,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onLevel={setDeLevel}
             onCategory={setDeCategory}
             onStart={handleDeStart}
@@ -1254,6 +1263,9 @@ function TopicWise({
   attempt,
   userSql,
   feedback,
+  sessionQuestionId,
+  pythonMode,
+  setPythonMode,
   onPickTopic,
   onSetSql,
   onRun,
@@ -1273,6 +1285,9 @@ function TopicWise({
   attempt: number;
   userSql: string;
   feedback: FeedbackData;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
   onPickTopic: (slug: string) => void;
   onSetSql: (v: string) => void;
   onRun: () => void;
@@ -1464,6 +1479,9 @@ function FocusPractice({
   attempt,
   userSql,
   feedback,
+  sessionQuestionId,
+  pythonMode,
+  setPythonMode,
   onStart,
   onSetSql,
   onRun,
@@ -1499,6 +1517,9 @@ function FocusPractice({
   onNext: () => void;
   onEnd: () => void;
   onReset: () => void;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const busy = loading === "plan" || loading === "init";
   const currentConcept = plan ? plan.concepts[focusIdx] : null;
@@ -1792,6 +1813,9 @@ function DataEngineering({
   attempt,
   userSql,
   feedback,
+  sessionQuestionId,
+  pythonMode,
+  setPythonMode,
   onLevel,
   onCategory,
   onStart,
@@ -1828,6 +1852,9 @@ function DataEngineering({
   onVisualize: () => void;
   onNext: () => void;
   onReset: () => void;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const lvl = DE_LEVEL_BY_NUMBER[level] ?? DE_LEVELS[0];
   const nextLevel = DE_LEVEL_BY_NUMBER[level + 1];
