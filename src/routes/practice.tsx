@@ -1090,10 +1090,24 @@ function Workspace() {
           </aside>
 
           <section className="space-y-4 min-w-0">
-            <QuestionCard question={question} attempt={attempt} />
+            <QuestionCard
+              question={question}
+              attempt={attempt}
+              rightSlot={session && question && sessionQuestionId ? (
+                <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
+              ) : null}
+            />
 
             {session && question && (
               <>
+                {pythonMode && sessionQuestionId ? (
+                  <PythonModePanel
+                    sessionQuestionId={sessionQuestionId}
+                    schema_sql={session.schema_sql}
+                    seed_data_sql={session.seed_data_sql}
+                    sql_task={question.task}
+                  />
+                ) : (<>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -1119,6 +1133,7 @@ function Workspace() {
                 </div>
 
                 <FeedbackPanel feedback={feedback} />
+                </>)}
               </>
             )}
 
