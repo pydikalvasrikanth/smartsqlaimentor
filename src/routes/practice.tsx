@@ -1813,6 +1813,9 @@ function DataEngineering({
   attempt,
   userSql,
   feedback,
+  sessionQuestionId,
+  pythonMode,
+  setPythonMode,
   onLevel,
   onCategory,
   onStart,
@@ -1849,6 +1852,9 @@ function DataEngineering({
   onVisualize: () => void;
   onNext: () => void;
   onReset: () => void;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const lvl = DE_LEVEL_BY_NUMBER[level] ?? DE_LEVELS[0];
   const nextLevel = DE_LEVEL_BY_NUMBER[level + 1];
