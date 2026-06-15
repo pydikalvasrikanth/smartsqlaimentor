@@ -14,6 +14,7 @@ import { SchemaPanel } from "@/components/sql/SchemaPanel";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
+import { PythonModePanel } from "@/components/sql/PythonModePanel";
 import { AiAssistant } from "@/components/AiAssistant";
 
 
