@@ -10,9 +10,10 @@ interface Question {
 interface Props {
   question: Question | null;
   attempt: number;
+  rightSlot?: React.ReactNode;
 }
 
-export function QuestionCard({ question, attempt }: Props) {
+export function QuestionCard({ question, attempt, rightSlot }: Props) {
   if (!question) {
     return (
       <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -34,6 +35,7 @@ export function QuestionCard({ question, attempt }: Props) {
           {attempt > 0 && (
             <span className="text-muted-foreground">attempt {attempt}</span>
           )}
+          {rightSlot}
         </div>
       </div>
       <div className="p-4 space-y-3">

@@ -25,6 +25,8 @@ import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
 import { AiAssistant } from "@/components/AiAssistant";
+import { PythonModePanel } from "@/components/sql/PythonModePanel";
+import { PythonToggle } from "@/components/sql/PythonToggle";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
 import {
   SQL_TOPICS,
@@ -239,6 +241,7 @@ function Workspace() {
   const [feedback, setFeedback] = useState<FeedbackData>({ kind: null });
   const [loading, setLoading] = useState<Loading>(null);
   const [questionCount, setQuestionCount] = useState(0); // 1..50 over the session
+  const [pythonMode, setPythonMode] = useState(false);
 
   const isInterviewMode = topic === INTERVIEW_TOPIC;
 
@@ -1087,10 +1090,24 @@ function Workspace() {
           </aside>
 
           <section className="space-y-4 min-w-0">
-            <QuestionCard question={question} attempt={attempt} />
+            <QuestionCard
+              question={question}
+              attempt={attempt}
+              rightSlot={session && question && sessionQuestionId ? (
+                <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
+              ) : null}
+            />
 
             {session && question && (
               <>
+                {pythonMode && sessionQuestionId ? (
+                  <PythonModePanel
+                    sessionQuestionId={sessionQuestionId}
+                    schema_sql={session.schema_sql}
+                    seed_data_sql={session.seed_data_sql}
+                    sql_task={question.task}
+                  />
+                ) : (<>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -1116,6 +1133,7 @@ function Workspace() {
                 </div>
 
                 <FeedbackPanel feedback={feedback} />
+                </>)}
               </>
             )}
 
@@ -1362,10 +1380,24 @@ function TopicWise({
             </aside>
 
             <section className="space-y-4 min-w-0">
-              <QuestionCard question={question} attempt={attempt} />
+              <QuestionCard
+                question={question}
+                attempt={attempt}
+                rightSlot={session && question && sessionQuestionId ? (
+                  <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
+                ) : null}
+              />
 
               {session && question && (
                 <>
+                  {pythonMode && sessionQuestionId ? (
+                    <PythonModePanel
+                      sessionQuestionId={sessionQuestionId}
+                      schema_sql={session.schema_sql}
+                      seed_data_sql={session.seed_data_sql}
+                      sql_task={question.task}
+                    />
+                  ) : (<>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
@@ -1400,6 +1432,7 @@ function TopicWise({
                   </div>
 
                   <FeedbackPanel feedback={feedback} />
+                  </>)}
                 </>
               )}
             </section>
@@ -1589,7 +1622,21 @@ function FocusPractice({
           </aside>
 
           <section className="space-y-4 min-w-0">
-            <QuestionCard question={question} attempt={attempt} />
+            <QuestionCard
+              question={question}
+              attempt={attempt}
+              rightSlot={session && question && sessionQuestionId ? (
+                <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
+              ) : null}
+            />
+            {pythonMode && sessionQuestionId ? (
+              <PythonModePanel
+                sessionQuestionId={sessionQuestionId}
+                schema_sql={session.schema_sql}
+                seed_data_sql={session.seed_data_sql}
+                sql_task={question.task}
+              />
+            ) : (<>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
@@ -1623,6 +1670,7 @@ function FocusPractice({
               </div>
             </div>
             <FeedbackPanel feedback={feedback} />
+            </>)}
           </section>
         </div>
       )}
@@ -1908,7 +1956,21 @@ function DataEngineering({
             </aside>
 
             <section className="space-y-4 min-w-0">
-              <QuestionCard question={question} attempt={attempt} />
+              <QuestionCard
+                question={question}
+                attempt={attempt}
+                rightSlot={session && question && sessionQuestionId ? (
+                  <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
+                ) : null}
+              />
+              {pythonMode && sessionQuestionId ? (
+                <PythonModePanel
+                  sessionQuestionId={sessionQuestionId}
+                  schema_sql={session.schema_sql}
+                  seed_data_sql={session.seed_data_sql}
+                  sql_task={question.task}
+                />
+              ) : (<>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
@@ -1946,6 +2008,7 @@ function DataEngineering({
                 </div>
               </div>
               <FeedbackPanel feedback={feedback} />
+              </>)}
             </section>
           </div>
         </>

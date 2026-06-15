@@ -14,6 +14,8 @@ import { SchemaPanel } from "@/components/sql/SchemaPanel";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
+import { PythonModePanel } from "@/components/sql/PythonModePanel";
+import { PythonToggle } from "@/components/sql/PythonToggle";
 import { AiAssistant } from "@/components/AiAssistant";
 
 
@@ -149,6 +151,7 @@ function TopicPage() {
   >([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [liveStats, setLiveStats] = useState<{ attempted: number; correct: number } | null>(null);
+  const [pythonMode, setPythonMode] = useState(false);
 
 
   useEffect(() => {
@@ -448,30 +451,49 @@ function TopicPage() {
               />
             </aside>
             <section className="space-y-4 min-w-0">
-              <QuestionCard question={question} attempt={attempt} />
-              <SqlEditor value={userSql} onChange={setUserSql} />
-              <div className="flex flex-wrap gap-2 items-center">
-                <Btn primary onClick={handleRun} loading={loading === "evaluate"} icon={<Play className="h-3.5 w-3.5" />}>Run</Btn>
-                <Btn onClick={handleVisualize} loading={loading === "visualize"} icon={<Workflow className="h-3.5 w-3.5" />}>Visualize</Btn>
-                <Btn onClick={handleHint} loading={loading === "hint"} icon={<Lightbulb className="h-3.5 w-3.5" />}>Hint</Btn>
-                <Btn onClick={handleDebug} loading={loading === "debug"} icon={<Bug className="h-3.5 w-3.5" />}>Debug</Btn>
-                <Btn onClick={handleReveal} loading={loading === "solution"} icon={<Eye className="h-3.5 w-3.5" />}>Reveal</Btn>
-                <Btn onClick={handleOptimize} loading={loading === "optimize"} icon={<Zap className="h-3.5 w-3.5" />}>AI Review</Btn>
-                <div className="ml-auto flex items-center gap-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
-                    Q {questionCount || 1} / {TOTAL_QUESTIONS}
-                  </span>
-                  <Btn
-                    onClick={handlePrevious}
-                    icon={<ArrowLeft className="h-3.5 w-3.5" />}
-                    disabled={historyIndex <= 0}
-                  >
-                    Previous
-                  </Btn>
-                  <Btn onClick={handleNext} loading={loading === "next"} icon={<ArrowRight className="h-3.5 w-3.5" />}>Next question</Btn>
-                </div>
-              </div>
-              <FeedbackPanel feedback={feedback} />
+              <QuestionCard
+                question={question}
+                attempt={attempt}
+                rightSlot={
+                  question && sessionQuestionId ? (
+                    <PythonToggle active={pythonMode} onToggle={() => setPythonMode((v) => !v)} />
+                  ) : null
+                }
+              />
+              {pythonMode && question && sessionQuestionId && session ? (
+                <PythonModePanel
+                  sessionQuestionId={sessionQuestionId}
+                  schema_sql={session.schema_sql}
+                  seed_data_sql={session.seed_data_sql}
+                  sql_task={question.task}
+                />
+              ) : (
+                <>
+                  <SqlEditor value={userSql} onChange={setUserSql} />
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <Btn primary onClick={handleRun} loading={loading === "evaluate"} icon={<Play className="h-3.5 w-3.5" />}>Run</Btn>
+                    <Btn onClick={handleVisualize} loading={loading === "visualize"} icon={<Workflow className="h-3.5 w-3.5" />}>Visualize</Btn>
+                    <Btn onClick={handleHint} loading={loading === "hint"} icon={<Lightbulb className="h-3.5 w-3.5" />}>Hint</Btn>
+                    <Btn onClick={handleDebug} loading={loading === "debug"} icon={<Bug className="h-3.5 w-3.5" />}>Debug</Btn>
+                    <Btn onClick={handleReveal} loading={loading === "solution"} icon={<Eye className="h-3.5 w-3.5" />}>Reveal</Btn>
+                    <Btn onClick={handleOptimize} loading={loading === "optimize"} icon={<Zap className="h-3.5 w-3.5" />}>AI Review</Btn>
+                    <div className="ml-auto flex items-center gap-2">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
+                        Q {questionCount || 1} / {TOTAL_QUESTIONS}
+                      </span>
+                      <Btn
+                        onClick={handlePrevious}
+                        icon={<ArrowLeft className="h-3.5 w-3.5" />}
+                        disabled={historyIndex <= 0}
+                      >
+                        Previous
+                      </Btn>
+                      <Btn onClick={handleNext} loading={loading === "next"} icon={<ArrowRight className="h-3.5 w-3.5" />}>Next question</Btn>
+                    </div>
+                  </div>
+                  <FeedbackPanel feedback={feedback} />
+                </>
+              )}
             </section>
           </div>
         )}
@@ -508,3 +530,4 @@ function Btn({
     </button>
   );
 }
+
