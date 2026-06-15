@@ -188,6 +188,20 @@ function Hint({ data }: { data: any }) {
 
 function Solution({ data }: { data: any }) {
   const [revealed, setRevealed] = useState(false);
+  const rawSql: string = data?.correct_sql ?? "";
+  // Models occasionally emit literal escape sequences (\n, \t, \") instead of
+  // real characters, which makes the SQL show up as one long unreadable line.
+  // Normalize those before rendering, then lightly format the SQL.
+  const formattedSql = formatSql(
+    rawSql
+      .replace(/\\r\\n/g, "\n")
+      .replace(/\\n/g, "\n")
+      .replace(/\\t/g, "  ")
+      .replace(/\\"/g, '"')
+      .replace(/\\'/g, "'")
+      .replace(/\s+\n/g, "\n")
+      .trim(),
+  );
   return (
     <>
       <div className="flex items-center gap-2 px-4 py-3 bg-accent">
@@ -206,8 +220,8 @@ function Solution({ data }: { data: any }) {
       ) : (
         <>
           <Section label="SQL">
-            <pre className="font-mono text-xs bg-background rounded p-3 overflow-auto whitespace-pre-wrap">
-              {data?.correct_sql}
+            <pre className="font-mono text-xs bg-background rounded p-3 overflow-auto whitespace-pre border border-border leading-relaxed text-foreground">
+              <code>{formattedSql}</code>
             </pre>
           </Section>
           <Section label="Walkthrough">
@@ -221,6 +235,52 @@ function Solution({ data }: { data: any }) {
       )}
     </>
   );
+}
+
+// Lightweight SQL formatter: puts major clauses on their own line and
+// indents items after SELECT / lists. Good enough for display when the
+// model returns a single-line query.
+function formatSql(sql: string): string {
+  if (!sql) return "";
+  // If it already has multiple lines, keep them but trim trailing spaces.
+  if (sql.includes("\n")) {
+    return sql
+      .split("\n")
+      .map((l) => l.replace(/\s+$/g, ""))
+      .join("\n");
+  }
+  const KEYWORDS = [
+    "WITH",
+    "SELECT",
+    "FROM",
+    "LEFT JOIN",
+    "RIGHT JOIN",
+    "INNER JOIN",
+    "FULL JOIN",
+    "CROSS JOIN",
+    "JOIN",
+    "WHERE",
+    "GROUP BY",
+    "HAVING",
+    "ORDER BY",
+    "LIMIT",
+    "OFFSET",
+    "UNION ALL",
+    "UNION",
+    "INTERSECT",
+    "EXCEPT",
+    "ON",
+  ];
+  let out = sql.replace(/\s+/g, " ").trim();
+  for (const kw of KEYWORDS) {
+    const re = new RegExp(`\\s+${kw.replace(/ /g, "\\s+")}\\s+`, "gi");
+    out = out.replace(re, `\n${kw} `);
+  }
+  return out
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join("\n");
 }
 
 function Optimize({ data }: { data: any }) {
