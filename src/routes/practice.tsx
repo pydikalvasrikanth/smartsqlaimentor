@@ -1517,9 +1517,9 @@ function FocusPractice({
   onNext: () => void;
   onEnd: () => void;
   onReset: () => void;
-  sessionQuestionId?: string | null;
-  pythonMode?: boolean;
-  setPythonMode?: React.Dispatch<React.SetStateAction<boolean>>;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const busy = loading === "plan" || loading === "init";
   const currentConcept = plan ? plan.concepts[focusIdx] : null;
