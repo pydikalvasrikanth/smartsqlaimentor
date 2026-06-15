@@ -1162,6 +1162,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onPickTopic={startTopic}
             onSetSql={setUserSql}
             onRun={handleRun}
@@ -1189,6 +1192,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onStart={handleFocusStart}
             onSetSql={setUserSql}
             onRun={handleRun}
@@ -1216,6 +1222,9 @@ function Workspace() {
             attempt={attempt}
             userSql={userSql}
             feedback={feedback}
+            sessionQuestionId={sessionQuestionId}
+            pythonMode={pythonMode}
+            setPythonMode={setPythonMode}
             onLevel={setDeLevel}
             onCategory={setDeCategory}
             onStart={handleDeStart}
@@ -1273,6 +1282,9 @@ function TopicWise({
   attempt: number;
   userSql: string;
   feedback: FeedbackData;
+  sessionQuestionId: string | null;
+  pythonMode: boolean;
+  setPythonMode: React.Dispatch<React.SetStateAction<boolean>>;
   onPickTopic: (slug: string) => void;
   onSetSql: (v: string) => void;
   onRun: () => void;
@@ -1499,6 +1511,9 @@ function FocusPractice({
   onNext: () => void;
   onEnd: () => void;
   onReset: () => void;
+  sessionQuestionId?: string | null;
+  pythonMode?: boolean;
+  setPythonMode?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const busy = loading === "plan" || loading === "init";
   const currentConcept = plan ? plan.concepts[focusIdx] : null;
