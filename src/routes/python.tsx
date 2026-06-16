@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2 } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { AiAssistant } from "@/components/AiAssistant";
@@ -48,6 +48,21 @@ const PY_CONCEPTS: Record<string, string[]> = {
 const TOTAL = 50;
 type Level = "beginner" | "intermediate" | "advanced";
 const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
+
+// Top employers that commonly run Python coding interviews.
+const PY_COMPANIES: string[] = [
+  "Google","Amazon","Meta","Microsoft","Apple","Netflix","Uber","Airbnb","LinkedIn","Twitter / X",
+  "Stripe","Shopify","Square","Pinterest","Reddit","Snap","Spotify","Dropbox","Salesforce","Adobe",
+  "Oracle","IBM","Intel","NVIDIA","AMD","Cisco","SAP","ServiceNow","Atlassian","GitHub",
+  "GitLab","HashiCorp","Cloudflare","Datadog","Snowflake","Databricks","MongoDB","Elastic","Twilio","Coinbase",
+  "Robinhood","PayPal","eBay","Walmart Labs","Target Tech","Best Buy","DoorDash","Instacart","Lyft","Grubhub",
+  "Tesla","SpaceX","Booking.com","Expedia","Airwallex","Revolut","Wise","Plaid","Brex","Ramp",
+  "Affirm","Klarna","Goldman Sachs","JPMorgan","Morgan Stanley","Citadel","Two Sigma","Jane Street","Jump Trading","DRW",
+  "Bloomberg","Capital One","American Express","Mastercard","Visa","Wells Fargo","Bank of America","HSBC","Barclays","Deutsche Bank",
+  "TCS","Infosys","Wipro","HCL","Tech Mahindra","Cognizant","Accenture","Capgemini","Deloitte","EY",
+  "Flipkart","Swiggy","Zomato","Paytm","Razorpay","PhonePe","Ola","BYJU's","Freshworks","Zoho",
+  "Samsung","Sony","Huawei","Alibaba","Tencent","Baidu","Rakuten","LINE","Yandex","Mercado Libre",
+];
 
 interface PyPlan {
   days: number;
@@ -128,7 +143,10 @@ function PythonWorkspace() {
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "free">("today");
+  const [tab, setTab] = useState<"today" | "free" | "interview">("today");
+  const [interviewCompany, setInterviewCompany] = useState<string>("Google");
+  const [interviewLevel, setInterviewLevel] = useState<Level>("intermediate");
+  const [interviewMode, setInterviewMode] = useState(false);
   const [question, setQuestion] = useState<PyQuestion | null>(null);
   const [sessionQid, setSessionQid] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -204,6 +222,27 @@ function PythonWorkspace() {
     toast.success(`Q 1 / ${TOTAL} · ${startDiff}`);
   }
 
+  async function handleStartInterview() {
+    setLoading("init");
+    clearPanels();
+    const concept = pickConcept(1, []);
+    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+      difficulty: interviewLevel,
+      target_concept: concept,
+      company: interviewCompany,
+    });
+    setLoading(null);
+    if (!data) return;
+    setInterviewMode(true);
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(`${interviewCompany} · ${interviewLevel} interview question`);
+  }
+
   function handleStartToday() {
     if (!plan) return;
     const day = dayNumberFor(plan);
@@ -217,12 +256,13 @@ function PythonWorkspace() {
     const next = qIndex + 1;
     if (next > TOTAL) { toast.success("Session complete!"); return; }
     setLoading("next"); clearPanels();
-    const tgt = diffForIndex(next, planLevel);
+    const tgt = interviewMode ? interviewLevel : diffForIndex(next, planLevel);
     const data = await call("NEXT_PYTHON_QUESTION", {
       target_difficulty: tgt,
       target_concept: pickConcept(next, covered),
       covered_concepts: covered,
       previous_question_ids: pastIds,
+      ...(interviewMode ? { company: interviewCompany } : {}),
     });
     setLoading(null);
     if (!data) return;
@@ -232,7 +272,8 @@ function PythonWorkspace() {
     setQIndex(next);
     setPastIds((ids) => [...ids, data.question.question_id]);
     if (data.question.concept) setCovered((cs) => cs.includes(data.question.concept) ? cs : [...cs, data.question.concept]);
-    if (next % 5 === 1) toast.success(`Difficulty up → ${tgt} (Q ${next}/${TOTAL})`);
+    if (interviewMode) toast.success(`${interviewCompany} · Q ${next}/${TOTAL}`);
+    else if (next % 5 === 1) toast.success(`Difficulty up → ${tgt} (Q ${next}/${TOTAL})`);
     else toast.success(`Question ${next} / ${TOTAL}`);
   }
 
@@ -329,6 +370,9 @@ function PythonWorkspace() {
             <button onClick={() => setTab("free")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "free" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Wrench className="h-3.5 w-3.5" /> Free practice
             </button>
+            <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
+            </button>
           </div>
         )}
 
@@ -336,7 +380,46 @@ function PythonWorkspace() {
           <PyPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
         )}
 
-        {!question && ((tab === "free") || !plan) && (
+        {!question && tab === "interview" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Building2 className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">Company-style Python interview</h2>
+                <p className="text-xs text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <div className="grid grid-cols-3 gap-2">
+                {LEVEL_ORDER.map((l) => (
+                  <button key={l} onClick={() => setInterviewLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${interviewLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                    <div className="text-sm font-semibold capitalize">{l}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Company ({PY_COMPANIES.length})</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 max-h-72 overflow-y-auto p-1">
+                {PY_COMPANIES.map((c) => (
+                  <button key={c} onClick={() => setInterviewCompany(c)} className={`text-xs px-2.5 py-1.5 rounded border text-left truncate transition-colors ${interviewCompany === c ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button onClick={handleStartInterview} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-sm font-semibold disabled:opacity-50">
+              {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              Start {interviewCompany} interview
+            </button>
+            <p className="text-[11px] text-muted-foreground">Topic-wise, Targeted and Data Engineering tabs (matching the SQL practice page) are coming next.</p>
+          </div>
+        )}
+
+        {!question && tab === "free" && ((tab === "free") || !plan) && (
           <div className="grid place-items-center min-h-[50vh]">
             <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
               <div className="flex items-center gap-2">
