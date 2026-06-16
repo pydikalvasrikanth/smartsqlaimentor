@@ -59,6 +59,54 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          ai_quality_rating: number | null
+          bug_report: string | null
+          code_correctness: string | null
+          contact_email: string | null
+          created_at: string
+          id: string
+          improvement_suggestion: string | null
+          nps_score: number | null
+          overall_rating: number | null
+          page_context: string | null
+          subject_area: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_quality_rating?: number | null
+          bug_report?: string | null
+          code_correctness?: string | null
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          improvement_suggestion?: string | null
+          nps_score?: number | null
+          overall_rating?: number | null
+          page_context?: string | null
+          subject_area?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_quality_rating?: number | null
+          bug_report?: string | null
+          code_correctness?: string | null
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          improvement_suggestion?: string | null
+          nps_score?: number | null
+          overall_rating?: number | null
+          page_context?: string | null
+          subject_area?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       plan_days: {
         Row: {
           completed: boolean
