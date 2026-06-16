@@ -195,9 +195,9 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
 function buildUserPrompt(command: string, payload: any): string {
   switch (command) {
     case "INIT_PYTHON_ENVIRONMENT":
-      return `Generate a Python interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}`;
+      return `Generate a Python interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
     case "NEXT_PYTHON_QUESTION":
-      return `Generate the next Python question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}`;
+      return `Generate the next Python question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_PYTHON":
       return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code against each test case. Compare actual vs expected. Grade fairly.`;
     case "PYTHON_HINT":
@@ -220,12 +220,14 @@ const PayloadSchemas = {
     difficulty: z.string().max(50),
     target_concept: z.string().max(200),
     topic: z.string().max(500).optional(),
+    company: z.string().max(100).optional(),
   }),
   NEXT_PYTHON_QUESTION: z.object({
     target_difficulty: z.string().max(50),
     target_concept: z.string().max(200),
     covered_concepts: z.array(z.string().max(100)).max(200).optional(),
     previous_question_ids: z.array(z.number()).max(500).optional(),
+    company: z.string().max(100).optional(),
   }),
   EVALUATE_PYTHON: z.object({
     session_question_id: z.string().uuid(),
