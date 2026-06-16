@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as GcpRouteImport } from './routes/gcp'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -51,6 +52,11 @@ const GcpRoute = GcpRouteImport.update({
   path: '/gcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EngineRoute = EngineRouteImport.update({
   id: '/engine',
   path: '/engine',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/engine': typeof EngineRoute
+  '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/engine': typeof EngineRoute
+  '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/engine': typeof EngineRoute
+  '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/engine'
+    | '/feedback'
     | '/gcp'
     | '/practice'
     | '/python'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/engine'
+    | '/feedback'
     | '/gcp'
     | '/practice'
     | '/python'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/engine'
+    | '/feedback'
     | '/gcp'
     | '/practice'
     | '/python'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ChatRoute: typeof ChatRoute
   EngineRoute: typeof EngineRoute
+  FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
   PracticeRoute: typeof PracticeRoute
   PythonRoute: typeof PythonRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GcpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/engine': {
       id: '/engine'
       path: '/engine'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ChatRoute: ChatRoute,
   EngineRoute: EngineRoute,
+  FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
   PracticeRoute: PracticeRoute,
   PythonRoute: PythonRoute,
