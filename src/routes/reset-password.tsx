@@ -233,6 +233,6 @@ function ResetPasswordPage() {
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
