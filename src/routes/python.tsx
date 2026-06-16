@@ -208,6 +208,7 @@ function PythonWorkspace() {
   async function handleStart(opts?: { difficulty?: string; concept?: string }) {
     setLoading("init");
     clearPanels();
+    setInterviewMode(false);
     const startDiff = opts?.difficulty ?? diffForIndex(1, planLevel);
     const concept = opts?.concept ?? pickConcept(1, []);
     const data = await call("INIT_PYTHON_ENVIRONMENT", { difficulty: startDiff, target_concept: concept });
