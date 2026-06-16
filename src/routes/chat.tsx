@@ -201,7 +201,7 @@ function ChatPage() {
                   {m.attachments.map((a) => (
                     <div key={a.id} className="text-[11px] opacity-90">
                       {a.previewUrl && a.kind === "image" ? (
-                        <img src={a.previewUrl} alt={a.name} className="max-h-32 rounded border border-border/40" />
+                        <img src={a.previewUrl} alt="" className="max-h-32 rounded border border-border/40" />
                       ) : a.previewUrl ? (
                         <video src={a.previewUrl} className="max-h-32 rounded border border-border/40" controls />
                       ) : (
@@ -218,7 +218,7 @@ function ChatPage() {
                   ? <AiMessage content={m.content} />
                   : <div>{m.content}</div>
               )}
-              {m.imageUrl && <img src={m.imageUrl} alt="AI generated" className="mt-2 rounded border border-border/40 max-w-full" />}
+              {m.imageUrl && <img src={m.imageUrl} alt={m.content ? `Illustration for: ${m.content.slice(0, 120)}` : "AI generated illustration"} className="mt-2 rounded border border-border/40 max-w-full" />}
             </div>
           </div>
         ))}
@@ -239,7 +239,7 @@ function ChatPage() {
               {pending.map((a) => (
                 <div key={a.id} className="relative group">
                   {a.previewUrl && a.kind === "image" ? (
-                    <img src={a.previewUrl} alt={a.name} className="h-16 w-16 object-cover rounded border border-border" />
+                    <img src={a.previewUrl} alt="" className="h-16 w-16 object-cover rounded border border-border" />
                   ) : a.previewUrl ? (
                     <video src={a.previewUrl} className="h-16 w-24 object-cover rounded border border-border" />
                   ) : (
