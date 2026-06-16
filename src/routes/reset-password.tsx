@@ -102,7 +102,7 @@ function ResetPasswordPage() {
   const canUpdatePassword = recoveryRequested || hasRecoverySession;
 
   return (
-    <div className="min-h-screen bg-background grid place-items-center p-4">
+    <main className="min-h-screen bg-background grid place-items-center p-4">
       <Toaster theme="dark" position="top-right" richColors />
       <div className="w-full max-w-sm space-y-6">
         <div className="flex items-center gap-3">
