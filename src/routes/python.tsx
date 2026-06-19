@@ -684,7 +684,7 @@ function PythonWorkspace() {
           </div>
         )}
 
-        {!question && (tab === "free" || (!plan && tab !== "interview")) && (
+        {!question && (tab === "free" || (!plan && tab !== "interview" && tab !== "topic")) && (
           <div className="grid place-items-center min-h-[50vh]">
             <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
               <div className="flex items-center gap-2">
