@@ -10,7 +10,8 @@ import {
 
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
-import { StudySidebar } from "@/components/StudySidebar";
+import { FloatingTimer } from "@/components/FloatingTimer";
+import { FeedbackFab } from "@/components/FeedbackFab";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -145,7 +146,8 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <Outlet />
-          <StudySidebar />
+          <FloatingTimer />
+          <FeedbackFab />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
