@@ -10,7 +10,7 @@ import {
 
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
-import { FeedbackButton } from "@/components/FeedbackButton";
+import { StudySidebar } from "@/components/StudySidebar";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -145,7 +145,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <Outlet />
-          <FeedbackButton />
+          <StudySidebar />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
