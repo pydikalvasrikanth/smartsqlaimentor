@@ -308,7 +308,7 @@ export function FloatingTimer() {
       className={`fixed z-50 select-none ${dragging ? "cursor-grabbing" : ""}`}
     >
       {open ? (
-        <div className="w-56 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
+        <div className="w-64 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
           <div
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
@@ -319,7 +319,7 @@ export function FloatingTimer() {
             <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
             <TimerIcon className="h-3.5 w-3.5 text-primary" />
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Focus
+              {tab === "focus" ? "Focus" : "Daily Challenge"}
             </span>
             <button
               onClick={() => setOpen(false)}
@@ -329,6 +329,26 @@ export function FloatingTimer() {
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
+          <div className="flex border-b border-border text-[11px]">
+            <button
+              onClick={() => setTab("focus")}
+              className={`flex-1 py-1.5 ${tab === "focus" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
+            >
+              Focus
+            </button>
+            <button
+              onClick={() => setTab("challenge")}
+              className={`flex-1 py-1.5 inline-flex items-center justify-center gap-1 ${tab === "challenge" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
+            >
+              <Trophy className="h-3 w-3" /> Challenge
+              {challenge && !rewardedToday && (
+                <span className="ml-0.5 inline-flex items-center justify-center text-[9px] rounded-full bg-primary text-primary-foreground w-3.5 h-3.5">
+                  {challenge.solved}
+                </span>
+              )}
+            </button>
+          </div>
+          {tab === "focus" ? (
           <div className="p-3 space-y-2.5">
             <div className="font-mono text-2xl tabular-nums text-center text-foreground">
               {fmt(remaining)}
@@ -389,6 +409,92 @@ export function FloatingTimer() {
               </button>
             </div>
           </div>
+          ) : (
+          <div className="p-3 space-y-2.5">
+            <div className="text-[10px] text-muted-foreground text-center">
+              Solve in 1 hour to earn <span className="text-primary font-semibold">{REWARD_POINTS} pts</span>
+            </div>
+            {!challenge ? (
+              <>
+                <div className="space-y-1">
+                  {(Object.keys(QUOTAS) as Difficulty[]).map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => startChallenge(d)}
+                      disabled={rewardedToday}
+                      className="w-full flex items-center justify-between rounded-md border border-border px-2 py-1.5 text-xs hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="capitalize font-medium">{d}</span>
+                      <span className="text-muted-foreground">
+                        {QUOTAS[d]} questions
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {rewardedToday && (
+                  <div className="text-[10px] text-center text-green-500">
+                    ✓ Today's reward already earned
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="text-center">
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground capitalize">
+                    {challenge.difficulty}
+                  </div>
+                  <div className="font-mono text-xl tabular-nums text-foreground">
+                    {fmt(challengeRemaining)}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-medium text-foreground">
+                      {challenge.solved} / {QUOTAS[challenge.difficulty]}
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-surface-2 overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all"
+                      style={{
+                        width: `${Math.min(100, (challenge.solved / QUOTAS[challenge.difficulty]) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                {showReward && rewardedToday ? (
+                  <div className="rounded-md bg-primary/10 border border-primary/30 p-2 text-center">
+                    <Trophy className="h-4 w-4 text-primary mx-auto mb-0.5" />
+                    <div className="text-xs font-semibold text-primary">
+                      +{REWARD_POINTS} points earned!
+                    </div>
+                    <button
+                      onClick={() => setShowReward(false)}
+                      className="mt-1 text-[10px] text-muted-foreground hover:text-foreground"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                ) : challengeRemaining === 0 && challenge.solved < QUOTAS[challenge.difficulty] ? (
+                  <div className="rounded-md border border-border p-2 text-center text-[11px] text-muted-foreground">
+                    Time's up — try again tomorrow.
+                  </div>
+                ) : null}
+                <button
+                  onClick={cancelChallenge}
+                  className="w-full rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
+                >
+                  {challengeRemaining === 0 || rewardedToday ? "Close" : "Cancel challenge"}
+                </button>
+              </>
+            )}
+            <div className="pt-1 border-t border-border flex items-center justify-between text-[10px]">
+              <span className="text-muted-foreground">Total points</span>
+              <span className="font-semibold text-foreground">{points}</span>
+            </div>
+          </div>
+          )}
         </div>
       ) : (
         <button
