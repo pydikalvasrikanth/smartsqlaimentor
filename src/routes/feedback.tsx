@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { z } from "zod";
+import { sendFeedbackEmail } from "@/lib/feedback-email.functions";
 
 export const Route = createFileRoute("/feedback")({
   head: () => ({
@@ -93,7 +94,7 @@ function FeedbackPage() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("feedback").insert({
+    const { data: inserted, error } = await supabase.from("feedback").insert({
       user_id: user.id,
       subject_area: subjectArea,
       page_context: typeof document !== "undefined" ? document.referrer || null : null,
@@ -104,11 +105,15 @@ function FeedbackPage() {
       bug_report: bug.trim() || null,
       improvement_suggestion: improvement.trim() || null,
       contact_email: email.trim() || null,
-    });
+    }).select("id").maybeSingle();
     setSubmitting(false);
     if (error) {
       toast.error(error.message);
       return;
+    }
+    if (inserted?.id) {
+      // Fire-and-forget email notification; failures don't block the user.
+      sendFeedbackEmail({ data: { feedbackId: inserted.id } }).catch(() => {});
     }
     setDone(true);
     toast.success("Thanks! Your feedback was sent.");
