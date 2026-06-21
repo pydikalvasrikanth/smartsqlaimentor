@@ -368,6 +368,17 @@ function Workspace() {
     if (!evaluation) return;
     setFeedback({ kind: "evaluation", payload: evaluation });
     if (evaluation.is_correct) toast.success("Nice — query is correct");
+    if (evaluation.is_correct) {
+      try {
+        window.dispatchEvent(
+          new CustomEvent("practice:solved", {
+            detail: { difficulty: question.difficulty },
+          }),
+        );
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   async function handleHint() {
