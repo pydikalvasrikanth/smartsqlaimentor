@@ -143,6 +143,107 @@ export function FloatingTimer() {
     }
   }, [minutes]);
 
+  // Hydrate challenge + reward + points
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(CHALLENGE_KEY);
+      if (raw) {
+        const c: ChallengeState = JSON.parse(raw);
+        if (c.date === today()) setChallenge(c);
+        else localStorage.removeItem(CHALLENGE_KEY);
+      }
+      setRewardedToday(localStorage.getItem(REWARD_KEY) === today());
+      const p = Number(localStorage.getItem(POINTS_KEY));
+      if (Number.isFinite(p)) setPoints(p);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Persist challenge
+  useEffect(() => {
+    try {
+      if (challenge) localStorage.setItem(CHALLENGE_KEY, JSON.stringify(challenge));
+    } catch {
+      /* ignore */
+    }
+  }, [challenge]);
+
+  // Challenge countdown tick
+  useEffect(() => {
+    if (!challenge) {
+      setChallengeRemaining(0);
+      return;
+    }
+    function compute() {
+      if (!challenge) return 0;
+      const elapsed = Math.floor((Date.now() - challenge.startedAt) / 1000);
+      return Math.max(0, CHALLENGE_DURATION - elapsed);
+    }
+    setChallengeRemaining(compute());
+    const id = window.setInterval(() => {
+      setChallengeRemaining(compute());
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [challenge]);
+
+  // Listen for solved questions
+  useEffect(() => {
+    function onSolved(e: Event) {
+      const detail = (e as CustomEvent).detail || {};
+      const diff = normalizeDifficulty(String(detail.difficulty || ""));
+      if (!diff) return;
+      setChallenge((prev) => {
+        if (!prev) return prev;
+        if (prev.difficulty !== diff) return prev; // only same difficulty counts
+        const elapsed = Math.floor((Date.now() - prev.startedAt) / 1000);
+        if (elapsed >= CHALLENGE_DURATION) return prev; // timer ended
+        const solved = prev.solved + 1;
+        const quota = QUOTAS[prev.difficulty];
+        const next = { ...prev, solved };
+        if (solved >= quota && !rewardedToday) {
+          // Award!
+          try {
+            localStorage.setItem(REWARD_KEY, today());
+            const np = points + REWARD_POINTS;
+            localStorage.setItem(POINTS_KEY, String(np));
+            setPoints(np);
+          } catch {
+            /* ignore */
+          }
+          setRewardedToday(true);
+          setShowReward(true);
+          setOpen(true);
+          setTab("challenge");
+        }
+        return next;
+      });
+    }
+    window.addEventListener("practice:solved", onSolved as EventListener);
+    return () =>
+      window.removeEventListener("practice:solved", onSolved as EventListener);
+  }, [rewardedToday, points]);
+
+  function startChallenge(d: Difficulty) {
+    setChallenge({
+      difficulty: d,
+      startedAt: Date.now(),
+      solved: 0,
+      date: today(),
+    });
+    setShowReward(false);
+  }
+
+  function cancelChallenge() {
+    setChallenge(null);
+    try {
+      localStorage.removeItem(CHALLENGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+
   // Timer engine
   useEffect(() => {
     if (!running) return;
