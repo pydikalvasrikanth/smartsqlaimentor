@@ -7,6 +7,7 @@ import {
   RotateCcw,
   X,
   GripVertical,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,6 +16,37 @@ const POS_KEY = "focus_timer_pos_v1";
 const OPEN_KEY = "focus_timer_open_v1";
 const MIN_KEY = "focus_timer_min_v1";
 const PRESETS = [10, 15, 25, 45, 60];
+const CHALLENGE_KEY = "daily_challenge_v1";
+const REWARD_KEY = "daily_reward_v1";
+const POINTS_KEY = "user_points_v1";
+const CHALLENGE_DURATION = 60 * 60; // 1 hour in seconds
+const REWARD_POINTS = 50;
+
+type Difficulty = "beginner" | "intermediate" | "hard";
+const QUOTAS: Record<Difficulty, number> = {
+  beginner: 10,
+  intermediate: 8,
+  hard: 5,
+};
+
+type ChallengeState = {
+  difficulty: Difficulty;
+  startedAt: number; // epoch ms
+  solved: number;
+  date: string; // YYYY-MM-DD
+};
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function normalizeDifficulty(d: string): Difficulty | null {
+  const x = (d || "").toLowerCase();
+  if (x === "beginner" || x === "easy") return "beginner";
+  if (x === "intermediate" || x === "medium") return "intermediate";
+  if (x === "hard" || x === "advanced" || x === "expert") return "hard";
+  return null;
+}
 
 function fmt(s: number) {
   const m = Math.floor(s / 60);
@@ -55,6 +87,14 @@ export function FloatingTimer() {
   const tick = useRef<number | null>(null);
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null);
   const movedRef = useRef(false);
+
+  // Daily challenge state
+  const [challenge, setChallenge] = useState<ChallengeState | null>(null);
+  const [challengeRemaining, setChallengeRemaining] = useState(0);
+  const [rewardedToday, setRewardedToday] = useState(false);
+  const [points, setPoints] = useState(0);
+  const [showReward, setShowReward] = useState(false);
+  const [tab, setTab] = useState<"focus" | "challenge">("focus");
 
   // Hydrate
   useEffect(() => {
@@ -102,6 +142,107 @@ export function FloatingTimer() {
       /* ignore */
     }
   }, [minutes]);
+
+  // Hydrate challenge + reward + points
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(CHALLENGE_KEY);
+      if (raw) {
+        const c: ChallengeState = JSON.parse(raw);
+        if (c.date === today()) setChallenge(c);
+        else localStorage.removeItem(CHALLENGE_KEY);
+      }
+      setRewardedToday(localStorage.getItem(REWARD_KEY) === today());
+      const p = Number(localStorage.getItem(POINTS_KEY));
+      if (Number.isFinite(p)) setPoints(p);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Persist challenge
+  useEffect(() => {
+    try {
+      if (challenge) localStorage.setItem(CHALLENGE_KEY, JSON.stringify(challenge));
+    } catch {
+      /* ignore */
+    }
+  }, [challenge]);
+
+  // Challenge countdown tick
+  useEffect(() => {
+    if (!challenge) {
+      setChallengeRemaining(0);
+      return;
+    }
+    function compute() {
+      if (!challenge) return 0;
+      const elapsed = Math.floor((Date.now() - challenge.startedAt) / 1000);
+      return Math.max(0, CHALLENGE_DURATION - elapsed);
+    }
+    setChallengeRemaining(compute());
+    const id = window.setInterval(() => {
+      setChallengeRemaining(compute());
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [challenge]);
+
+  // Listen for solved questions
+  useEffect(() => {
+    function onSolved(e: Event) {
+      const detail = (e as CustomEvent).detail || {};
+      const diff = normalizeDifficulty(String(detail.difficulty || ""));
+      if (!diff) return;
+      setChallenge((prev) => {
+        if (!prev) return prev;
+        if (prev.difficulty !== diff) return prev; // only same difficulty counts
+        const elapsed = Math.floor((Date.now() - prev.startedAt) / 1000);
+        if (elapsed >= CHALLENGE_DURATION) return prev; // timer ended
+        const solved = prev.solved + 1;
+        const quota = QUOTAS[prev.difficulty];
+        const next = { ...prev, solved };
+        if (solved >= quota && !rewardedToday) {
+          // Award!
+          try {
+            localStorage.setItem(REWARD_KEY, today());
+            const np = points + REWARD_POINTS;
+            localStorage.setItem(POINTS_KEY, String(np));
+            setPoints(np);
+          } catch {
+            /* ignore */
+          }
+          setRewardedToday(true);
+          setShowReward(true);
+          setOpen(true);
+          setTab("challenge");
+        }
+        return next;
+      });
+    }
+    window.addEventListener("practice:solved", onSolved as EventListener);
+    return () =>
+      window.removeEventListener("practice:solved", onSolved as EventListener);
+  }, [rewardedToday, points]);
+
+  function startChallenge(d: Difficulty) {
+    setChallenge({
+      difficulty: d,
+      startedAt: Date.now(),
+      solved: 0,
+      date: today(),
+    });
+    setShowReward(false);
+  }
+
+  function cancelChallenge() {
+    setChallenge(null);
+    try {
+      localStorage.removeItem(CHALLENGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
 
   // Timer engine
   useEffect(() => {
@@ -167,7 +308,7 @@ export function FloatingTimer() {
       className={`fixed z-50 select-none ${dragging ? "cursor-grabbing" : ""}`}
     >
       {open ? (
-        <div className="w-56 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
+        <div className="w-64 rounded-lg border border-border bg-card shadow-xl overflow-hidden">
           <div
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
@@ -178,7 +319,7 @@ export function FloatingTimer() {
             <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
             <TimerIcon className="h-3.5 w-3.5 text-primary" />
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Focus
+              {tab === "focus" ? "Focus" : "Daily Challenge"}
             </span>
             <button
               onClick={() => setOpen(false)}
@@ -188,6 +329,26 @@ export function FloatingTimer() {
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
+          <div className="flex border-b border-border text-[11px]">
+            <button
+              onClick={() => setTab("focus")}
+              className={`flex-1 py-1.5 ${tab === "focus" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
+            >
+              Focus
+            </button>
+            <button
+              onClick={() => setTab("challenge")}
+              className={`flex-1 py-1.5 inline-flex items-center justify-center gap-1 ${tab === "challenge" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
+            >
+              <Trophy className="h-3 w-3" /> Challenge
+              {challenge && !rewardedToday && (
+                <span className="ml-0.5 inline-flex items-center justify-center text-[9px] rounded-full bg-primary text-primary-foreground w-3.5 h-3.5">
+                  {challenge.solved}
+                </span>
+              )}
+            </button>
+          </div>
+          {tab === "focus" ? (
           <div className="p-3 space-y-2.5">
             <div className="font-mono text-2xl tabular-nums text-center text-foreground">
               {fmt(remaining)}
@@ -248,6 +409,92 @@ export function FloatingTimer() {
               </button>
             </div>
           </div>
+          ) : (
+          <div className="p-3 space-y-2.5">
+            <div className="text-[10px] text-muted-foreground text-center">
+              Solve in 1 hour to earn <span className="text-primary font-semibold">{REWARD_POINTS} pts</span>
+            </div>
+            {!challenge ? (
+              <>
+                <div className="space-y-1">
+                  {(Object.keys(QUOTAS) as Difficulty[]).map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => startChallenge(d)}
+                      disabled={rewardedToday}
+                      className="w-full flex items-center justify-between rounded-md border border-border px-2 py-1.5 text-xs hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="capitalize font-medium">{d}</span>
+                      <span className="text-muted-foreground">
+                        {QUOTAS[d]} questions
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {rewardedToday && (
+                  <div className="text-[10px] text-center text-green-500">
+                    ✓ Today's reward already earned
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="text-center">
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground capitalize">
+                    {challenge.difficulty}
+                  </div>
+                  <div className="font-mono text-xl tabular-nums text-foreground">
+                    {fmt(challengeRemaining)}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-[11px] mb-1">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-medium text-foreground">
+                      {challenge.solved} / {QUOTAS[challenge.difficulty]}
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-surface-2 overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all"
+                      style={{
+                        width: `${Math.min(100, (challenge.solved / QUOTAS[challenge.difficulty]) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                {showReward && rewardedToday ? (
+                  <div className="rounded-md bg-primary/10 border border-primary/30 p-2 text-center">
+                    <Trophy className="h-4 w-4 text-primary mx-auto mb-0.5" />
+                    <div className="text-xs font-semibold text-primary">
+                      +{REWARD_POINTS} points earned!
+                    </div>
+                    <button
+                      onClick={() => setShowReward(false)}
+                      className="mt-1 text-[10px] text-muted-foreground hover:text-foreground"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                ) : challengeRemaining === 0 && challenge.solved < QUOTAS[challenge.difficulty] ? (
+                  <div className="rounded-md border border-border p-2 text-center text-[11px] text-muted-foreground">
+                    Time's up — try again tomorrow.
+                  </div>
+                ) : null}
+                <button
+                  onClick={cancelChallenge}
+                  className="w-full rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
+                >
+                  {challengeRemaining === 0 || rewardedToday ? "Close" : "Cancel challenge"}
+                </button>
+              </>
+            )}
+            <div className="pt-1 border-t border-border flex items-center justify-between text-[10px]">
+              <span className="text-muted-foreground">Total points</span>
+              <span className="font-semibold text-foreground">{points}</span>
+            </div>
+          </div>
+          )}
         </div>
       ) : (
         <button
