@@ -88,6 +88,14 @@ export function FloatingTimer() {
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null);
   const movedRef = useRef(false);
 
+  // Daily challenge state
+  const [challenge, setChallenge] = useState<ChallengeState | null>(null);
+  const [challengeRemaining, setChallengeRemaining] = useState(0);
+  const [rewardedToday, setRewardedToday] = useState(false);
+  const [points, setPoints] = useState(0);
+  const [showReward, setShowReward] = useState(false);
+  const [tab, setTab] = useState<"focus" | "challenge">("focus");
+
   // Hydrate
   useEffect(() => {
     if (typeof window === "undefined") return;
