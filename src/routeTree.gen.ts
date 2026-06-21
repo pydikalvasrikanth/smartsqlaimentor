@@ -21,7 +21,6 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
-import { Route as ApiPublicHooksFeedbackEmailRouteImport } from './routes/api/public/hooks/feedback-email'
 
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
@@ -83,12 +82,6 @@ const TopicSlugRoute = TopicSlugRouteImport.update({
   path: '/topic/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksFeedbackEmailRoute =
-  ApiPublicHooksFeedbackEmailRouteImport.update({
-    id: '/api/public/hooks/feedback-email',
-    path: '/api/public/hooks/feedback-email',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,7 +96,6 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
-  '/api/public/hooks/feedback-email': typeof ApiPublicHooksFeedbackEmailRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,7 +110,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
-  '/api/public/hooks/feedback-email': typeof ApiPublicHooksFeedbackEmailRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,7 +125,6 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
-  '/api/public/hooks/feedback-email': typeof ApiPublicHooksFeedbackEmailRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,7 +141,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
-    | '/api/public/hooks/feedback-email'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,7 +155,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
-    | '/api/public/hooks/feedback-email'
   id:
     | '__root__'
     | '/'
@@ -181,7 +169,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
-    | '/api/public/hooks/feedback-email'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,7 +184,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TutorialRoute: typeof TutorialRoute
   TopicSlugRoute: typeof TopicSlugRoute
-  ApiPublicHooksFeedbackEmailRoute: typeof ApiPublicHooksFeedbackEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -286,13 +272,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/feedback-email': {
-      id: '/api/public/hooks/feedback-email'
-      path: '/api/public/hooks/feedback-email'
-      fullPath: '/api/public/hooks/feedback-email'
-      preLoaderRoute: typeof ApiPublicHooksFeedbackEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -309,7 +288,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TutorialRoute: TutorialRoute,
   TopicSlugRoute: TopicSlugRoute,
-  ApiPublicHooksFeedbackEmailRoute: ApiPublicHooksFeedbackEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
