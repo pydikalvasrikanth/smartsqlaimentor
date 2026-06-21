@@ -86,7 +86,7 @@ function GcpWorkspace() {
       <Toaster theme="dark" position="top-right" richColors />
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /></Link>
+          <Link to="/" aria-label="Back to subjects" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /></Link>
           <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Cloud className="h-4 w-4 text-primary-foreground" />
           </div>
@@ -96,7 +96,7 @@ function GcpWorkspace() {
           </div>
           <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
             <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{correctCount} correct</span>
-            <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
+            <button onClick={() => signOut()} aria-label="Sign out" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" />
             </button>
           </div>

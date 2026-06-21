@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { TOPICS } from "@/lib/topic-catalog";
 
-const BASE_URL = "https://smartsqlaimentor.lovable.app";
+const BASE_URL = "https://www.smartsqlaimentor.live";
 
 interface SitemapEntry {
   path: string;
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/gcp", changefreq: "weekly", priority: "0.8" },
           { path: "/chat", changefreq: "weekly", priority: "0.6" },
           { path: "/tutorial", changefreq: "weekly", priority: "0.7" },
+          { path: "/feedback", changefreq: "monthly", priority: "0.4" },
           { path: "/reset-password", changefreq: "yearly", priority: "0.2" },
           ...TOPICS.map((t) => ({
             path: `/topic/${t.slug}`,
