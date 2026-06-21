@@ -7,6 +7,7 @@ import {
   RotateCcw,
   X,
   GripVertical,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,6 +16,37 @@ const POS_KEY = "focus_timer_pos_v1";
 const OPEN_KEY = "focus_timer_open_v1";
 const MIN_KEY = "focus_timer_min_v1";
 const PRESETS = [10, 15, 25, 45, 60];
+const CHALLENGE_KEY = "daily_challenge_v1";
+const REWARD_KEY = "daily_reward_v1";
+const POINTS_KEY = "user_points_v1";
+const CHALLENGE_DURATION = 60 * 60; // 1 hour in seconds
+const REWARD_POINTS = 50;
+
+type Difficulty = "beginner" | "intermediate" | "hard";
+const QUOTAS: Record<Difficulty, number> = {
+  beginner: 10,
+  intermediate: 8,
+  hard: 5,
+};
+
+type ChallengeState = {
+  difficulty: Difficulty;
+  startedAt: number; // epoch ms
+  solved: number;
+  date: string; // YYYY-MM-DD
+};
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function normalizeDifficulty(d: string): Difficulty | null {
+  const x = (d || "").toLowerCase();
+  if (x === "beginner" || x === "easy") return "beginner";
+  if (x === "intermediate" || x === "medium") return "intermediate";
+  if (x === "hard" || x === "advanced" || x === "expert") return "hard";
+  return null;
+}
 
 function fmt(s: number) {
   const m = Math.floor(s / 60);
