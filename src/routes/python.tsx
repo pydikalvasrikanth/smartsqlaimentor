@@ -3,8 +3,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2, Library } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2, Library, Sparkles, Square } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
+import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { AiAssistant } from "@/components/AiAssistant";
 
@@ -323,17 +324,26 @@ interface PyQuestion {
 
 function PythonWorkspace() {
   const engine = useServerFn(runPythonEngine);
+  const planFocusFn = useServerFn(planPythonFocus);
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "free" | "topic" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "free" | "topic" | "targeted" | "interview">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
   const [interviewLevel, setInterviewLevel] = useState<Level>("intermediate");
   const [interviewMode, setInterviewMode] = useState(false);
+
+  // Targeted (goal-driven) practice state
+  type FocusPlan = { focus_title: string; difficulty: Level; concepts: string[]; intro: string };
+  const [focusGoal, setFocusGoal] = useState("");
+  const [focusPlan, setFocusPlan] = useState<FocusPlan | null>(null);
+  const [focusIdx, setFocusIdx] = useState(0);
+  const [focusCount, setFocusCount] = useState(0);
+
   const [question, setQuestion] = useState<PyQuestion | null>(null);
   const [sessionQid, setSessionQid] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -435,6 +445,7 @@ function PythonWorkspace() {
     setLoading("init");
     clearPanels();
     setInterviewMode(false);
+    setFocusPlan(null);
     const data = await call("INIT_PYTHON_ENVIRONMENT", {
       difficulty,
       target_concept: topicSlug,
@@ -449,6 +460,81 @@ function PythonWorkspace() {
     setPastIds([data.question.question_id]);
     if (data.question.concept) setCovered([data.question.concept]);
     toast.success(`${topicLabel} · ${difficulty}`);
+  }
+
+  async function handleStartFocus() {
+    const goal = focusGoal.trim();
+    if (goal.length < 2) {
+      toast.error('Tell me what you\'d like to practice, e.g. "drill me on decorators".');
+      return;
+    }
+    setLoading("init");
+    clearPanels();
+    setInterviewMode(false);
+    let planRes: any;
+    try {
+      planRes = await planFocusFn({ data: { goal } });
+    } catch (e: any) {
+      setLoading(null);
+      toast.error(e?.message ?? "Could not build a plan.");
+      return;
+    }
+    if (planRes?.error) { setLoading(null); toast.error(planRes.error); return; }
+    const fp = planRes?.data as FocusPlan | undefined;
+    if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
+    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+      difficulty: fp.difficulty,
+      target_concept: fp.concepts[0],
+      topic: fp.focus_title,
+    });
+    setLoading(null);
+    if (!data) return;
+    setFocusPlan(fp);
+    setFocusIdx(0);
+    setFocusCount(1);
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(fp.intro || `${fp.focus_title} — let's go!`);
+  }
+
+  async function handleFocusNext() {
+    if (!focusPlan) return;
+    const nextIdx = (focusIdx + 1) % focusPlan.concepts.length;
+    const concept = focusPlan.concepts[nextIdx];
+    setLoading("next"); clearPanels();
+    const data = await call("NEXT_PYTHON_QUESTION", {
+      target_difficulty: focusPlan.difficulty,
+      target_concept: concept,
+      covered_concepts: covered,
+      previous_question_ids: pastIds,
+    });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex((i) => i + 1);
+    setFocusIdx(nextIdx);
+    setFocusCount((c) => c + 1);
+    setPastIds((ids) => [...ids, data.question.question_id]);
+    if (data.question.concept) setCovered((cs) => cs.includes(data.question.concept) ? cs : [...cs, data.question.concept]);
+    toast.success(`Focus: ${concept}`);
+  }
+
+  function handleFocusReset() {
+    setFocusPlan(null);
+    setFocusIdx(0);
+    setFocusCount(0);
+    setQuestion(null);
+    setSessionQid(null);
+    setPastIds([]);
+    setCovered([]);
+    setQIndex(0);
+    clearPanels();
   }
 
   function handleStartToday() {
@@ -581,6 +667,9 @@ function PythonWorkspace() {
             <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
             </button>
+            <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Target className="h-3.5 w-3.5" /> Targeted
+            </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
@@ -645,6 +734,57 @@ function PythonWorkspace() {
           </div>
         )}
 
+        {!question && tab === "targeted" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Target className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">Tell me what to test you on</h2>
+                <p className="text-xs text-muted-foreground">
+                  Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                value={focusGoal}
+                onChange={(e) => setFocusGoal(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
+                placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
+                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm"
+                disabled={loading === "init"}
+              />
+              <button
+                onClick={handleStartFocus}
+                disabled={loading === "init"}
+                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+              >
+                {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Start
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                "Test my Python basics",
+                "Drill me on decorators and generators",
+                "Make me confident with pandas groupby & joins",
+                "I want to be a pro at recursion and DP",
+                "Practice asyncio like a pro",
+              ].map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => setFocusGoal(ex)}
+                  disabled={loading === "init"}
+                  className="text-[11px] px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {!question && tab === "interview" && (
           <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
             <div className="flex items-center gap-2">
@@ -736,6 +876,19 @@ function PythonWorkspace() {
         )}
 
         {question && (
+          <>
+          {focusPlan && (
+            <div className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 mb-3 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold">🎯 {focusPlan.focus_title}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">{focusPlan.difficulty}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">{focusCount} answered</span>
+              <div className="flex flex-wrap gap-1 ml-2">
+                {focusPlan.concepts.map((c, i) => (
+                  <span key={c} className={`text-[10px] font-mono px-2 py-0.5 rounded border ${i === focusIdx ? "border-primary bg-primary/10 text-foreground" : i < focusIdx ? "border-border bg-surface text-muted-foreground" : "border-dashed border-border text-muted-foreground/60"}`}>{c}</span>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <section className="space-y-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
@@ -873,12 +1026,18 @@ function PythonWorkspace() {
                 <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
                   {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
                 </button>
-                <button onClick={handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                {focusPlan && (
+                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                    <Square className="h-3.5 w-3.5" /> End focus
+                  </button>
+                )}
+                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
                   {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
                 </button>
               </div>
             </section>
           </div>
+          </>
         )}
       </main>
       <AiAssistant

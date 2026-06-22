@@ -323,6 +323,8 @@ export function FloatingTimer() {
             </span>
             <button
               onClick={() => setOpen(false)}
+              onPointerDown={(e) => e.stopPropagation()}
+              onPointerUp={(e) => e.stopPropagation()}
               aria-label="Minimize timer"
               className="ml-auto text-muted-foreground hover:text-foreground"
             >
@@ -332,12 +334,14 @@ export function FloatingTimer() {
           <div className="flex border-b border-border text-[11px]">
             <button
               onClick={() => setTab("focus")}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`flex-1 py-1.5 ${tab === "focus" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
             >
               Focus
             </button>
             <button
               onClick={() => setTab("challenge")}
+              onPointerDown={(e) => e.stopPropagation()}
               className={`flex-1 py-1.5 inline-flex items-center justify-center gap-1 ${tab === "challenge" ? "bg-card text-foreground font-medium" : "bg-surface-2 text-muted-foreground hover:text-foreground"}`}
             >
               <Trophy className="h-3 w-3" /> Challenge
