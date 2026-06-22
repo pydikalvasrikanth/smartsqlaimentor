@@ -876,6 +876,19 @@ function PythonWorkspace() {
         )}
 
         {question && (
+          <>
+          {focusPlan && (
+            <div className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 mb-3 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold">🎯 {focusPlan.focus_title}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">{focusPlan.difficulty}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">{focusCount} answered</span>
+              <div className="flex flex-wrap gap-1 ml-2">
+                {focusPlan.concepts.map((c, i) => (
+                  <span key={c} className={`text-[10px] font-mono px-2 py-0.5 rounded border ${i === focusIdx ? "border-primary bg-primary/10 text-foreground" : i < focusIdx ? "border-border bg-surface text-muted-foreground" : "border-dashed border-border text-muted-foreground/60"}`}>{c}</span>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <section className="space-y-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
@@ -1024,6 +1037,7 @@ function PythonWorkspace() {
               </div>
             </section>
           </div>
+          </>
         )}
       </main>
       <AiAssistant
