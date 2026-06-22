@@ -734,9 +734,6 @@ function PythonWorkspace() {
           </div>
         )}
 
-        {!question && tab === "interview" && (
-          null
-        )}
         {!question && tab === "targeted" && (
           <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-4">
             <div className="flex items-center gap-2">
@@ -788,7 +785,7 @@ function PythonWorkspace() {
             </div>
           </div>
         )}
-        {tab === "interview-original-marker" && (
+        {!question && tab === "interview" && (
           <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
