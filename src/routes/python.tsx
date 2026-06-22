@@ -324,17 +324,26 @@ interface PyQuestion {
 
 function PythonWorkspace() {
   const engine = useServerFn(runPythonEngine);
+  const planFocusFn = useServerFn(planPythonFocus);
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "free" | "topic" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "free" | "topic" | "targeted" | "interview">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
   const [interviewLevel, setInterviewLevel] = useState<Level>("intermediate");
   const [interviewMode, setInterviewMode] = useState(false);
+
+  // Targeted (goal-driven) practice state
+  type FocusPlan = { focus_title: string; difficulty: Level; concepts: string[]; intro: string };
+  const [focusGoal, setFocusGoal] = useState("");
+  const [focusPlan, setFocusPlan] = useState<FocusPlan | null>(null);
+  const [focusIdx, setFocusIdx] = useState(0);
+  const [focusCount, setFocusCount] = useState(0);
+
   const [question, setQuestion] = useState<PyQuestion | null>(null);
   const [sessionQid, setSessionQid] = useState<string | null>(null);
   const [code, setCode] = useState("");
