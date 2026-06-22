@@ -8,6 +8,7 @@ import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { AiAssistant } from "@/components/AiAssistant";
+import { ThemeToggle } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/python")({
   head: () => ({
@@ -648,6 +649,7 @@ function PythonWorkspace() {
             )}
             {question && <span className="px-2 py-0.5 rounded border border-border">{question.difficulty}</span>}
             {question?.concept && <span className="px-2 py-0.5 rounded border border-border text-primary-glow">{question.concept}</span>}
+            <ThemeToggle />
             <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" />
             </button>
