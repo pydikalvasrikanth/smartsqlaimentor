@@ -735,6 +735,60 @@ function PythonWorkspace() {
         )}
 
         {!question && tab === "interview" && (
+          null
+        )}
+        {!question && tab === "targeted" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Target className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">Tell me what to test you on</h2>
+                <p className="text-xs text-muted-foreground">
+                  Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                value={focusGoal}
+                onChange={(e) => setFocusGoal(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
+                placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
+                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm"
+                disabled={loading === "init"}
+              />
+              <button
+                onClick={handleStartFocus}
+                disabled={loading === "init"}
+                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+              >
+                {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Start
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                "Test my Python basics",
+                "Drill me on decorators and generators",
+                "Make me confident with pandas groupby & joins",
+                "I want to be a pro at recursion and DP",
+                "Practice asyncio like a pro",
+              ].map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => setFocusGoal(ex)}
+                  disabled={loading === "init"}
+                  className="text-[11px] px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {tab === "interview-original-marker" && (
           <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
