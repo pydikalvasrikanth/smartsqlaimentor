@@ -5,6 +5,7 @@ import { Toaster, toast } from "sonner";
 import { Cloud, ArrowLeft, ArrowRight, Eye, EyeOff, LogOut, CheckCircle2, XCircle, Filter } from "lucide-react";
 import { GCP_BANK, type GcpDifficulty, type GcpQuestion } from "@/lib/gcp-bank";
 import { AiAssistant } from "@/components/AiAssistant";
+import { ThemeToggle } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/gcp")({
   head: () => ({
@@ -96,6 +97,7 @@ function GcpWorkspace() {
           </div>
           <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
             <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{correctCount} correct</span>
+            <ThemeToggle />
             <button onClick={() => signOut()} aria-label="Sign out" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" />
             </button>
