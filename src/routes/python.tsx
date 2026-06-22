@@ -445,6 +445,7 @@ function PythonWorkspace() {
     setLoading("init");
     clearPanels();
     setInterviewMode(false);
+    setFocusPlan(null);
     const data = await call("INIT_PYTHON_ENVIRONMENT", {
       difficulty,
       target_concept: topicSlug,
@@ -459,6 +460,81 @@ function PythonWorkspace() {
     setPastIds([data.question.question_id]);
     if (data.question.concept) setCovered([data.question.concept]);
     toast.success(`${topicLabel} · ${difficulty}`);
+  }
+
+  async function handleStartFocus() {
+    const goal = focusGoal.trim();
+    if (goal.length < 2) {
+      toast.error('Tell me what you\'d like to practice, e.g. "drill me on decorators".');
+      return;
+    }
+    setLoading("init");
+    clearPanels();
+    setInterviewMode(false);
+    let planRes: any;
+    try {
+      planRes = await planFocusFn({ data: { goal } });
+    } catch (e: any) {
+      setLoading(null);
+      toast.error(e?.message ?? "Could not build a plan.");
+      return;
+    }
+    if (planRes?.error) { setLoading(null); toast.error(planRes.error); return; }
+    const fp = planRes?.data as FocusPlan | undefined;
+    if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
+    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+      difficulty: fp.difficulty,
+      target_concept: fp.concepts[0],
+      topic: fp.focus_title,
+    });
+    setLoading(null);
+    if (!data) return;
+    setFocusPlan(fp);
+    setFocusIdx(0);
+    setFocusCount(1);
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(fp.intro || `${fp.focus_title} — let's go!`);
+  }
+
+  async function handleFocusNext() {
+    if (!focusPlan) return;
+    const nextIdx = (focusIdx + 1) % focusPlan.concepts.length;
+    const concept = focusPlan.concepts[nextIdx];
+    setLoading("next"); clearPanels();
+    const data = await call("NEXT_PYTHON_QUESTION", {
+      target_difficulty: focusPlan.difficulty,
+      target_concept: concept,
+      covered_concepts: covered,
+      previous_question_ids: pastIds,
+    });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex((i) => i + 1);
+    setFocusIdx(nextIdx);
+    setFocusCount((c) => c + 1);
+    setPastIds((ids) => [...ids, data.question.question_id]);
+    if (data.question.concept) setCovered((cs) => cs.includes(data.question.concept) ? cs : [...cs, data.question.concept]);
+    toast.success(`Focus: ${concept}`);
+  }
+
+  function handleFocusReset() {
+    setFocusPlan(null);
+    setFocusIdx(0);
+    setFocusCount(0);
+    setQuestion(null);
+    setSessionQid(null);
+    setPastIds([]);
+    setCovered([]);
+    setQIndex(0);
+    clearPanels();
   }
 
   function handleStartToday() {
