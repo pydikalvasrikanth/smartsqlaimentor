@@ -1013,7 +1013,12 @@ function PythonWorkspace() {
                 <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
                   {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
                 </button>
-                <button onClick={handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                {focusPlan && (
+                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                    <Square className="h-3.5 w-3.5" /> End focus
+                  </button>
+                )}
+                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
                   {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
                 </button>
               </div>
