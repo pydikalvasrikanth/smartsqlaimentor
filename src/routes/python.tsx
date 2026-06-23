@@ -678,6 +678,9 @@ function PythonWorkspace() {
             <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Target className="h-3.5 w-3.5" /> Targeted
             </button>
+            <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Boxes className="h-3.5 w-3.5" /> Data Engineering
+            </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
@@ -832,7 +835,7 @@ function PythonWorkspace() {
           </div>
         )}
 
-        {!question && (tab === "free" || (!plan && tab !== "interview" && tab !== "topic")) && (
+        {!question && (tab === "free" || (tab === "today" && !plan)) && (
           <div className="grid place-items-center min-h-[50vh]">
             <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
               <div className="flex items-center gap-2">
