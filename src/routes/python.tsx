@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2, Library, Sparkles, Square } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
@@ -332,8 +332,9 @@ function PythonWorkspace() {
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "free" | "topic" | "targeted" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "free" | "topic" | "targeted" | "data-eng" | "interview">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
+  const [deLevel, setDeLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
   const [interviewLevel, setInterviewLevel] = useState<Level>("intermediate");
   const [interviewMode, setInterviewMode] = useState(false);
@@ -469,6 +470,10 @@ function PythonWorkspace() {
       toast.error('Tell me what you\'d like to practice, e.g. "drill me on decorators".');
       return;
     }
+    await runFocus(goal);
+  }
+
+  async function runFocus(goal: string, overrideLevel?: Level) {
     setLoading("init");
     clearPanels();
     setInterviewMode(false);
@@ -481,8 +486,9 @@ function PythonWorkspace() {
       return;
     }
     if (planRes?.error) { setLoading(null); toast.error(planRes.error); return; }
-    const fp = planRes?.data as FocusPlan | undefined;
+    let fp = planRes?.data as FocusPlan | undefined;
     if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
+    if (overrideLevel) fp = { ...fp, difficulty: overrideLevel };
     const data = await call("INIT_PYTHON_ENVIRONMENT", {
       difficulty: fp.difficulty,
       target_concept: fp.concepts[0],
@@ -672,6 +678,9 @@ function PythonWorkspace() {
             <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Target className="h-3.5 w-3.5" /> Targeted
             </button>
+            <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Boxes className="h-3.5 w-3.5" /> Data Engineering
+            </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
@@ -787,6 +796,70 @@ function PythonWorkspace() {
             </div>
           </div>
         )}
+        {!question && tab === "data-eng" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Boxes className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">Data Engineering — Python on the job</h2>
+                <p className="text-xs text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <div className="grid grid-cols-3 gap-2">
+                {LEVEL_ORDER.map((l) => (
+                  <button key={l} onClick={() => setDeLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${deLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                    <div className="text-sm font-semibold capitalize">{l}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              {[
+                { group: "Batch ETL / ELT", scenarios: [
+                  "Build a pandas pipeline that ingests CSVs, deduplicates, and writes partitioned Parquet",
+                  "Write a PySpark job that joins dimension and fact tables, then aggregates daily revenue",
+                  "Implement an incremental load using watermark columns and upserts",
+                ]},
+                { group: "Streaming", scenarios: [
+                  "Process a Kafka stream of clickstream events with windowed aggregations",
+                  "Handle late-arriving events with watermarks and stateful processing",
+                ]},
+                { group: "Orchestration", scenarios: [
+                  "Design an Airflow DAG with retries, SLAs, and dynamic task mapping",
+                  "Backfill a partitioned table for a date range with idempotent tasks",
+                ]},
+                { group: "Warehousing & Modeling", scenarios: [
+                  "Implement SCD Type 2 logic in Python over a dimension table",
+                  "Generate a star schema loader with surrogate keys and referential checks",
+                ]},
+                { group: "Data Quality & Reliability", scenarios: [
+                  "Write data-quality checks (null, uniqueness, range, freshness) with clear failure modes",
+                  "Detect and quarantine schema drift in incoming JSON events",
+                ]},
+              ].map((g) => (
+                <div key={g.group} className="space-y-1.5">
+                  <div className="text-xs font-semibold text-primary-glow">{g.group}</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                    {g.scenarios.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => runFocus(s, deLevel)}
+                        disabled={loading === "init"}
+                        className="text-left text-xs px-3 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {!question && tab === "interview" && (
           <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
             <div className="flex items-center gap-2">
@@ -826,7 +899,7 @@ function PythonWorkspace() {
           </div>
         )}
 
-        {!question && (tab === "free" || (!plan && tab !== "interview" && tab !== "topic")) && (
+        {!question && (tab === "free" || (tab === "today" && !plan)) && (
           <div className="grid place-items-center min-h-[50vh]">
             <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
               <div className="flex items-center gap-2">
