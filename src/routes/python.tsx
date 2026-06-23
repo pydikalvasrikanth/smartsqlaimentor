@@ -470,6 +470,10 @@ function PythonWorkspace() {
       toast.error('Tell me what you\'d like to practice, e.g. "drill me on decorators".');
       return;
     }
+    await runFocus(goal);
+  }
+
+  async function runFocus(goal: string, overrideLevel?: Level) {
     setLoading("init");
     clearPanels();
     setInterviewMode(false);
@@ -482,8 +486,9 @@ function PythonWorkspace() {
       return;
     }
     if (planRes?.error) { setLoading(null); toast.error(planRes.error); return; }
-    const fp = planRes?.data as FocusPlan | undefined;
+    let fp = planRes?.data as FocusPlan | undefined;
     if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
+    if (overrideLevel) fp = { ...fp, difficulty: overrideLevel };
     const data = await call("INIT_PYTHON_ENVIRONMENT", {
       difficulty: fp.difficulty,
       target_concept: fp.concepts[0],
