@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorialRouteImport } from './routes/tutorial'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PracticeRouteImport } from './routes/practice'
@@ -25,11 +24,6 @@ import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
   path: '/tutorial',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -93,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
 }
@@ -107,7 +100,6 @@ export interface FileRoutesByTo {
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
 }
@@ -122,7 +114,6 @@ export interface FileRoutesById {
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
 }
@@ -138,7 +129,6 @@ export interface FileRouteTypes {
     | '/practice'
     | '/python'
     | '/reset-password'
-    | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -152,7 +142,6 @@ export interface FileRouteTypes {
     | '/practice'
     | '/python'
     | '/reset-password'
-    | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
   id:
@@ -166,7 +155,6 @@ export interface FileRouteTypes {
     | '/practice'
     | '/python'
     | '/reset-password'
-    | '/sitemap.xml'
     | '/tutorial'
     | '/topic/$slug'
   fileRoutesById: FileRoutesById
@@ -181,7 +169,6 @@ export interface RootRouteChildren {
   PracticeRoute: typeof PracticeRoute
   PythonRoute: typeof PythonRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TutorialRoute: typeof TutorialRoute
   TopicSlugRoute: typeof TopicSlugRoute
 }
@@ -193,13 +180,6 @@ declare module '@tanstack/react-router' {
       path: '/tutorial'
       fullPath: '/tutorial'
       preLoaderRoute: typeof TutorialRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -285,7 +265,6 @@ const rootRouteChildren: RootRouteChildren = {
   PracticeRoute: PracticeRoute,
   PythonRoute: PythonRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TutorialRoute: TutorialRoute,
   TopicSlugRoute: TopicSlugRoute,
 }
