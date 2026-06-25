@@ -69,19 +69,19 @@ function EnginePage() {
             <Database className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-semibold tracking-tight">MySQL Intelligence Engine</h1>
-            <p className="text-[11px] text-muted-foreground font-mono">
+            <h1 className="text-base font-semibold tracking-tight">MySQL Intelligence Engine</h1>
+            <p className="text-xs text-muted-foreground font-mono">
               {TOTAL_ROWS} rows · CUSTOMERS · ORDERS · ORDER_ITEMS
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+            <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
               <ArrowLeft className="h-3 w-3" /> Practice mode
             </Link>
           </div>
         </div>
-        <nav className="max-w-[1400px] mx-auto px-4 flex gap-1 text-xs font-mono">
+        <nav className="max-w-[1400px] mx-auto px-4 flex gap-1 text-sm font-mono">
           <TabBtn active={tab === "preview"} onClick={() => setTab("preview")} icon={<Database className="h-3.5 w-3.5" />}>Data Preview</TabBtn>
           <TabBtn active={tab === "ai"} onClick={() => setTab("ai")} icon={<Sparkles className="h-3.5 w-3.5" />}>AI SQL Compiler</TabBtn>
           <TabBtn active={tab === "quality"} onClick={() => setTab("quality")} icon={<ShieldCheck className="h-3.5 w-3.5" />}>Data Quality</TabBtn>
@@ -124,14 +124,14 @@ function PreviewTab() {
   return (
     <div className="grid lg:grid-cols-[360px_1fr] gap-4">
       <aside className="rounded-lg border border-border bg-card p-3 h-[calc(100vh-180px)] overflow-auto">
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">ERD</div>
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">ERD</div>
         <ErdDiagram chart={ERD_MERMAID} />
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 mb-2">Schema</div>
-        <pre className="text-[11px] font-mono whitespace-pre-wrap text-foreground/85">{SCHEMA_SQL}</pre>
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mt-4 mb-2">Schema</div>
+        <pre className="text-xs font-mono whitespace-pre-wrap text-foreground/85">{SCHEMA_SQL}</pre>
       </aside>
 
       <section className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="flex items-center gap-2 p-3 border-b border-border bg-surface-2 text-xs">
+        <div className="flex items-center gap-2 p-3 border-b border-border bg-surface-2 text-sm">
           {(["customers", "orders", "items"] as const).map((k) => (
             <button key={k} onClick={() => setWhich(k)}
               className={`px-2.5 py-1 rounded ${which === k ? "bg-primary/20 text-primary-glow" : "hover:bg-accent"}`}>
@@ -140,7 +140,7 @@ function PreviewTab() {
           ))}
         </div>
         <div className="overflow-auto h-[calc(100vh-235px)]">
-          <table className="text-xs font-mono w-full">
+          <table className="text-sm font-mono w-full">
             <thead className="bg-surface-2 sticky top-0">
               <tr>{cols.map((c) => <th key={c} className="text-left px-3 py-2 text-muted-foreground">{c}</th>)}</tr>
             </thead>
@@ -187,18 +187,18 @@ function AITab() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-        <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Ask in plain English</label>
+        <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Ask in plain English</label>
         <textarea value={nl} onChange={(e) => setNl(e.target.value)}
-          className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm font-mono min-h-[80px]" />
+          className="w-full bg-background border border-input rounded-md px-3 py-2 text-base font-mono min-h-[80px]" />
         <div className="flex gap-2">
           <button onClick={go} disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-gradient-to-r from-primary to-primary-glow text-primary-foreground disabled:opacity-50">
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium bg-gradient-to-r from-primary to-primary-glow text-primary-foreground disabled:opacity-50">
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
             Compile to SQL
           </button>
           {result && (
             <button onClick={() => setShowBQ((v) => !v)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs border border-border hover:bg-accent">
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm border border-border hover:bg-accent">
               <Cloud className="h-3.5 w-3.5" /> {showBQ ? "Show MySQL" : "GCP Shift → BigQuery"}
             </button>
           )}
@@ -208,7 +208,7 @@ function AITab() {
       {result && (
         <>
           {(local3VL || result.three_valued_logic_warning) && (
-            <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs">
+            <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
               <div className="flex items-center gap-1.5 font-semibold text-amber-300 mb-1">
                 <AlertTriangle className="h-3.5 w-3.5" /> Senior Pitfall — Three-Valued Logic (3VL)
               </div>
@@ -221,7 +221,7 @@ function AITab() {
 
           <div className="rounded-lg border border-border bg-card overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface-2">
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 {showBQ ? "BigQuery Standard SQL" : "MySQL 8.0"}
               </span>
             </div>
@@ -229,14 +229,14 @@ function AITab() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-4">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
               <Zap className="h-3.5 w-3.5" /> Explain Plan
             </div>
-            <pre className="text-xs font-mono whitespace-pre-wrap text-foreground/85">{result.explain_plan}</pre>
+            <pre className="text-sm font-mono whitespace-pre-wrap text-foreground/85">{result.explain_plan}</pre>
           </div>
 
           {result.notes && (
-            <div className="rounded-lg border border-border bg-card p-4 text-xs text-foreground/80">
+            <div className="rounded-lg border border-border bg-card p-4 text-sm text-foreground/80">
               {result.notes}
             </div>
           )}
@@ -261,9 +261,9 @@ function QualityTab() {
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {cards.map((c) => (
         <div key={c.label} className="rounded-lg border border-border bg-card p-4">
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{c.label}</div>
-          <div className={`text-2xl font-semibold mt-1 ${c.good ? "text-foreground" : "text-destructive"}`}>{c.value}</div>
-          <div className="text-[11px] text-muted-foreground mt-1">{c.hint}</div>
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">{c.label}</div>
+          <div className={`text-3xl font-semibold mt-1 ${c.good ? "text-foreground" : "text-destructive"}`}>{c.value}</div>
+          <div className="text-xs text-muted-foreground mt-1">{c.hint}</div>
         </div>
       ))}
     </div>
@@ -276,7 +276,7 @@ function LabTab() {
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-1 text-xs font-mono">
+      <div className="flex gap-1 text-sm font-mono">
         {(["window", "cte", "index"] as const).map((k) => (
           <button key={k} onClick={() => setWhich(k)}
             className={`px-3 py-1.5 rounded ${which === k ? "bg-primary/20 text-primary-glow" : "border border-border hover:bg-accent"}`}>
@@ -321,8 +321,8 @@ function LabCard({ title, body, sql }: { title: string; body: string; sql: strin
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="px-4 py-3 border-b border-border bg-surface-2">
-        <div className="text-sm font-semibold">{title}</div>
-        <p className="text-xs text-muted-foreground mt-0.5">{body}</p>
+        <div className="text-base font-semibold">{title}</div>
+        <p className="text-sm text-muted-foreground mt-0.5">{body}</p>
       </div>
       <SqlEditor value={sql} onChange={() => {}} height="220px" />
     </div>
@@ -347,27 +347,27 @@ function IndexLab() {
     <div className="rounded-lg border border-border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-sm font-semibold">Indexed vs Non-Indexed lookup</div>
-          <p className="text-xs text-muted-foreground">SELECT * FROM CUSTOMERS WHERE email = '{target}';</p>
+          <div className="text-base font-semibold">Indexed vs Non-Indexed lookup</div>
+          <p className="text-sm text-muted-foreground">SELECT * FROM CUSTOMERS WHERE email = '{target}';</p>
         </div>
         <button onClick={() => setIndexed((v) => !v)}
-          className="px-3 py-1.5 rounded-md text-xs border border-border hover:bg-accent">
+          className="px-3 py-1.5 rounded-md text-sm border border-border hover:bg-accent">
           Toggle: {indexed ? "INDEX ON" : "INDEX OFF"}
         </button>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-md border border-border p-3">
-          <div className="text-[10px] uppercase text-muted-foreground">Strategy</div>
-          <div className="text-lg font-semibold mt-1">{indexed ? "Index Seek (B-Tree)" : "Full Table Scan"}</div>
+          <div className="text-[11px] uppercase text-muted-foreground">Strategy</div>
+          <div className="text-xl font-semibold mt-1">{indexed ? "Index Seek (B-Tree)" : "Full Table Scan"}</div>
         </div>
         <div className="rounded-md border border-border p-3">
-          <div className="text-[10px] uppercase text-muted-foreground">Simulated time</div>
-          <div className={`text-lg font-semibold mt-1 ${indexed ? "text-emerald-400" : "text-amber-400"}`}>
+          <div className="text-[11px] uppercase text-muted-foreground">Simulated time</div>
+          <div className={`text-xl font-semibold mt-1 ${indexed ? "text-emerald-400" : "text-amber-400"}`}>
             {ms.toFixed(3)} ms
           </div>
         </div>
       </div>
-      <pre className="text-[11px] font-mono whitespace-pre-wrap text-foreground/85 bg-surface-2 p-3 rounded">
+      <pre className="text-xs font-mono whitespace-pre-wrap text-foreground/85 bg-surface-2 p-3 rounded">
 {indexed
   ? `-- EXPLAIN
 type=ref  key=idx_email  rows=1

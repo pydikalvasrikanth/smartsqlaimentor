@@ -945,7 +945,7 @@ function Workspace() {
   const coverageInLevel = pool.filter((c) => coveredConcepts.includes(c)).length;
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">Loading…</div>;
+    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
   }
 
   return (
@@ -961,13 +961,13 @@ function Workspace() {
             <Terminal className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-semibold tracking-tight">SQL Intelligence Engine</h1>
-            <p className="text-[11px] text-muted-foreground font-mono">
+            <h1 className="text-base font-semibold tracking-tight">SQL Intelligence Engine</h1>
+            <p className="text-xs text-muted-foreground font-mono">
               senior data engineer · in your browser
             </p>
           </div>
           {session ? (
-            <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
+            <div className="ml-auto flex items-center gap-2 text-xs font-mono">
               <span className="text-muted-foreground">{difficulty} coverage</span>
               <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
                 {coverageInLevel}/{pool.length}
@@ -995,19 +995,19 @@ function Workspace() {
             </div>
           ) : (
             <div className="ml-auto flex items-center gap-2">
-              <Link to="/tutorial" className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent">
+              <Link to="/tutorial" className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent">
                 <BookOpen className="h-3 w-3" /> Tutorial
               </Link>
-              <Link to="/engine" className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent">
+              <Link to="/engine" className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
               <ThemeToggle />
-              <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">
+              <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
                 {user.email}
               </span>
               <button
                 onClick={() => signOut()}
-                className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+                className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent"
               >
                 <LogOut className="h-3 w-3" /> Sign out
               </button>
@@ -1040,7 +1040,7 @@ function Workspace() {
 
         {tab === "today" && (
           planQ.isLoading ? (
-            <div className="p-10 text-center text-sm text-muted-foreground">Loading your plan…</div>
+            <div className="p-10 text-center text-base text-muted-foreground">Loading your plan…</div>
           ) : planQ.data?.plan ? (
             <PlanDashboard
               plan={planQ.data.plan}
@@ -1052,13 +1052,13 @@ function Workspace() {
             />
           ) : (
             <div className="rounded-lg border border-dashed border-border p-10 text-center space-y-3">
-              <h2 className="text-lg font-semibold">No active practice plan</h2>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              <h2 className="text-xl font-semibold">No active practice plan</h2>
+              <p className="text-base text-muted-foreground max-w-md mx-auto">
                 Build a personalized day-wise curriculum across all SQL topics, ramping to your target proficiency.
               </p>
               <button
                 onClick={() => setShowPlanner(true)}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold"
               >
                 Build my plan
               </button>
@@ -1083,7 +1083,7 @@ function Workspace() {
           companies={["Any", ...COMPANIES]}
         />
         {isInterviewMode && (
-          <div className="text-[11px] font-mono text-muted-foreground -mt-2 px-1">
+          <div className="text-xs font-mono text-muted-foreground -mt-2 px-1">
             Interview mode: cycling through {120}+ canonical FAANG SQL questions
             (Meta, Google, Amazon, Microsoft, Netflix, Uber, Stripe, Bloomberg…). Press{" "}
             <span className="text-foreground">Next question</span> after each to draw a new one.
@@ -1121,10 +1121,10 @@ function Workspace() {
                 ) : (<>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                       MySQL editor
                     </span>
-                    <span className="text-[10px] font-mono text-muted-foreground">
+                    <span className="text-[11px] font-mono text-muted-foreground">
                       cmd+enter to run
                     </span>
                   </div>
@@ -1150,7 +1150,7 @@ function Workspace() {
 
             {!session && (
               <div className="rounded-lg border border-dashed border-border p-10 text-center">
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                <p className="text-base text-muted-foreground max-w-md mx-auto">
                   Choose a topic and difficulty above, then press{" "}
                   <span className="text-foreground font-semibold">Start session</span>. Your
                   AI mentor will generate a realistic schema, seed data, and your first
@@ -1320,13 +1320,13 @@ function TopicWise({
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="text-sm font-semibold">Practice by topic</h2>
-            <p className="text-[11px] text-muted-foreground">
+            <h2 className="text-base font-semibold">Practice by topic</h2>
+            <p className="text-xs text-muted-foreground">
               Pick a topic — you'll get up to {QUESTIONS_PER_TOPIC} questions, then it auto-advances to the next one. Switch any time.
             </p>
           </div>
           {active && (
-            <button onClick={onReset} className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-accent">
+            <button onClick={onReset} className="text-sm px-3 py-1.5 rounded-md border border-border hover:bg-accent">
               End session
             </button>
           )}
@@ -1339,9 +1339,9 @@ function TopicWise({
             return (
               <div key={cat}>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-base">{info.emoji}</span>
-                  <span className="text-xs font-semibold">{info.label}</span>
-                  <span className="text-[10px] text-muted-foreground hidden sm:inline">— {info.blurb}</span>
+                  <span className="text-lg">{info.emoji}</span>
+                  <span className="text-sm font-semibold">{info.label}</span>
+                  <span className="text-[11px] text-muted-foreground hidden sm:inline">— {info.blurb}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {topics.map((t) => {
@@ -1351,7 +1351,7 @@ function TopicWise({
                         key={t.slug}
                         onClick={() => onPickTopic(t.slug)}
                         disabled={loading === "init"}
-                        className={`text-xs px-2.5 py-1.5 rounded-md border transition-colors disabled:opacity-50 ${
+                        className={`text-sm px-2.5 py-1.5 rounded-md border transition-colors disabled:opacity-50 ${
                           isActive
                             ? "border-primary bg-primary/10 text-foreground"
                             : "border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground"
@@ -1372,19 +1372,19 @@ function TopicWise({
       {active && (
         <>
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-2 px-4 py-2.5">
-            <span className="text-xs font-semibold">{CATEGORY_INFO[active.category].emoji} {active.name}</span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
+            <span className="text-sm font-semibold">{CATEGORY_INFO[active.category].emoji} {active.name}</span>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
               {active.category}
             </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border">
               Q {topicQ} / {QUESTIONS_PER_TOPIC}
             </span>
             <div className="ml-auto flex items-center gap-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Switch</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Switch</label>
               <select
                 value={activeSlug ?? ""}
                 onChange={(e) => onPickTopic(e.target.value)}
-                className="bg-background border border-input rounded-md px-2 py-1 text-xs font-mono max-w-[200px]"
+                className="bg-background border border-input rounded-md px-2 py-1 text-sm font-mono max-w-[200px]"
               >
                 {SQL_TOPICS.map((t) => (
                   <option key={t.slug} value={t.slug}>
@@ -1426,8 +1426,8 @@ function TopicWise({
                   ) : (<>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
-                      <span className="text-[10px] font-mono text-muted-foreground">cmd+enter to run</span>
+                      <span className="text-[11px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
+                      <span className="text-[11px] font-mono text-muted-foreground">cmd+enter to run</span>
                     </div>
                     <SqlEditor value={userSql} onChange={onSetSql} />
                     <div className="flex flex-wrap gap-2 items-center">
@@ -1468,7 +1468,7 @@ function TopicWise({
 
       {!active && (
         <div className="rounded-lg border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          <p className="text-base text-muted-foreground max-w-md mx-auto">
             Select any topic above to begin. Questions are generated to match the chosen SQL category.
           </p>
         </div>
@@ -1549,9 +1549,9 @@ function FocusPractice({
       <div className="rounded-lg border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Target className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold">Tell me what to test you on</h2>
+          <h2 className="text-base font-semibold">Tell me what to test you on</h2>
         </div>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Describe your goal in plain English. I'll build a focused set of questions that covers it end-to-end,
           track every mistake, and when you press <span className="text-foreground font-semibold">End &amp; analyze</span> I'll
           tell you exactly where you're strong and where you need work.
@@ -1562,13 +1562,13 @@ function FocusPractice({
             onChange={(e) => onGoal(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !busy) onStart(); }}
             placeholder='e.g. "Test my basic commands" or "I want to be a pro at joins"'
-            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm"
+            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
             disabled={busy}
           />
           <button
             onClick={onStart}
             disabled={busy}
-            className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             {plan ? "Restart with this goal" : "Start"}
@@ -1580,7 +1580,7 @@ function FocusPractice({
               key={ex}
               onClick={() => onGoal(ex)}
               disabled={busy}
-              className="text-[11px] px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
+              className="text-xs px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               {ex}
             </button>
@@ -1591,15 +1591,15 @@ function FocusPractice({
       {/* Active focus session */}
       {plan && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-2 px-4 py-2.5">
-          <span className="text-xs font-semibold">🎯 {plan.focus_title}</span>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">
+          <span className="text-sm font-semibold">🎯 {plan.focus_title}</span>
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">
             {plan.difficulty}
           </span>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border">
             {focusCount} answered
           </span>
           {currentConcept && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border text-primary-glow">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border text-primary-glow">
               now: {currentConcept}
             </span>
           )}
@@ -1607,12 +1607,12 @@ function FocusPractice({
             <button
               onClick={onEnd}
               disabled={loading === "analyze"}
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-accent disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-accent disabled:opacity-50"
             >
               {loading === "analyze" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Square className="h-3.5 w-3.5" />}
               End &amp; analyze
             </button>
-            <button onClick={onReset} className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-accent">
+            <button onClick={onReset} className="text-sm px-3 py-1.5 rounded-md border border-border hover:bg-accent">
               New goal
             </button>
           </div>
@@ -1625,7 +1625,7 @@ function FocusPractice({
           {plan.concepts.map((c, i) => (
             <span
               key={c}
-              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+              className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
                 i === focusIdx
                   ? "border-primary bg-primary/10 text-foreground"
                   : i < focusIdx
@@ -1671,8 +1671,8 @@ function FocusPractice({
             ) : (<>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
-                <span className="text-[10px] font-mono text-muted-foreground">cmd+enter to run</span>
+                <span className="text-[11px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
+                <span className="text-[11px] font-mono text-muted-foreground">cmd+enter to run</span>
               </div>
               <SqlEditor value={userSql} onChange={onSetSql} />
               <div className="flex flex-wrap gap-2 items-center">
@@ -1709,7 +1709,7 @@ function FocusPractice({
 
       {!plan && (
         <div className="rounded-lg border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          <p className="text-base text-muted-foreground max-w-md mx-auto">
             Type what you want to be tested on above and press <span className="text-foreground font-semibold">Start</span>.
             The AI mentor plans a focused path, asks targeted questions, and analyzes your mistakes when you finish.
           </p>
@@ -1730,18 +1730,18 @@ function FocusAnalysisPanel({ analysis }: { analysis: any }) {
     <div className="rounded-lg border border-primary/40 bg-card p-4 space-y-4">
       <div className="flex items-center gap-2">
         <Trophy className="h-4 w-4 text-primary" />
-        <h2 className="text-sm font-semibold">Session analysis</h2>
-        <span className="ml-auto text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
+        <h2 className="text-base font-semibold">Session analysis</h2>
+        <span className="ml-auto text-xs font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
           {correct}/{total} correct · {pct}%
         </span>
       </div>
 
       {a?.verdict && (
-        <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm font-medium">
+        <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-base font-medium">
           {a.verdict}
         </div>
       )}
-      {a?.overall_summary && <p className="text-sm text-muted-foreground">{a.overall_summary}</p>}
+      {a?.overall_summary && <p className="text-base text-muted-foreground">{a.overall_summary}</p>}
       {a?.accuracy_note && <p className="text-[12px] text-muted-foreground">{a.accuracy_note}</p>}
 
       {analysis?.analysis_error && (
@@ -1753,7 +1753,7 @@ function FocusAnalysisPanel({ analysis }: { analysis: any }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {Array.isArray(a?.strengths) && a.strengths.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-emerald-400">
               <Trophy className="h-3.5 w-3.5" /> Strengths
             </div>
             {a.strengths.map((s: any, i: number) => (
@@ -1766,7 +1766,7 @@ function FocusAnalysisPanel({ analysis }: { analysis: any }) {
         )}
         {Array.isArray(a?.weaknesses) && a.weaknesses.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-amber-400">
               <AlertTriangle className="h-3.5 w-3.5" /> Needs work
             </div>
             {a.weaknesses.map((w: any, i: number) => (
@@ -1789,12 +1789,12 @@ function FocusAnalysisPanel({ analysis }: { analysis: any }) {
       {/* Raw per-concept stats */}
       {stats.length > 0 && (
         <div className="space-y-1.5">
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Per-concept accuracy</div>
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Per-concept accuracy</div>
           <div className="flex flex-wrap gap-1.5">
             {stats.map((s) => (
               <span
                 key={s.concept}
-                className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
                   s.accuracy >= 0.7
                     ? "border-emerald-500/40 text-emerald-400"
                     : s.accuracy >= 0.4
@@ -1877,9 +1877,9 @@ function DataEngineering({
       <div className="rounded-lg border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Boxes className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold">Data Engineering — MySQL mentor</h2>
+          <h2 className="text-base font-semibold">Data Engineering — MySQL mentor</h2>
         </div>
-        <p className="text-[11px] text-muted-foreground max-w-3xl">
+        <p className="text-xs text-muted-foreground max-w-3xl">
           Train like a production Data Engineer. A senior mentor generates realistic day-to-day work — ETL/ELT loads,
           warehouse modeling, SCD Type 1/2, CDC merges, data validation, KPI reporting and incident RCA — one exercise
           at a time, ramping from <span className="text-foreground">Junior</span> to <span className="text-foreground">Staff</span>.
@@ -1887,11 +1887,11 @@ function DataEngineering({
 
         {/* Category selector */}
         <div className="flex flex-wrap items-center gap-2">
-          <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Category</label>
+          <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Category</label>
           <button
             onClick={() => onCategory("mix")}
             disabled={loading === "init"}
-            className={`text-[11px] px-2 py-1 rounded-full border transition-colors disabled:opacity-50 ${
+            className={`text-xs px-2 py-1 rounded-full border transition-colors disabled:opacity-50 ${
               category === "mix"
                 ? "border-primary bg-primary/10 text-foreground"
                 : "border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground"
@@ -1904,7 +1904,7 @@ function DataEngineering({
               key={c.key}
               onClick={() => onCategory(c.key)}
               disabled={loading === "init"}
-              className={`text-[11px] px-2 py-1 rounded-full border transition-colors disabled:opacity-50 ${
+              className={`text-xs px-2 py-1 rounded-full border transition-colors disabled:opacity-50 ${
                 category === c.key
                   ? "border-primary bg-primary/10 text-foreground"
                   : "border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground"
@@ -1932,13 +1932,13 @@ function DataEngineering({
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+                <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
                   L{l.level}
                 </span>
-                <span className="text-[10px] font-mono capitalize text-muted-foreground">{l.difficulty}</span>
+                <span className="text-[11px] font-mono capitalize text-muted-foreground">{l.difficulty}</span>
               </div>
-              <div className="mt-1.5 text-xs font-semibold">{l.name}</div>
-              <p className="mt-1 text-[11px] text-muted-foreground leading-snug">{l.blurb}</p>
+              <div className="mt-1.5 text-sm font-semibold">{l.name}</div>
+              <p className="mt-1 text-xs text-muted-foreground leading-snug">{l.blurb}</p>
             </button>
           );
         })}
@@ -1948,19 +1948,19 @@ function DataEngineering({
       {active && session && question ? (
         <>
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-2 px-4 py-2.5">
-            <span className="text-xs font-semibold">📦 Level {lvl.level} · {lvl.name}</span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">
+            <span className="text-sm font-semibold">📦 Level {lvl.level} · {lvl.name}</span>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">
               {lvl.difficulty}
             </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border">
               {count} exercise{count === 1 ? "" : "s"}
             </span>
             {question?.concept && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border text-primary-glow">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border text-primary-glow">
                 now: {question.concept}
               </span>
             )}
-            <button onClick={onReset} className="ml-auto text-xs px-3 py-1.5 rounded-md border border-border hover:bg-accent">
+            <button onClick={onReset} className="ml-auto text-sm px-3 py-1.5 rounded-md border border-border hover:bg-accent">
               End session
             </button>
           </div>
@@ -1970,7 +1970,7 @@ function DataEngineering({
             {lvl.concepts.map((c, i) => (
               <span
                 key={c}
-                className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
                   i === conceptIdx
                     ? "border-primary bg-primary/10 text-foreground"
                     : i < conceptIdx
@@ -2011,8 +2011,8 @@ function DataEngineering({
               ) : (<>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">cmd+enter to run</span>
+                  <span className="text-[11px] uppercase tracking-widest text-muted-foreground">MySQL editor</span>
+                  <span className="text-[11px] font-mono text-muted-foreground">cmd+enter to run</span>
                 </div>
                 <SqlEditor value={userSql} onChange={onSetSql} />
                 <div className="flex flex-wrap gap-2 items-center">
@@ -2052,7 +2052,7 @@ function DataEngineering({
         </>
       ) : (
         <div className="rounded-lg border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          <p className="text-base text-muted-foreground max-w-md mx-auto">
             Pick a level above to start. You begin at <span className="text-foreground font-semibold">Level 1 (Junior)</span> and
             get promoted to the next level automatically as you work through each level's exercises.
           </p>
@@ -2069,7 +2069,7 @@ function TabBtn({ active, onClick, icon, children }: { active: boolean; onClick:
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
         active ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
@@ -2122,7 +2122,7 @@ function ActionBar({
       </ActionBtn>
       <div className="ml-auto flex items-center gap-2">
         {questionCount > 0 && (
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground">
             Q {questionCount} / {TOTAL_QUESTIONS}
           </span>
         )}
@@ -2151,7 +2151,7 @@ function ActionBtn({
     <button
       onClick={onClick}
       disabled={loading}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all disabled:opacity-50 ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all disabled:opacity-50 ${
         primary
           ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-[0_6px_18px_-10px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
           : "border border-border bg-surface hover:bg-accent"

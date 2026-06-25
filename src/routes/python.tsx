@@ -631,7 +631,7 @@ function PythonWorkspace() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">Loading…</div>;
+    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
   }
 
   return (
@@ -644,10 +644,10 @@ function PythonWorkspace() {
             <Code2 className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-semibold tracking-tight">Python Interview Engine</h1>
-            <p className="text-[11px] text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
+            <h1 className="text-base font-semibold tracking-tight">Python Interview Engine</h1>
+            <p className="text-xs text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
           </div>
-          <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
+          <div className="ml-auto flex items-center gap-2 text-xs font-mono">
             {question && (
               <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
                 Day {Math.max(1, Math.ceil((qIndex / TOTAL) * planDays))}/{planDays} · Q {qIndex}/{TOTAL}
@@ -666,19 +666,19 @@ function PythonWorkspace() {
       <main className="max-w-[1400px] mx-auto p-4 space-y-4">
         {!question && (
           <div className="flex items-center gap-1 border-b border-border">
-            <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Calendar className="h-3.5 w-3.5" /> Today
             </button>
-            <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
             </button>
-            <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Target className="h-3.5 w-3.5" /> Targeted
             </button>
-            <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Boxes className="h-3.5 w-3.5" /> Data Engineering
             </button>
-            <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
           </div>
@@ -695,15 +695,15 @@ function PythonWorkspace() {
                 <Library className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-base font-semibold">Topic-wise Python practice for Data Engineers</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-lg font-semibold">Topic-wise Python practice for Data Engineers</h2>
+                <p className="text-sm text-muted-foreground">
                   Pick any topic or library. AI generates a focused question and grades your solution.
                   Covers core Python, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
                 </p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
               <div className="grid grid-cols-3 gap-2">
                 {LEVEL_ORDER.map((l) => (
                   <button
@@ -711,7 +711,7 @@ function PythonWorkspace() {
                     onClick={() => setTopicLevel(l)}
                     className={`text-left p-2.5 rounded-md border transition-colors ${topicLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}
                   >
-                    <div className="text-sm font-semibold capitalize">{l}</div>
+                    <div className="text-base font-semibold capitalize">{l}</div>
                   </button>
                 ))}
               </div>
@@ -720,8 +720,8 @@ function PythonWorkspace() {
               {DE_TOPIC_GROUPS.map((g) => (
                 <div key={g.group} className="space-y-2">
                   <div>
-                    <div className="text-xs font-semibold text-primary-glow">{g.group}</div>
-                    <div className="text-[11px] text-muted-foreground">{g.blurb}</div>
+                    <div className="text-sm font-semibold text-primary-glow">{g.group}</div>
+                    <div className="text-xs text-muted-foreground">{g.blurb}</div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
                     {g.topics.map((t) => (
@@ -729,7 +729,7 @@ function PythonWorkspace() {
                         key={t.slug}
                         onClick={() => handleStartTopic(t.slug, t.label, topicLevel)}
                         disabled={loading === "init"}
-                        className="text-left text-xs px-2.5 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50 flex items-start justify-between gap-2"
+                        className="text-left text-sm px-2.5 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50 flex items-start justify-between gap-2"
                       >
                         <span className="truncate">{t.label}</span>
                         <span className="text-[9px] uppercase tracking-wider text-muted-foreground shrink-0">{t.level[0]}</span>
@@ -749,8 +749,8 @@ function PythonWorkspace() {
                 <Target className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-base font-semibold">Tell me what to test you on</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-lg font-semibold">Tell me what to test you on</h2>
+                <p className="text-sm text-muted-foreground">
                   Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
                 </p>
               </div>
@@ -761,13 +761,13 @@ function PythonWorkspace() {
                 onChange={(e) => setFocusGoal(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
                 placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
-                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm"
+                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
                 disabled={loading === "init"}
               />
               <button
                 onClick={handleStartFocus}
                 disabled={loading === "init"}
-                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50"
               >
                 {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 Start
@@ -785,7 +785,7 @@ function PythonWorkspace() {
                   key={ex}
                   onClick={() => setFocusGoal(ex)}
                   disabled={loading === "init"}
-                  className="text-[11px] px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  className="text-xs px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
                 >
                   {ex}
                 </button>
@@ -800,16 +800,16 @@ function PythonWorkspace() {
                 <Boxes className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-base font-semibold">Data Engineering — Python on the job</h2>
-                <p className="text-xs text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
+                <h2 className="text-lg font-semibold">Data Engineering — Python on the job</h2>
+                <p className="text-sm text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
               <div className="grid grid-cols-3 gap-2">
                 {LEVEL_ORDER.map((l) => (
                   <button key={l} onClick={() => setDeLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${deLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
-                    <div className="text-sm font-semibold capitalize">{l}</div>
+                    <div className="text-base font-semibold capitalize">{l}</div>
                   </button>
                 ))}
               </div>
@@ -839,14 +839,14 @@ function PythonWorkspace() {
                 ]},
               ].map((g) => (
                 <div key={g.group} className="space-y-1.5">
-                  <div className="text-xs font-semibold text-primary-glow">{g.group}</div>
+                  <div className="text-sm font-semibold text-primary-glow">{g.group}</div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                     {g.scenarios.map((s) => (
                       <button
                         key={s}
                         onClick={() => runFocus(s, deLevel)}
                         disabled={loading === "init"}
-                        className="text-left text-xs px-3 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50"
+                        className="text-left text-sm px-3 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50"
                       >
                         {s}
                       </button>
@@ -864,35 +864,35 @@ function PythonWorkspace() {
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-base font-semibold">Company-style Python interview</h2>
-                <p className="text-xs text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
+                <h2 className="text-lg font-semibold">Company-style Python interview</h2>
+                <p className="text-sm text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
               <div className="grid grid-cols-3 gap-2">
                 {LEVEL_ORDER.map((l) => (
                   <button key={l} onClick={() => setInterviewLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${interviewLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
-                    <div className="text-sm font-semibold capitalize">{l}</div>
+                    <div className="text-base font-semibold capitalize">{l}</div>
                   </button>
                 ))}
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Company ({PY_COMPANIES.length})</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Company ({PY_COMPANIES.length})</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 max-h-72 overflow-y-auto p-1">
                 {PY_COMPANIES.map((c) => (
-                  <button key={c} onClick={() => setInterviewCompany(c)} className={`text-xs px-2.5 py-1.5 rounded border text-left truncate transition-colors ${interviewCompany === c ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
+                  <button key={c} onClick={() => setInterviewCompany(c)} className={`text-sm px-2.5 py-1.5 rounded border text-left truncate transition-colors ${interviewCompany === c ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
                     {c}
                   </button>
                 ))}
               </div>
             </div>
-            <button onClick={handleStartInterview} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-sm font-semibold disabled:opacity-50">
+            <button onClick={handleStartInterview} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold disabled:opacity-50">
               {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
               Start {interviewCompany} interview
             </button>
-            <p className="text-[11px] text-muted-foreground">Topic-wise, Targeted and Data Engineering tabs (matching the SQL practice page) are coming next.</p>
+            <p className="text-xs text-muted-foreground">Topic-wise, Targeted and Data Engineering tabs (matching the SQL practice page) are coming next.</p>
           </div>
         )}
 
@@ -904,27 +904,27 @@ function PythonWorkspace() {
                   <Target className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold">Build your Python practice plan</h2>
-                  <p className="text-xs text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
+                  <h2 className="text-lg font-semibold">Build your Python practice plan</h2>
+                  <p className="text-sm text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{plan ? "Plan timeframe (saved)" : "Timeframe"}</label>
+                <label className="text-[11px] uppercase tracking-widest text-muted-foreground">{plan ? "Plan timeframe (saved)" : "Timeframe"}</label>
                 <div className="grid grid-cols-4 gap-2">
                   {[14, 30, 60, 90].map((d) => (
-                    <button key={d} onClick={() => setPlanDays(d)} className={`px-3 py-2 rounded-md text-sm font-mono border transition-colors ${planDays === d ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
+                    <button key={d} onClick={() => setPlanDays(d)} className={`px-3 py-2 rounded-md text-base font-mono border transition-colors ${planDays === d ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
                       {d} days
                     </button>
                   ))}
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground">Target level</label>
+                <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Target level</label>
                 <div className="grid grid-cols-3 gap-2">
                   {LEVEL_ORDER.map((l) => (
                     <button key={l} onClick={() => setPlanLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${planLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
-                      <div className="text-sm font-semibold capitalize">{l}</div>
-                      <div className="text-[11px] text-muted-foreground">
+                      <div className="text-base font-semibold capitalize">{l}</div>
+                      <div className="text-xs text-muted-foreground">
                         {l === "beginner" && "Syntax, lists, dicts, loops."}
                         {l === "intermediate" && "Sliding window, recursion, trees."}
                         {l === "advanced" && "DP, graphs, system design."}
@@ -934,12 +934,12 @@ function PythonWorkspace() {
                 </div>
               </div>
               {plan ? (
-                <button onClick={() => handleStart()} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-sm font-semibold disabled:opacity-50">
+                <button onClick={() => handleStart()} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold disabled:opacity-50">
                   {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                   Start free session
                 </button>
               ) : (
-                <button onClick={handleCreatePlan} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-sm font-semibold">
+                <button onClick={handleCreatePlan} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold">
                   <Play className="h-4 w-4" /> Create {planDays}-day plan
                 </button>
               )}
@@ -951,12 +951,12 @@ function PythonWorkspace() {
           <>
           {focusPlan && (
             <div className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 mb-3 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold">🎯 {focusPlan.focus_title}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">{focusPlan.difficulty}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-border">{focusCount} answered</span>
+              <span className="text-sm font-semibold">🎯 {focusPlan.focus_title}</span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">{focusPlan.difficulty}</span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border">{focusCount} answered</span>
               <div className="flex flex-wrap gap-1 ml-2">
                 {focusPlan.concepts.map((c, i) => (
-                  <span key={c} className={`text-[10px] font-mono px-2 py-0.5 rounded border ${i === focusIdx ? "border-primary bg-primary/10 text-foreground" : i < focusIdx ? "border-border bg-surface text-muted-foreground" : "border-dashed border-border text-muted-foreground/60"}`}>{c}</span>
+                  <span key={c} className={`text-[11px] font-mono px-2 py-0.5 rounded border ${i === focusIdx ? "border-primary bg-primary/10 text-foreground" : i < focusIdx ? "border-border bg-surface text-muted-foreground" : "border-dashed border-border text-muted-foreground/60"}`}>{c}</span>
                 ))}
               </div>
             </div>
@@ -964,15 +964,15 @@ function PythonWorkspace() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <section className="space-y-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                <div className="flex items-center gap-2 text-[11px] font-mono">
+                <div className="flex items-center gap-2 text-xs font-mono">
                   <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{question.difficulty}</span>
                   {question.concept && <span className="text-muted-foreground">{question.concept}</span>}
                 </div>
-                <h2 className="text-base font-semibold">Question {qIndex}</h2>
-                {question.business_context && <p className="text-sm text-muted-foreground">{question.business_context}</p>}
-                <p className="text-sm whitespace-pre-wrap">{question.task}</p>
-                <pre className="text-xs bg-surface-2 p-2 rounded font-mono">{question.function_signature}</pre>
-                <div className="text-[11px] font-mono text-muted-foreground space-y-1">
+                <h2 className="text-lg font-semibold">Question {qIndex}</h2>
+                {question.business_context && <p className="text-base text-muted-foreground">{question.business_context}</p>}
+                <p className="text-base whitespace-pre-wrap">{question.task}</p>
+                <pre className="text-sm bg-surface-2 p-2 rounded font-mono">{question.function_signature}</pre>
+                <div className="text-xs font-mono text-muted-foreground space-y-1">
                   <div className="font-semibold">Examples:</div>
                   {question.test_cases.slice(0, 3).map((tc, i) => (
                     <div key={i} className="pl-2 border-l border-border">
@@ -987,11 +987,11 @@ function PythonWorkspace() {
                 <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
                   <div className="flex items-center gap-2">
                     {feedback.is_correct ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-yellow-500" />}
-                    <span className="text-sm font-semibold">{feedback.passed}/{feedback.total} tests passed</span>
+                    <span className="text-base font-semibold">{feedback.passed}/{feedback.total} tests passed</span>
                   </div>
-                  <p className="text-sm">{feedback.explanation}</p>
+                  <p className="text-base">{feedback.explanation}</p>
                   {feedback.per_test && (
-                    <div className="space-y-1 text-[11px] font-mono">
+                    <div className="space-y-1 text-xs font-mono">
                       {feedback.per_test.map((t: any, i: number) => (
                         <div key={i} className={`p-2 rounded ${t.passed ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
                           <div>in: {t.input_repr}</div>
@@ -1003,7 +1003,7 @@ function PythonWorkspace() {
                     </div>
                   )}
                   {feedback.improvements?.length > 0 && (
-                    <ul className="list-disc pl-5 text-xs space-y-1">
+                    <ul className="list-disc pl-5 text-sm space-y-1">
                       {feedback.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
                     </ul>
                   )}
@@ -1011,7 +1011,7 @@ function PythonWorkspace() {
               )}
 
               {hint && (
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-sm space-y-2">
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-base space-y-2">
                   <div className="font-semibold text-amber-400">Hint</div>
                   <p>{hint.hint}</p>
                   {hint.leading_question && <p className="text-muted-foreground italic">{hint.leading_question}</p>}
@@ -1020,24 +1020,24 @@ function PythonWorkspace() {
 
               {solution && (
                 <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                  <div className="font-semibold text-sm">Reference Solution</div>
-                  <pre className="text-xs bg-surface-2 p-3 rounded font-mono overflow-auto">{solution.solution}</pre>
-                  <p className="text-sm whitespace-pre-wrap">{solution.walkthrough}</p>
-                  <div className="text-[11px] font-mono text-muted-foreground">
+                  <div className="font-semibold text-base">Reference Solution</div>
+                  <pre className="text-sm bg-surface-2 p-3 rounded font-mono overflow-auto">{solution.solution}</pre>
+                  <p className="text-base whitespace-pre-wrap">{solution.walkthrough}</p>
+                  <div className="text-xs font-mono text-muted-foreground">
                     Time: {solution.time_complexity} · Space: {solution.space_complexity}
                   </div>
                 </div>
               )}
 
               {debugInfo && (
-                <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-4 text-sm space-y-2">
+                <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-4 text-base space-y-2">
                   <div className="font-semibold text-orange-400 flex items-center gap-1"><Bug className="h-4 w-4" /> Debugger</div>
                   <p>{debugInfo.error_analysis}</p>
                   {debugInfo.suspected_line && (
-                    <pre className="text-[11px] bg-surface-2 p-2 rounded font-mono">{debugInfo.suspected_line}</pre>
+                    <pre className="text-xs bg-surface-2 p-2 rounded font-mono">{debugInfo.suspected_line}</pre>
                   )}
-                  <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Concept to apply</div>
-                  <p className="text-sm text-muted-foreground">{debugInfo.educational_fix}</p>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Concept to apply</div>
+                  <p className="text-base text-muted-foreground">{debugInfo.educational_fix}</p>
                 </div>
               )}
 
@@ -1052,58 +1052,58 @@ function PythonWorkspace() {
 
               {review && (
                 <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                  <div className="font-semibold text-sm flex items-center gap-1"><Zap className="h-4 w-4 text-primary-glow" /> AI Senior Review</div>
-                  <pre className="text-xs bg-surface-2 p-3 rounded font-mono overflow-auto">{review.optimized_code}</pre>
+                  <div className="font-semibold text-base flex items-center gap-1"><Zap className="h-4 w-4 text-primary-glow" /> AI Senior Review</div>
+                  <pre className="text-sm bg-surface-2 p-3 rounded font-mono overflow-auto">{review.optimized_code}</pre>
                   {review.improvements?.length > 0 && (
-                    <ul className="list-disc pl-5 text-xs space-y-1">
+                    <ul className="list-disc pl-5 text-sm space-y-1">
                       {review.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
                     </ul>
                   )}
                   {(review.time_complexity_before || review.time_complexity_after) && (
-                    <div className="text-[11px] font-mono text-muted-foreground">
+                    <div className="text-xs font-mono text-muted-foreground">
                       Before: {review.time_complexity_before} → After: {review.time_complexity_after}
                     </div>
                   )}
-                  {review.idiomatic_notes && <p className="text-xs text-muted-foreground">{review.idiomatic_notes}</p>}
+                  {review.idiomatic_notes && <p className="text-sm text-muted-foreground">{review.idiomatic_notes}</p>}
                 </div>
               )}
             </section>
 
             <section className="space-y-3">
               <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
-                <div className="px-3 py-2 border-b border-border text-[11px] font-mono text-muted-foreground">solution.py</div>
+                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground">solution.py</div>
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   spellCheck={false}
-                  className="w-full h-[420px] bg-surface-2 text-sm font-mono p-3 outline-none resize-none"
+                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-none"
                 />
               </div>
               <div className="flex flex-wrap gap-2">
-                <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50">
+                <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
                   {loading === "eval" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />} Run
                 </button>
-                <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "visualize" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Workflow className="h-3.5 w-3.5" />} Visualize
                 </button>
-                <button onClick={handleHint} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={handleHint} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "hint" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="h-3.5 w-3.5" />} Hint
                 </button>
-                <button onClick={handleDebug} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={handleDebug} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "debug" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bug className="h-3.5 w-3.5" />} Debug
                 </button>
-                <button onClick={handleReveal} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={handleReveal} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "solution" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />} Reveal
                 </button>
-                <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
                 </button>
                 {focusPlan && (
-                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                     <Square className="h-3.5 w-3.5" /> End focus
                   </button>
                 )}
-                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50">
+                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
                   {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
                 </button>
               </div>
@@ -1133,18 +1133,18 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
       <div className="rounded-xl border border-border bg-gradient-to-br from-card to-surface-2 p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm font-mono text-muted-foreground">
             <Flame className="h-3.5 w-3.5 text-primary-glow" />
             Day {day} of {plan.days} · {plan.level} track
           </div>
-          <button onClick={onReplan} className="text-[11px] font-mono text-muted-foreground hover:text-foreground">
+          <button onClick={onReplan} className="text-xs font-mono text-muted-foreground hover:text-foreground">
             Replan
           </button>
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
-          <h2 className="text-2xl font-bold mt-1">🐍 Python · {concept}</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
+          <h2 className="text-3xl font-bold mt-1">🐍 Python · {concept}</h2>
+          <p className="text-base text-muted-foreground mt-1">
             50-question session ramping every 5 · starts at{" "}
             <span className="font-mono text-primary-glow">{diff}</span>
           </p>
@@ -1152,13 +1152,13 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
         <button
           onClick={onStartToday}
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
           Start today's session
         </button>
         <div className="pt-3 border-t border-border">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+          <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
             <Calendar className="h-3 w-3" /> Schedule
           </div>
           <div className="flex flex-wrap gap-1">
@@ -1170,7 +1170,7 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
                 <div
                   key={d}
                   title={`Day ${d}: ${conceptForDay(d, plan.level)} (${difficultyForDay(d, plan.days, plan.level)})`}
-                  className={`h-6 w-6 rounded text-[10px] grid place-items-center font-mono border ${
+                  className={`h-6 w-6 rounded text-[11px] grid place-items-center font-mono border ${
                     done
                       ? "bg-primary/30 border-primary text-primary-glow"
                       : isToday
@@ -1188,10 +1188,10 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
         </div>
       </div>
       <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
           <AlertTriangle className="h-3 w-3 text-orange-400" /> Weak spots
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           No weak concepts yet — answer a few questions to build a learning state.
         </p>
       </div>
