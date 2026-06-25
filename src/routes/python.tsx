@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Wrench, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
@@ -332,7 +332,7 @@ function PythonWorkspace() {
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "free" | "topic" | "targeted" | "data-eng" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [deLevel, setDeLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
@@ -669,9 +669,6 @@ function PythonWorkspace() {
             <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Calendar className="h-3.5 w-3.5" /> Today
             </button>
-            <button onClick={() => setTab("free")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "free" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Wrench className="h-3.5 w-3.5" /> Free practice
-            </button>
             <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
             </button>
@@ -899,7 +896,7 @@ function PythonWorkspace() {
           </div>
         )}
 
-        {!question && (tab === "free" || (tab === "today" && !plan)) && (
+        {!question && tab === "today" && !plan && (
           <div className="grid place-items-center min-h-[50vh]">
             <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
               <div className="flex items-center gap-2">
@@ -907,8 +904,8 @@ function PythonWorkspace() {
                   <Target className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold">{plan ? "Free practice session" : "Build your Python practice plan"}</h2>
-                  <p className="text-xs text-muted-foreground">{plan ? "Jump into a session at any level." : "50 questions ramping every 5 — capped at your target level."}</p>
+                  <h2 className="text-base font-semibold">Build your Python practice plan</h2>
+                  <p className="text-xs text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
                 </div>
               </div>
               <div className="space-y-2">
