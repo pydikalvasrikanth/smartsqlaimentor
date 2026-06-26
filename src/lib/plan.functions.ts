@@ -483,3 +483,40 @@ export const analyzeFocus = createServerFn({ method: "POST" })
       },
     };
   });
+
+// ---- REWARD POINTS ---------------------------------------------------------
+// Increments the signed-in user's profile points balance. Used to award 25
+// points every time a learner completes another 5 questions in a session.
+export const awardPoints = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ amount: z.number().int().min(1).max(1000) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("points")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const current = existing?.points ?? 0;
+    const next = current + data.amount;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ points: next })
+      .eq("user_id", userId);
+    if (error) return { error: error.message };
+    return { data: { points: next, awarded: data.amount } };
+  });
+
+export const getProfilePoints = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data } = await supabase
+      .from("profiles")
+      .select("points")
+      .eq("user_id", userId)
+      .maybeSingle();
+    return { points: data?.points ?? 0 };
+  });
