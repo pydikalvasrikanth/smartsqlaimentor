@@ -1,132 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.smartsqlaimentor.live/</loc>
+    <loc>https://smartsqlaimentor.lovable.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/auth</loc>
+    <loc>https://smartsqlaimentor.lovable.app/auth</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/engine</loc>
+    <loc>https://smartsqlaimentor.lovable.app/engine</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/practice</loc>
+    <loc>https://smartsqlaimentor.lovable.app/practice</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/python</loc>
+    <loc>https://smartsqlaimentor.lovable.app/python</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/gcp</loc>
+    <loc>https://smartsqlaimentor.lovable.app/gcp</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/chat</loc>
+    <loc>https://smartsqlaimentor.lovable.app/chat</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/tutorial</loc>
+    <loc>https://smartsqlaimentor.lovable.app/tutorial</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/feedback</loc>
+    <loc>https://smartsqlaimentor.lovable.app/feedback</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/reset-password</loc>
+    <loc>https://smartsqlaimentor.lovable.app/reset-password</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/select-where</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/select-where</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/joins</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/joins</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/aggregates</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/aggregates</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/subqueries</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/subqueries</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/ctes</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/ctes</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/recursive-ctes</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/recursive-ctes</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/window-functions</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/window-functions</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/ranking</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/ranking</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/string-functions</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/string-functions</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/date-functions</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/date-functions</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/null-3vl</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/null-3vl</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/pivots</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/pivots</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/set-ops</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/set-ops</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/indexing</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/indexing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/transactions</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/transactions</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.smartsqlaimentor.live/topic/json</loc>
+    <loc>https://smartsqlaimentor.lovable.app/topic/json</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
