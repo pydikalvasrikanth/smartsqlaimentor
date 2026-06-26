@@ -492,6 +492,14 @@ function TopicPage() {
           </div>
           <div className="ml-auto flex items-center gap-3 text-[11px] font-mono">
             <span className="px-2 py-0.5 rounded bg-accent">{currentTier}</span>
+            {session && (
+              <span className="px-2 py-0.5 rounded bg-primary/20 text-primary-glow">
+                Q {questionCount || 1}/{TOTAL_QUESTIONS}
+              </span>
+            )}
+            <span className="px-2 py-0.5 rounded bg-yellow-500/15 text-yellow-400">
+              ⭐ {pointsQ.data?.points ?? 0} pts
+            </span>
             <span className="text-muted-foreground">{correct}/{attempted} correct ({successPct}%)</span>
           </div>
         </div>
@@ -517,18 +525,34 @@ function TopicPage() {
         {!session && (
           <div className="rounded-lg border border-dashed border-border p-10 text-center space-y-3">
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Press start to generate a fresh schema and your first question on{" "}
+              {hasSavedProgress
+                ? "You have an unfinished session on "
+                : "Press start to generate a fresh schema and your first question on "}
               <span className="text-foreground">{topic.name}</span>
               {sp.concept && <> — concept <span className="font-mono text-primary-glow">{sp.concept}</span></>}.
             </p>
-            <button
-              onClick={handleStart}
-              disabled={loading === "init"}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
-            >
-              {loading === "init" && <Loader2 className="h-4 w-4 animate-spin" />}
-              Start practice
-            </button>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {hasSavedProgress && (
+                <button
+                  onClick={handleResume}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-sm font-semibold"
+                >
+                  Resume where you left off
+                </button>
+              )}
+              <button
+                onClick={hasSavedProgress ? handleRestart : handleStart}
+                disabled={loading === "init"}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50 ${
+                  hasSavedProgress
+                    ? "border border-border bg-surface hover:bg-accent"
+                    : "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
+                }`}
+              >
+                {loading === "init" && <Loader2 className="h-4 w-4 animate-spin" />}
+                {hasSavedProgress ? "Start over" : "Start practice"}
+              </button>
+            </div>
           </div>
         )}
 
