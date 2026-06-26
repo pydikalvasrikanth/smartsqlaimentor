@@ -193,6 +193,7 @@ export type Database = {
           display_name: string | null
           id: string
           points: number
+          points_credited_attempts: number
           updated_at: string
           user_id: string
         }
@@ -201,6 +202,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           points?: number
+          points_credited_attempts?: number
           updated_at?: string
           user_id: string
         }
@@ -209,6 +211,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           points?: number
+          points_credited_attempts?: number
           updated_at?: string
           user_id?: string
         }

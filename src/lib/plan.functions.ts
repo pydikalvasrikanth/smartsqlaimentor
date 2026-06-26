@@ -485,28 +485,50 @@ export const analyzeFocus = createServerFn({ method: "POST" })
   });
 
 // ---- REWARD POINTS ---------------------------------------------------------
-// Increments the signed-in user's profile points balance. Used to award 25
-// points every time a learner completes another 5 questions in a session.
+// Server-authoritative: counts the user's verified attempts and awards 25
+// points for every completed batch of 5 attempts that has not already been
+// credited. The client cannot influence the amount or the eligibility — both
+// are derived from the attempts table and the profile's credited counter.
+const POINTS_PER_BATCH = 25;
+const ATTEMPTS_PER_BATCH = 5;
+
 export const awardPoints = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ amount: z.number().int().min(1).max(1000) }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ context }) => {
     const { supabase, userId } = context;
+
+    const { count: attemptCount, error: countErr } = await supabase
+      .from("attempts")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId);
+    if (countErr) return { error: countErr.message };
+    const totalAttempts = attemptCount ?? 0;
+
     const { data: existing } = await supabase
       .from("profiles")
-      .select("points")
+      .select("points, points_credited_attempts")
       .eq("user_id", userId)
       .maybeSingle();
-    const current = existing?.points ?? 0;
-    const next = current + data.amount;
+    const currentPoints = existing?.points ?? 0;
+    const credited = existing?.points_credited_attempts ?? 0;
+
+    const eligibleBatches = Math.floor(totalAttempts / ATTEMPTS_PER_BATCH);
+    const creditedBatches = Math.floor(credited / ATTEMPTS_PER_BATCH);
+    const newBatches = Math.max(0, eligibleBatches - creditedBatches);
+
+    if (newBatches === 0) {
+      return { data: { points: currentPoints, awarded: 0 } };
+    }
+
+    const awarded = newBatches * POINTS_PER_BATCH;
+    const nextPoints = currentPoints + awarded;
+    const nextCredited = eligibleBatches * ATTEMPTS_PER_BATCH;
     const { error } = await supabase
       .from("profiles")
-      .update({ points: next })
+      .update({ points: nextPoints, points_credited_attempts: nextCredited })
       .eq("user_id", userId);
     if (error) return { error: error.message };
-    return { data: { points: next, awarded: data.amount } };
+    return { data: { points: nextPoints, awarded } };
   });
 
 export const getProfilePoints = createServerFn({ method: "POST" })

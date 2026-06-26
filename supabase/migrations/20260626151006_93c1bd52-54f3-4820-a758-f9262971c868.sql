@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS points_credited_attempts integer NOT NULL DEFAULT 0;
