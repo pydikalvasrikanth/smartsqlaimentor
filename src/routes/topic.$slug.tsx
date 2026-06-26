@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { useAuth } from "@/hooks/use-auth";
 import { runSqlEngine } from "@/lib/sql-engine.functions";
-import { getLearningState, logAttempt, initPractice, nextPractice, revealSolution } from "@/lib/plan.functions";
+import { getLearningState, logAttempt, initPractice, nextPractice, revealSolution, awardPoints, getProfilePoints } from "@/lib/plan.functions";
 import { TOPIC_BY_SLUG, TOPICS, TIER_ORDER, type Tier } from "@/lib/topic-catalog";
 import { SchemaPanel } from "@/components/sql/SchemaPanel";
 import { QuestionCard } from "@/components/sql/QuestionCard";
@@ -126,10 +126,18 @@ function TopicPage() {
   const nextFn = useServerFn(nextPractice);
   const revealFn = useServerFn(revealSolution);
   const learning = useServerFn(getLearningState);
+  const awardFn = useServerFn(awardPoints);
+  const pointsFn = useServerFn(getProfilePoints);
 
   const learningQ = useQuery({
     queryKey: ["learning", user?.id],
     queryFn: () => learning(),
+    enabled: !!user,
+  });
+
+  const pointsQ = useQuery({
+    queryKey: ["points", user?.id],
+    queryFn: () => pointsFn(),
     enabled: !!user,
   });
 
@@ -152,6 +160,41 @@ function TopicPage() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [liveStats, setLiveStats] = useState<{ attempted: number; correct: number } | null>(null);
   const [pythonMode, setPythonMode] = useState(false);
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
+
+  const storageKey = user ? `practice:progress:${user.id}:${slug}` : "";
+
+  // Detect saved progress for this topic so we can offer Resume.
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      setHasSavedProgress(!!raw);
+    } catch {}
+  }, [storageKey]);
+
+  // Persist progress whenever it changes mid-session.
+  useEffect(() => {
+    if (!storageKey || !session || !question || !sessionQuestionId) return;
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          questionCount,
+          session,
+          question,
+          sessionQuestionId,
+          pastIds,
+          coveredConcepts,
+          userSql,
+          history,
+          historyIndex,
+          savedAt: Date.now(),
+        }),
+      );
+      setHasSavedProgress(true);
+    } catch {}
+  }, [storageKey, session, question, sessionQuestionId, questionCount, pastIds, coveredConcepts, userSql, history, historyIndex]);
 
 
   useEffect(() => {
@@ -221,6 +264,38 @@ function TopicPage() {
     setUserSql(initialSql);
     setHistory([{ question: data.question, sessionQuestionId: data.session_question_id, userSql: initialSql }]);
     setHistoryIndex(0);
+  }
+
+  function handleResume() {
+    if (!storageKey) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      setSession(s.session);
+      setQuestion(s.question);
+      setSessionQuestionId(s.sessionQuestionId);
+      setPastIds(s.pastIds ?? []);
+      setCoveredConcepts(s.coveredConcepts ?? []);
+      setUserSql(s.userSql ?? "-- Write your SQL here\n");
+      setHistory(s.history ?? []);
+      setHistoryIndex(s.historyIndex ?? 0);
+      setQuestionCount(s.questionCount ?? 1);
+      setFeedback({ kind: null });
+      setAttempt(0);
+      toast.success(`Resumed at question ${s.questionCount} / ${TOTAL_QUESTIONS}`);
+    } catch (e) {
+      toast.error("Could not resume — starting fresh.");
+      handleStart();
+    }
+  }
+
+  function handleRestart() {
+    if (storageKey) {
+      try { localStorage.removeItem(storageKey); } catch {}
+    }
+    setHasSavedProgress(false);
+    handleStart();
   }
 
   async function handleRun() {
@@ -361,6 +436,23 @@ function TopicPage() {
     ]);
     setHistoryIndex((i) => i + 1);
     toast.success(`Question ${nextIndex} / ${TOTAL_QUESTIONS} · stage ${complexityStage(nextIndex)}/10 · ${targetDifficulty}`);
+
+    // Reward: every 5 questions advanced, award 25 points.
+    if (nextIndex > 1 && (nextIndex - 1) % 5 === 0) {
+      try {
+        const res: any = await awardFn({ data: { amount: 25 } });
+        if (res?.data) {
+          toast.success(`🎉 +25 points! You're at ${res.data.points} pts.`);
+          pointsQ.refetch();
+        }
+      } catch {}
+    }
+
+    // Clear saved progress once the session is complete.
+    if (nextIndex >= TOTAL_QUESTIONS && storageKey) {
+      try { localStorage.removeItem(storageKey); } catch {}
+      setHasSavedProgress(false);
+    }
   }
 
   function handlePrevious() {
