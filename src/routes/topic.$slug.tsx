@@ -440,7 +440,7 @@ function TopicPage() {
     // Reward: every 5 questions advanced, award 25 points.
     if (nextIndex > 1 && (nextIndex - 1) % 5 === 0) {
       try {
-        const res: any = await awardFn({ data: { amount: 25 } });
+        const res: any = await awardFn();
         if (res?.data) {
           toast.success(`🎉 +25 points! You're at ${res.data.points} pts.`);
           pointsQ.refetch();
