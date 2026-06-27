@@ -111,7 +111,7 @@ export const interviewTranscribe = createServerFn({ method: "POST" })
         : data.mimeType.includes("mp4")
           ? "mp4"
           : "wav";
-    const file = new File([bytes], `recording.${ext}`, { type: data.mimeType });
+    const file = new File([bytes.buffer as ArrayBuffer], `recording.${ext}`, { type: data.mimeType });
 
     const form = new FormData();
     form.append("model", STT_MODEL);
