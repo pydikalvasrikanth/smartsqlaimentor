@@ -138,6 +138,17 @@ function SubjectPicker() {
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
+
+        <div className="mt-4 text-center">
+          <Link
+            to="/interview"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/5 px-5 py-3 hover:border-primary/70 transition-all text-sm"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+            Take a live AI Interview — voice + camera mock interview
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </main>
     </div>
   );
