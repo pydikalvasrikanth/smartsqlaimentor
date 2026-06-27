@@ -30,6 +30,33 @@ const ChatInput = z.object({
   context: z.string().max(500).optional(),
 });
 
+// Soft per-user rate limit. In-memory only — a Cloudflare Worker may spin up
+// multiple instances, so this is a deterrent against bursty abuse from a
+// single signed-in user, not a global guarantee.
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 20;
+const rateBuckets = new Map<string, number[]>();
+
+function checkRateLimit(userId: string): { ok: boolean; retryAfter: number } {
+  const now = Date.now();
+  const cutoff = now - RATE_WINDOW_MS;
+  const arr = (rateBuckets.get(userId) ?? []).filter((t) => t > cutoff);
+  if (arr.length >= RATE_MAX) {
+    return { ok: false, retryAfter: Math.ceil((arr[0] + RATE_WINDOW_MS - now) / 1000) };
+  }
+  arr.push(now);
+  rateBuckets.set(userId, arr);
+  // opportunistic cleanup
+  if (rateBuckets.size > 5000) {
+    for (const [k, v] of rateBuckets) {
+      const kept = v.filter((t) => t > cutoff);
+      if (kept.length === 0) rateBuckets.delete(k);
+      else rateBuckets.set(k, kept);
+    }
+  }
+  return { ok: true, retryAfter: 0 };
+}
+
 const SYSTEM_PROMPT = `You are a helpful, concise AI assistant inside the Interview Intelligence app. You can read images the user attaches (look closely at code screenshots, diagrams, error messages). When code is shown, answer with explanations and corrected code in markdown. Keep replies focused.`;
 
 function toGatewayContent(m: z.infer<typeof MessageSchema>) {
@@ -113,7 +140,11 @@ async function runImage(prompt: string) {
 export const chat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => ChatInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const limit = checkRateLimit(context.userId);
+    if (!limit.ok) {
+      return { error: `Too many requests. Try again in ${limit.retryAfter}s.` };
+    }
     if (data.mode === "image") {
       const last = data.messages[data.messages.length - 1];
       return runImage(typeof last.content === "string" ? last.content : "");
