@@ -1157,16 +1157,11 @@ function PythonWorkspace() {
 
             <section className="space-y-3 w-full lg:flex-1 lg:min-w-[280px]">
               <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
-                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground">solution.py</div>
-                <textarea
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  onKeyDown={(e) => handlePyKeyDown(e, setCode)}
-                  spellCheck={false}
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-y"
-                />
+                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
+                  <span>solution.py</span>
+                  <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
+                </div>
+                <PythonEditor value={code} onChange={setCode} minHeight={440} />
               </div>
               <div className="flex flex-wrap gap-2">
                 <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
