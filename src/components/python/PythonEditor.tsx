@@ -74,7 +74,7 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
         <Editor
         value={value}
         onValueChange={onChange}
-        highlight={(code) => Prism.highlight(code, Prism.languages.python, "python")}
+        highlight={(code: string) => Prism.highlight(code, Prism.languages.python, "python")}
         padding={14}
         tabSize={4}
         insertSpaces={true}
