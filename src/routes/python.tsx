@@ -7,6 +7,7 @@ import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, Ch
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
+import { PythonEditor } from "@/components/python/PythonEditor";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ThemeToggle } from "@/hooks/use-theme";
 const INDENT = "    "; // 4 spaces
