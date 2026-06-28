@@ -1070,60 +1070,120 @@ function PythonWorkspace() {
               </div>
 
               {feedback && (
-                <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    {feedback.is_correct ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-yellow-500" />}
-                    <span className="text-base font-semibold">{feedback.passed}/{feedback.total} tests passed</span>
-                  </div>
-                  <p className="text-base">{feedback.explanation}</p>
-                  {feedback.per_test && (
-                    <div className="space-y-1 text-xs font-mono">
-                      {feedback.per_test.map((t: any, i: number) => (
-                        <div key={i} className={`p-2 rounded ${t.passed ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
-                          <div>in: {t.input_repr}</div>
-                          <div>expected: {t.expected_repr}</div>
-                          <div>got: {t.actual_repr}</div>
-                          {t.note && <div className="text-muted-foreground">{t.note}</div>}
-                        </div>
-                      ))}
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className={`px-4 py-2.5 flex items-center justify-between border-b border-border ${feedback.is_correct ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
+                    <div className="flex items-center gap-2">
+                      {feedback.is_correct ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-yellow-500" />}
+                      <span className="text-base font-semibold">Run Results</span>
                     </div>
-                  )}
-                  {feedback.improvements?.length > 0 && (
-                    <ul className="list-disc pl-5 text-sm space-y-1">
-                      {feedback.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
-                    </ul>
-                  )}
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${feedback.is_correct ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                      {feedback.passed}/{feedback.total} passed
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Summary</div>
+                      <p className="text-sm leading-relaxed">{feedback.explanation}</p>
+                    </div>
+                    {feedback.per_test && feedback.per_test.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">Test cases</div>
+                        <div className="space-y-1.5">
+                          {feedback.per_test.map((t: any, i: number) => (
+                            <div key={i} className={`rounded border ${t.passed ? "border-green-500/30 bg-green-500/5" : "border-yellow-500/30 bg-yellow-500/5"} overflow-hidden`}>
+                              <div className="flex items-center justify-between px-2.5 py-1 border-b border-border/50">
+                                <span className="text-[11px] font-mono">Test #{i + 1}</span>
+                                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${t.passed ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                                  {t.passed ? "PASS" : "FAIL"}
+                                </span>
+                              </div>
+                              <div className="px-2.5 py-1.5 text-xs font-mono space-y-0.5">
+                                <div><span className="text-muted-foreground">input:</span> <code>{t.input_repr}</code></div>
+                                <div><span className="text-muted-foreground">expected:</span> <code>{t.expected_repr}</code></div>
+                                <div><span className="text-muted-foreground">got:</span> <code>{t.actual_repr}</code></div>
+                                {t.note && <div className="text-muted-foreground italic pt-0.5">{t.note}</div>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {feedback.improvements?.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Improvements</div>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {feedback.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               {hint && (
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-base space-y-2">
-                  <div className="font-semibold text-amber-400">Hint</div>
-                  <p>{hint.hint}</p>
-                  {hint.leading_question && <p className="text-muted-foreground italic">{hint.leading_question}</p>}
+                <div className="rounded-lg border border-amber-500/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-400" />
+                    <span className="text-base font-semibold text-amber-400">Hint</span>
+                  </div>
+                  <div className="p-4 space-y-2 text-sm leading-relaxed">
+                    <p>{hint.hint}</p>
+                    {hint.leading_question && (
+                      <p className="text-muted-foreground italic border-l-2 border-amber-500/40 pl-3">
+                        {hint.leading_question}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
               {solution && (
-                <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                  <div className="font-semibold text-base">Reference Solution</div>
-                  <pre className="text-sm bg-surface-2 p-3 rounded font-mono overflow-auto">{solution.solution}</pre>
-                  <p className="text-base whitespace-pre-wrap">{solution.walkthrough}</p>
-                  <div className="text-xs font-mono text-muted-foreground">
-                    Time: {solution.time_complexity} · Space: {solution.space_complexity}
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">Reference Solution</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Code</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{solution.solution}</pre>
+                    </div>
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Walkthrough</div>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{solution.walkthrough}</p>
+                    </div>
+                    {(solution.time_complexity || solution.space_complexity) && (
+                      <div className="flex gap-2 pt-1">
+                        <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Time: {solution.time_complexity}</span>
+                        <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Space: {solution.space_complexity}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {debugInfo && (
-                <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-4 text-base space-y-2">
-                  <div className="font-semibold text-orange-400 flex items-center gap-1"><Bug className="h-4 w-4" /> Debugger</div>
-                  <p>{debugInfo.error_analysis}</p>
-                  {debugInfo.suspected_line && (
-                    <pre className="text-xs bg-surface-2 p-2 rounded font-mono">{debugInfo.suspected_line}</pre>
-                  )}
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Concept to apply</div>
-                  <p className="text-base text-muted-foreground">{debugInfo.educational_fix}</p>
+                <div className="rounded-lg border border-orange-500/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-orange-500/10 border-b border-orange-500/20 flex items-center gap-2">
+                    <Bug className="h-4 w-4 text-orange-400" />
+                    <span className="text-base font-semibold text-orange-400">Debugger</span>
+                  </div>
+                  <div className="p-4 space-y-3 text-sm">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">What's wrong</div>
+                      <p className="leading-relaxed">{debugInfo.error_analysis}</p>
+                    </div>
+                    {debugInfo.suspected_line && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Suspected line</div>
+                        <pre className="text-xs bg-[#1e1e1e] p-2 rounded font-mono overflow-auto">{debugInfo.suspected_line}</pre>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Concept to apply</div>
+                      <p className="leading-relaxed text-muted-foreground">{debugInfo.educational_fix}</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -1137,20 +1197,38 @@ function PythonWorkspace() {
               )}
 
               {review && (
-                <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
-                  <div className="font-semibold text-base flex items-center gap-1"><Zap className="h-4 w-4 text-primary-glow" /> AI Senior Review</div>
-                  <pre className="text-sm bg-surface-2 p-3 rounded font-mono overflow-auto">{review.optimized_code}</pre>
-                  {review.improvements?.length > 0 && (
-                    <ul className="list-disc pl-5 text-sm space-y-1">
-                      {review.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
-                    </ul>
-                  )}
-                  {(review.time_complexity_before || review.time_complexity_after) && (
-                    <div className="text-xs font-mono text-muted-foreground">
-                      Before: {review.time_complexity_before} → After: {review.time_complexity_after}
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">AI Senior Review</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Optimized code</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{review.optimized_code}</pre>
                     </div>
-                  )}
-                  {review.idiomatic_notes && <p className="text-sm text-muted-foreground">{review.idiomatic_notes}</p>}
+                    {review.improvements?.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Improvements</div>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {review.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {(review.time_complexity_before || review.time_complexity_after) && (
+                      <div className="flex gap-2 items-center text-xs font-mono">
+                        <span className="px-2 py-1 rounded bg-surface-2 border border-border">Before: {review.time_complexity_before}</span>
+                        <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                        <span className="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-primary-glow">After: {review.time_complexity_after}</span>
+                      </div>
+                    )}
+                    {review.idiomatic_notes && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Notes</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{review.idiomatic_notes}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </section>
