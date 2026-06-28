@@ -9,8 +9,6 @@ import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ThemeToggle } from "@/hooks/use-theme";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-
 const INDENT = "    "; // 4 spaces
 
 function handlePyKeyDown(
