@@ -19,11 +19,12 @@ interface Props {
  */
 export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (e: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
       // react-simple-code-editor already handles Tab / Shift+Tab via tabSize.
       // We only intercept Enter for Python-aware auto-indent.
       if (e.key !== "Enter" || e.shiftKey) return;
-      const ta = e.currentTarget;
+      const ta = e.target as HTMLTextAreaElement;
+      if (!(ta instanceof HTMLTextAreaElement)) return;
       const { selectionStart: s, selectionEnd: en, value: v } = ta;
       if (s !== en) return;
       e.preventDefault();
