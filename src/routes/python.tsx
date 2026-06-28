@@ -9,6 +9,91 @@ import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ThemeToggle } from "@/hooks/use-theme";
+const INDENT = "    "; // 4 spaces
+
+function handlePyKeyDown(
+  e: React.KeyboardEvent<HTMLTextAreaElement>,
+  setCode: (v: string) => void,
+) {
+  const ta = e.currentTarget;
+  const { selectionStart: s, selectionEnd: en, value } = ta;
+
+  // Tab / Shift+Tab: indent / dedent (supports multi-line selection)
+  if (e.key === "Tab") {
+    e.preventDefault();
+    if (s !== en) {
+      const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+      const before = value.slice(0, lineStart);
+      const block = value.slice(lineStart, en);
+      const after = value.slice(en);
+      let updated: string;
+      if (e.shiftKey) {
+        updated = block
+          .split("\n")
+          .map((l) => (l.startsWith(INDENT) ? l.slice(4) : l.replace(/^ {1,3}/, "")))
+          .join("\n");
+      } else {
+        updated = block.split("\n").map((l) => INDENT + l).join("\n");
+      }
+      const next = before + updated + after;
+      setCode(next);
+      requestAnimationFrame(() => {
+        ta.selectionStart = lineStart;
+        ta.selectionEnd = lineStart + updated.length;
+      });
+    } else if (e.shiftKey) {
+      const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+      const line = value.slice(lineStart, value.indexOf("\n", s) === -1 ? value.length : value.indexOf("\n", s));
+      const strip = line.startsWith(INDENT) ? 4 : line.match(/^ {1,3}/)?.[0].length || 0;
+      if (strip) {
+        const next = value.slice(0, lineStart) + value.slice(lineStart + strip);
+        setCode(next);
+        requestAnimationFrame(() => {
+          const np = Math.max(lineStart, s - strip);
+          ta.selectionStart = ta.selectionEnd = np;
+        });
+      }
+    } else {
+      const next = value.slice(0, s) + INDENT + value.slice(en);
+      setCode(next);
+      requestAnimationFrame(() => {
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+      });
+    }
+    return;
+  }
+
+  // Enter: auto-indent from previous line, extra indent after `:` (Python blocks)
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+    const curLine = value.slice(lineStart, s);
+    const indent = curLine.match(/^ */)?.[0] ?? "";
+    const trimmed = curLine.replace(/\s+$/, "");
+    const extra = /[:\[\(\{]$/.test(trimmed) ? INDENT : "";
+    const insert = "\n" + indent + extra;
+    const next = value.slice(0, s) + insert + value.slice(en);
+    setCode(next);
+    requestAnimationFrame(() => {
+      ta.selectionStart = ta.selectionEnd = s + insert.length;
+    });
+    return;
+  }
+
+  // Backspace at start of indented line: remove one indent level
+  if (e.key === "Backspace" && s === en) {
+    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+    const before = value.slice(lineStart, s);
+    if (before.length > 0 && /^ +$/.test(before) && before.length % 4 === 0) {
+      e.preventDefault();
+      const next = value.slice(0, s - 4) + value.slice(s);
+      setCode(next);
+      requestAnimationFrame(() => {
+        ta.selectionStart = ta.selectionEnd = s - 4;
+      });
+    }
+  }
+}
 
 export const Route = createFileRoute("/python")({
   head: () => ({
@@ -961,8 +1046,8 @@ function PythonWorkspace() {
               </div>
             </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <section className="space-y-3">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+            <section className="space-y-3 w-full lg:w-1/2 lg:min-w-[280px] lg:max-w-[80%] lg:resize-x overflow-auto lg:border-r lg:border-border lg:pr-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono">
                   <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{question.difficulty}</span>
@@ -1069,14 +1154,17 @@ function PythonWorkspace() {
               )}
             </section>
 
-            <section className="space-y-3">
+            <section className="space-y-3 w-full lg:flex-1 lg:min-w-[280px]">
               <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground">solution.py</div>
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
+                  onKeyDown={(e) => handlePyKeyDown(e, setCode)}
                   spellCheck={false}
-                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-none"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-y"
                 />
               </div>
               <div className="flex flex-wrap gap-2">
