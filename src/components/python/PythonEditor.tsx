@@ -9,8 +9,22 @@ import { Maximize2, Minimize2 } from "lucide-react";
 // module namespace instead of the default export, which makes React throw
 // "Element type is invalid: ... got: object". Resolve the real component
 // defensively so the editor works under both shapes.
-const Editor: any =
-  (RSCE as any).default ?? (RSCE as any).Editor ?? (RSCE as any);
+// Vite wraps the CJS module so the namespace looks like
+// { default: { default: EditorClass } }. Unwrap until we find a function.
+function resolveEditor(mod: any): any {
+  let cur = mod;
+  for (let i = 0; i < 4; i++) {
+    if (typeof cur === "function") return cur;
+    if (cur && typeof cur.default !== "undefined") {
+      cur = cur.default;
+      continue;
+    }
+    if (cur && typeof cur.Editor === "function") return cur.Editor;
+    break;
+  }
+  return cur;
+}
+const Editor: any = resolveEditor(RSCE);
 
 const INDENT = "    ";
 
