@@ -1048,7 +1048,23 @@ function PythonWorkspace() {
               </div>
             </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="hidden lg:flex gap-0 min-h-[520px]"
+          >
+            <ResizablePanel defaultSize={50} minSize={25}>
+              <section className="space-y-3 pr-2 h-full overflow-auto">
+                <PythonQuestionAndOutput />
+              </section>
+            </ResizablePanel>
+            <ResizableHandle withHandle className="mx-2" />
+            <ResizablePanel defaultSize={50} minSize={25}>
+              <section className="space-y-3 pl-2 h-full overflow-auto">
+                <PythonEditorPane />
+              </section>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+          <div className="grid grid-cols-1 lg:hidden gap-4">
             <section className="space-y-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono">
