@@ -1048,24 +1048,8 @@ function PythonWorkspace() {
               </div>
             </div>
           )}
-          <ResizablePanelGroup
-            direction="horizontal"
-            className="hidden lg:flex gap-0 min-h-[520px]"
-          >
-            <ResizablePanel defaultSize={50} minSize={25}>
-              <section className="space-y-3 pr-2 h-full overflow-auto">
-                <PythonQuestionAndOutput />
-              </section>
-            </ResizablePanel>
-            <ResizableHandle withHandle className="mx-2" />
-            <ResizablePanel defaultSize={50} minSize={25}>
-              <section className="space-y-3 pl-2 h-full overflow-auto">
-                <PythonEditorPane />
-              </section>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-          <div className="grid grid-cols-1 lg:hidden gap-4">
-            <section className="space-y-3">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+            <section className="space-y-3 w-full lg:w-1/2 lg:min-w-[280px] lg:max-w-[80%] lg:resize-x overflow-auto lg:border-r lg:border-border lg:pr-3">
               <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono">
                   <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{question.difficulty}</span>
