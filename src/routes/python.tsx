@@ -1154,14 +1154,17 @@ function PythonWorkspace() {
               )}
             </section>
 
-            <section className="space-y-3">
+            <section className="space-y-3 w-full lg:flex-1 lg:min-w-[280px]">
               <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground">solution.py</div>
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
+                  onKeyDown={(e) => handlePyKeyDown(e, setCode)}
                   spellCheck={false}
-                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-none"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  className="w-full h-[420px] bg-surface-2 text-base font-mono p-3 outline-none resize-y"
                 />
               </div>
               <div className="flex flex-wrap gap-2">
