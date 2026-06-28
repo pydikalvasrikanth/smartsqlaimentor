@@ -1,8 +1,16 @@
-import { useCallback } from "react";
-import Editor from "react-simple-code-editor";
+import { useCallback, useState } from "react";
+import * as RSCE from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/components/prism-python";
 import "prismjs/themes/prism-tomorrow.css";
+import { Maximize2, Minimize2 } from "lucide-react";
+
+// react-simple-code-editor ships as CJS. Vite's interop sometimes exposes the
+// module namespace instead of the default export, which makes React throw
+// "Element type is invalid: ... got: object". Resolve the real component
+// defensively so the editor works under both shapes.
+const Editor: any =
+  (RSCE as any).default ?? (RSCE as any).Editor ?? (RSCE as any);
 
 const INDENT = "    ";
 
@@ -16,8 +24,12 @@ interface Props {
  * Professional Python editor: Prism syntax highlighting + 4-space Tab/Shift+Tab
  * (via react-simple-code-editor) and Enter auto-indent that carries the
  * previous line's indentation, adding an extra level after `:` `(` `[` `{`.
+ * Supports vertical resize and a maximize toggle so the user can grow the
+ * editor against the question panel.
  */
 export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
+  const [maximized, setMaximized] = useState(false);
+  const effectiveMin = maximized ? Math.max(minHeight, 720) : minHeight;
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
       // react-simple-code-editor already handles Tab / Shift+Tab via tabSize.
@@ -45,11 +57,21 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
   );
 
   return (
-    <div
-      className="bg-[#1e1e1e] text-sm font-mono overflow-auto"
-      style={{ minHeight }}
-    >
-      <Editor
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setMaximized((m) => !m)}
+        title={maximized ? "Minimize editor" : "Maximize editor"}
+        className="absolute top-1.5 right-1.5 z-10 inline-flex items-center gap-1 px-2 py-1 rounded bg-black/40 text-white/80 hover:text-white text-[10px] border border-white/10"
+      >
+        {maximized ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+        {maximized ? "Minimize" : "Maximize"}
+      </button>
+      <div
+        className="bg-[#1e1e1e] text-sm font-mono overflow-auto resize-y"
+        style={{ minHeight: effectiveMin, height: effectiveMin }}
+      >
+        <Editor
         value={value}
         onValueChange={onChange}
         highlight={(code) => Prism.highlight(code, Prism.languages.python, "python")}
@@ -64,11 +86,12 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
           fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
           fontSize: 14,
           lineHeight: 1.55,
-          minHeight,
+          minHeight: effectiveMin,
           caretColor: "#fff",
         }}
         spellCheck={false}
-      />
+        />
+      </div>
     </div>
   );
 }
