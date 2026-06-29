@@ -2,8 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2 } from "lucide-react";
-import { interviewTurn, interviewTranscribe } from "@/lib/interview.functions";
+import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb } from "lucide-react";
+import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
+import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
 
 export const Route = createFileRoute("/interview")({
   head: () => ({
@@ -17,6 +18,18 @@ export const Route = createFileRoute("/interview")({
 });
 
 type Turn = { role: "interviewer" | "candidate"; text: string };
+
+type Report = {
+  overall_score?: number;
+  recommendation?: string;
+  headline?: string;
+  competencies?: { name: string; score: number; evidence: string }[];
+  strengths?: string[];
+  gaps?: string[];
+  red_flags?: string[];
+  improvements?: string[];
+  next_topics_to_study?: string[];
+};
 
 // --- WAV encoder (16-bit PCM mono, 16 kHz) -----------------------------------
 function encodeWav(samples: Float32Array, sampleRate: number) {
@@ -61,22 +74,11 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(bin);
 }
 
-function speak(text: string, onEnd?: () => void) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    onEnd?.();
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 1;
-  u.pitch = 1;
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find((v) => /en-(US|GB)/i.test(v.lang) && /female|samantha|google/i.test(v.name)) ||
-    voices.find((v) => /en/i.test(v.lang));
-  if (preferred) u.voice = preferred;
-  u.onend = () => onEnd?.();
-  u.onerror = () => onEnd?.();
-  window.speechSynthesis.speak(u);
+function base64ToBlob(b64: string, mime: string) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
 }
 
 function InterviewPage() {
@@ -88,9 +90,14 @@ function InterviewPage() {
 
   const ask = useServerFn(interviewTurn);
   const transcribe = useServerFn(interviewTranscribe);
+  const synthesize = useServerFn(interviewSpeak);
+  const buildReport = useServerFn(interviewReport);
 
   const [role, setRole] = useState("Data Engineer");
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
+  const [years, setYears] = useState(3);
+  const [competencies, setCompetencies] = useState("Python, SQL, Spark, Airflow, BigQuery, Kafka");
+  const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage">("alloy");
   const [started, setStarted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -98,10 +105,13 @@ function InterviewPage() {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [level01, setLevel01] = useState(0); // mic VU
+  const [mouthOpen, setMouthOpen] = useState(0); // 0..1 avatar lip-sync
   const [error, setError] = useState<string | null>(null);
   const [camOn, setCamOn] = useState(true);
   const [micOn, setMicOn] = useState(true);
   const [transcribing, setTranscribing] = useState(false);
+  const [report, setReport] = useState<Report | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<MediaStream | null>(null);
@@ -115,6 +125,14 @@ function InterviewPage() {
   const startedAtRef = useRef<number>(0);
   const turnsRef = useRef<Turn[]>([]);
   turnsRef.current = turns;
+
+  // TTS playback + lip-sync analyser
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+  const ttsSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const ttsAnalyserRef = useRef<AnalyserNode | null>(null);
+  const ttsRafRef = useRef<number | null>(null);
+  const speakingRef = useRef<boolean>(false);
+  const bargeMsRef = useRef<number>(0);
 
   // Acquire camera + mic
   const setupMedia = useCallback(async () => {
@@ -145,6 +163,16 @@ function InterviewPage() {
         for (let i = 0; i < input.length; i++) sum += input[i] * input[i];
         const rms = Math.sqrt(sum / input.length);
         setLevel01((p) => p * 0.6 + rms * 0.4);
+        // Barge-in: while AI is speaking, watch for sustained user speech
+        if (speakingRef.current) {
+          const dt = (4096 / ctx.sampleRate) * 1000;
+          if (rms > 0.035) bargeMsRef.current += dt;
+          else bargeMsRef.current = Math.max(0, bargeMsRef.current - dt * 0.5);
+          if (bargeMsRef.current > 280) {
+            bargeMsRef.current = 0;
+            stopTts(true);
+          }
+        }
         if (recordingRef.current) {
           samplesRef.current.push(new Float32Array(input));
           // simple silence detector
@@ -170,7 +198,8 @@ function InterviewPage() {
         procRef.current?.disconnect();
         sourceRef.current?.disconnect();
         audioCtxRef.current?.close();
-        window.speechSynthesis?.cancel();
+        if (ttsRafRef.current) cancelAnimationFrame(ttsRafRef.current);
+        ttsAudioRef.current?.pause();
       } catch {}
     };
   }, [setupMedia]);
@@ -183,14 +212,80 @@ function InterviewPage() {
     mediaRef.current?.getAudioTracks().forEach((t) => (t.enabled = micOn));
   }, [micOn]);
 
-  // ---- Turn helpers --------------------------------------------------------
-  const playInterviewer = (text: string) => {
+  // ---- TTS playback with lip-sync analyser --------------------------------
+  const stopTts = (bargedIn: boolean) => {
+    if (ttsRafRef.current) cancelAnimationFrame(ttsRafRef.current);
+    ttsRafRef.current = null;
+    const a = ttsAudioRef.current;
+    if (a) {
+      try { a.pause(); a.currentTime = 0; } catch {}
+    }
+    speakingRef.current = false;
+    setSpeaking(false);
+    setMouthOpen(0);
+    if (bargedIn && !ended) startListening();
+  };
+
+  const playInterviewer = async (text: string) => {
     setSpeaking(true);
-    speak(text, () => {
+    speakingRef.current = true;
+    bargeMsRef.current = 0;
+    try {
+      const res: any = await synthesize({ data: { text, voice } });
+      if (res?.error || !res?.audioBase64) {
+        // Fallback: just show the text and start listening
+        setSpeaking(false);
+        speakingRef.current = false;
+        if (!ended && micOn) startListening();
+        return;
+      }
+      const blob = base64ToBlob(res.audioBase64, res.mimeType || "audio/mpeg");
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+
+      const ctx = audioCtxRef.current;
+      if (ctx) {
+        try {
+          const src = ctx.createMediaElementSource(audio);
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 512;
+          src.connect(analyser);
+          src.connect(ctx.destination);
+          ttsSourceRef.current = src;
+          ttsAnalyserRef.current = analyser;
+          const data = new Uint8Array(analyser.fftSize);
+          const tick = () => {
+            analyser.getByteTimeDomainData(data);
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) {
+              const v = (data[i] - 128) / 128;
+              sum += v * v;
+            }
+            const rms = Math.sqrt(sum / data.length);
+            const target = Math.min(1, rms * 4.5);
+            setMouthOpen((p) => p * 0.5 + target * 0.5);
+            ttsRafRef.current = requestAnimationFrame(tick);
+          };
+          tick();
+        } catch {
+          // already connected — fallback to oscillating mouth
+        }
+      }
+
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        stopTts(false);
+        if (!ended && micOn) startListening();
+      };
+      audio.onerror = () => stopTts(false);
+      await audio.play();
+    } catch (e: any) {
+      console.error(e);
       setSpeaking(false);
-      // automatically start listening after AI finishes speaking
+      speakingRef.current = false;
       if (!ended && micOn) startListening();
-    });
+    }
   };
 
   const startListening = () => {
@@ -265,6 +360,8 @@ function InterviewPage() {
         data: {
           role,
           level,
+          experienceYears: years,
+          competencies,
           history: history.map((t) => ({ role: t.role, text: t.text })),
           action,
         },
@@ -279,7 +376,24 @@ function InterviewPage() {
       setTurns(next);
       if (action === "end") {
         setEnded(true);
-        speak(reply.slice(0, 400));
+        await playInterviewer(reply);
+        // kick off scorecard pass
+        setReportLoading(true);
+        try {
+          const rep: any = await buildReport({
+            data: {
+              role,
+              level,
+              experienceYears: years,
+              competencies,
+              history: next.map((t) => ({ role: t.role, text: t.text })),
+            },
+          });
+          if (rep?.report) setReport(rep.report as Report);
+          else if (rep?.error) setError(rep.error);
+        } finally {
+          setReportLoading(false);
+        }
       } else {
         playInterviewer(reply);
       }
@@ -293,12 +407,14 @@ function InterviewPage() {
     setStarted(true);
     setEnded(false);
     setTurns([]);
+    setReport(null);
     await aiTurn([], "start");
   };
 
   const finish = async () => {
     recordingRef.current = false;
     setListening(false);
+    stopTts(false);
     await aiTurn(turnsRef.current, "end");
   };
 
@@ -320,15 +436,45 @@ function InterviewPage() {
         </div>
       </header>
 
+      {!started && (
+        <PreInterviewForm
+          role={role}
+          setRole={setRole}
+          level={level}
+          setLevel={setLevel}
+          years={years}
+          setYears={setYears}
+          competencies={competencies}
+          setCompetencies={setCompetencies}
+          voice={voice}
+          setVoice={setVoice}
+          onBegin={begin}
+        />
+      )}
+
+      {started && (
       <main className="max-w-[1200px] mx-auto px-4 py-6 grid lg:grid-cols-[1fr_360px] gap-6">
         {/* Video + question panel */}
         <section className="space-y-4">
-          <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-border bg-black grid place-items-center">
-            <video ref={videoRef} muted playsInline className={`h-full w-full object-cover ${camOn ? "" : "opacity-0"}`} />
-            {!camOn && <p className="absolute text-xs text-muted-foreground">Camera off</p>}
+          {/* Avatar (main) + small user PIP */}
+          <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-border bg-black">
+            <InterviewAvatar
+              mouthOpen={mouthOpen}
+              speaking={speaking}
+              listening={listening}
+              thinking={thinking}
+              name="Aria"
+            />
+            {/* user camera PIP */}
+            <div className="absolute bottom-3 right-3 w-32 h-24 sm:w-40 sm:h-28 rounded-lg overflow-hidden border border-white/20 bg-black shadow-lg">
+              <video ref={videoRef} muted playsInline className={`h-full w-full object-cover ${camOn ? "" : "opacity-0"}`} />
+              {!camOn && (
+                <div className="absolute inset-0 grid place-items-center text-[10px] text-white/60">Camera off</div>
+              )}
+            </div>
 
             {/* Mic VU */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
+            <div className="absolute bottom-3 left-3 right-[10.5rem] flex items-center gap-2">
               <div className="h-1.5 flex-1 rounded-full bg-white/15 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-400 to-emerald-200 transition-[width] duration-75"
@@ -362,7 +508,7 @@ function InterviewPage() {
           {/* Current question */}
           <div className="rounded-2xl border border-border bg-surface-1 p-5 min-h-[120px]">
             <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground mb-2">
-              <Volume2 className="h-3 w-3" /> Interviewer
+              <Volume2 className="h-3 w-3" /> Aria · {role} · {level}
             </div>
             {thinking ? (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -370,43 +516,14 @@ function InterviewPage() {
               </div>
             ) : (
               <p className="text-base leading-relaxed whitespace-pre-wrap">
-                {turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? (started ? "" : "Press Start to begin the interview.")}
+                {turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? ""}
               </p>
             )}
           </div>
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            {!started ? (
-              <>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="bg-background border border-input rounded-md px-3 py-2 text-sm"
-                >
-                  <option>Data Engineer</option>
-                  <option>GCP Data Engineer</option>
-                  <option>Analytics Engineer</option>
-                  <option>Python Developer</option>
-                  <option>SQL Developer</option>
-                </select>
-                <select
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value as any)}
-                  className="bg-background border border-input rounded-md px-3 py-2 text-sm"
-                >
-                  <option value="junior">Junior</option>
-                  <option value="mid">Mid</option>
-                  <option value="senior">Senior</option>
-                </select>
-                <button
-                  onClick={begin}
-                  className="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground"
-                >
-                  <Play className="h-4 w-4" /> Start interview
-                </button>
-              </>
-            ) : !ended ? (
+            {!ended ? (
               <>
                 {listening ? (
                   <button
@@ -417,11 +534,14 @@ function InterviewPage() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => !speaking && !thinking && startListening()}
-                    disabled={speaking || thinking}
+                    onClick={() => {
+                      if (speaking) stopTts(true);
+                      else if (!thinking) startListening();
+                    }}
+                    disabled={thinking}
                     className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm disabled:opacity-50"
                   >
-                    <Mic className="h-4 w-4" /> Speak now
+                    <Mic className="h-4 w-4" /> {speaking ? "Interrupt & speak" : "Speak now"}
                   </button>
                 )}
                 <button
@@ -433,7 +553,7 @@ function InterviewPage() {
               </>
             ) : (
               <button
-                onClick={() => { setStarted(false); setEnded(false); setTurns([]); }}
+                onClick={() => { setStarted(false); setEnded(false); setTurns([]); setReport(null); }}
                 className="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground"
               >
                 <Play className="h-4 w-4" /> Start a new interview
@@ -445,6 +565,10 @@ function InterviewPage() {
             <div className="rounded-md border border-destructive/40 bg-destructive/10 text-destructive text-sm p-3">
               {error}
             </div>
+          )}
+
+          {ended && (
+            <ScoreCard report={report} loading={reportLoading} />
           )}
         </section>
 
@@ -458,7 +582,7 @@ function InterviewPage() {
             {turns.map((t, i) => (
               <div key={i} className={t.role === "interviewer" ? "" : "pl-4 border-l-2 border-primary/60"}>
                 <p className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">
-                  {t.role === "interviewer" ? "Interviewer" : "You"}
+                  {t.role === "interviewer" ? "Aria" : "You"}
                 </p>
                 <p className="text-sm whitespace-pre-wrap">{t.text}</p>
               </div>
@@ -471,6 +595,209 @@ function InterviewPage() {
           </div>
         </aside>
       </main>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Pre-interview form
+// ---------------------------------------------------------------------------
+function PreInterviewForm({
+  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, onBegin,
+}: {
+  role: string; setRole: (v: string) => void;
+  level: "junior" | "mid" | "senior"; setLevel: (v: "junior" | "mid" | "senior") => void;
+  years: number; setYears: (v: number) => void;
+  competencies: string; setCompetencies: (v: string) => void;
+  voice: "alloy" | "verse" | "shimmer" | "sage"; setVoice: (v: any) => void;
+  onBegin: () => void;
+}) {
+  return (
+    <main className="max-w-2xl mx-auto px-4 py-10">
+      <div className="rounded-2xl border border-border bg-surface-1 p-6 sm:p-8 space-y-6">
+        <div>
+          <div className="inline-flex items-center gap-2 text-[11px] font-mono text-muted-foreground mb-2">
+            <Sparkles className="h-3 w-3" /> MNC-style live mock interview
+          </div>
+          <h2 className="text-2xl font-semibold tracking-tight">Set up your interview</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Aria will calibrate questions to your target role, level and core competencies — Google/Amazon/Meta/Microsoft style.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Target role</label>
+            <input
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              placeholder="e.g. Senior Data Engineer"
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Seniority level</label>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value as any)}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            >
+              <option value="junior">Junior (L3 / 0–2 yrs)</option>
+              <option value="mid">Mid (L4 / 3–5 yrs)</option>
+              <option value="senior">Senior (L5+ / 6+ yrs)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Years of experience</label>
+            <input
+              type="number"
+              min={0} max={40}
+              value={years}
+              onChange={(e) => setYears(Math.max(0, Math.min(40, Number(e.target.value) || 0)))}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Interviewer voice</label>
+            <select
+              value={voice}
+              onChange={(e) => setVoice(e.target.value as any)}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            >
+              <option value="alloy">Alloy (neutral)</option>
+              <option value="sage">Sage (warm)</option>
+              <option value="verse">Verse (crisp)</option>
+              <option value="shimmer">Shimmer (bright)</option>
+            </select>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="text-xs font-medium text-muted-foreground">Core competencies (comma-separated)</label>
+            <textarea
+              value={competencies}
+              onChange={(e) => setCompetencies(e.target.value)}
+              rows={2}
+              placeholder="Python, SQL, Spark, Airflow, BigQuery, Kafka, system design"
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm resize-none"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Aria will bias technical questions toward these. Leave defaults to cover the full data-engineering surface.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface-2/40 p-3 text-[11px] text-muted-foreground space-y-1">
+          <p>• Mic &amp; camera stay on. Aria pauses the moment you start speaking (barge-in enabled).</p>
+          <p>• ~25-30 min: intro → deep technical → behavioural → wrap-up + scorecard.</p>
+          <p>• You can interrupt Aria any time with “Interrupt &amp; speak”.</p>
+        </div>
+
+        <button
+          onClick={onBegin}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-primary to-primary-glow px-4 py-3 text-sm font-medium text-primary-foreground"
+        >
+          <Play className="h-4 w-4" /> Start interview with Aria
+        </button>
+      </div>
+    </main>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Post-interview scorecard
+// ---------------------------------------------------------------------------
+function ScoreCard({ report, loading }: { report: Report | null; loading: boolean }) {
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-surface-1 p-6 flex items-center gap-3 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Compiling your evaluation scorecard…
+      </div>
+    );
+  }
+  if (!report) return null;
+  const rec = (report.recommendation || "").toLowerCase();
+  const recColor = rec.includes("strong_hire")
+    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+    : rec.includes("no_hire")
+      ? "bg-red-500/15 text-red-400 border-red-500/30"
+      : rec.includes("hire")
+        ? "bg-sky-500/15 text-sky-400 border-sky-500/30"
+        : "bg-muted text-muted-foreground border-border";
+  const score = typeof report.overall_score === "number" ? report.overall_score.toFixed(1) : "—";
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface-1 p-5 sm:p-6 space-y-5">
+      <div className="flex items-start gap-4 flex-wrap">
+        <div className="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 w-24 h-24">
+          <span className="text-3xl font-bold tracking-tight">{score}</span>
+          <span className="text-[10px] uppercase font-mono text-muted-foreground">overall / 10</span>
+        </div>
+        <div className="flex-1 min-w-[200px]">
+          <div className={`inline-block text-[11px] font-mono uppercase px-2 py-0.5 rounded border ${recColor} mb-2`}>
+            {report.recommendation || "evaluation"}
+          </div>
+          <p className="text-sm leading-relaxed">{report.headline}</p>
+        </div>
+      </div>
+
+      {report.competencies && report.competencies.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold mb-2"><Target className="h-3.5 w-3.5" /> Per-competency</div>
+          <div className="space-y-2">
+            {report.competencies.map((c, i) => (
+              <div key={i}>
+                <div className="flex items-center justify-between text-xs mb-0.5">
+                  <span className="font-medium">{c.name}</span>
+                  <span className="font-mono text-muted-foreground">{c.score.toFixed(1)}/10</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-primary-glow"
+                    style={{ width: `${Math.min(100, c.score * 10)}%` }}
+                  />
+                </div>
+                {c.evidence && <p className="text-[11px] text-muted-foreground mt-1">{c.evidence}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Section icon={<Award className="h-3.5 w-3.5" />} title="Strengths" items={report.strengths} tone="emerald" />
+        <Section icon={<AlertTriangle className="h-3.5 w-3.5" />} title="Gaps" items={report.gaps} tone="amber" />
+        {report.red_flags && report.red_flags.length > 0 && (
+          <Section icon={<AlertTriangle className="h-3.5 w-3.5" />} title="Red flags" items={report.red_flags} tone="red" />
+        )}
+        <Section icon={<Lightbulb className="h-3.5 w-3.5" />} title="Improvements" items={report.improvements} tone="sky" />
+        {report.next_topics_to_study && report.next_topics_to_study.length > 0 && (
+          <Section icon={<Sparkles className="h-3.5 w-3.5" />} title="Study next" items={report.next_topics_to_study} tone="violet" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Section({ icon, title, items, tone }: { icon: React.ReactNode; title: string; items?: string[]; tone: "emerald" | "amber" | "red" | "sky" | "violet" }) {
+  if (!items || items.length === 0) return null;
+  const dot = {
+    emerald: "bg-emerald-400",
+    amber: "bg-amber-400",
+    red: "bg-red-400",
+    sky: "bg-sky-400",
+    violet: "bg-violet-400",
+  }[tone];
+  return (
+    <div className="rounded-lg border border-border bg-surface-2/40 p-3">
+      <div className="flex items-center gap-2 text-xs font-semibold mb-2">{icon} {title}</div>
+      <ul className="space-y-1.5">
+        {items.map((s, i) => (
+          <li key={i} className="text-[12.5px] leading-snug flex gap-2">
+            <span className={`h-1.5 w-1.5 rounded-full ${dot} mt-1.5 shrink-0`} />
+            <span>{s}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
