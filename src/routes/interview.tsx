@@ -383,7 +383,8 @@ function InterviewPage() {
   }, [listening, stopListening]);
 
   const aiTurn = async (history: Turn[], action: "start" | "next" | "end") => {
-    if (thinking) return;
+    if (thinkingRef.current) return;
+    thinkingRef.current = true;
     setThinking(true);
     try {
       const res: any = await ask({
@@ -397,6 +398,7 @@ function InterviewPage() {
         },
       });
       setThinking(false);
+      thinkingRef.current = false;
       const reply: string = (res?.reply ?? res?.error ?? "").trim();
       if (!reply) {
         setError("The interviewer didn't respond. Try again.");
@@ -429,6 +431,7 @@ function InterviewPage() {
       }
     } catch (e: any) {
       setThinking(false);
+      thinkingRef.current = false;
       setError(e?.message ?? "AI error.");
     }
   };
