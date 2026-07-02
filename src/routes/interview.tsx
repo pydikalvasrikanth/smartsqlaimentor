@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb } from "lucide-react";
 import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
@@ -84,6 +85,7 @@ function base64ToBlob(b64: string, mime: string) {
 function InterviewPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
@@ -133,6 +135,13 @@ function InterviewPage() {
   const ttsRafRef = useRef<number | null>(null);
   const speakingRef = useRef<boolean>(false);
   const bargeMsRef = useRef<number>(0);
+  const cooldownUntilRef = useRef<number>(0);
+  const processingRef = useRef<boolean>(false);
+  const thinkingRef = useRef<boolean>(false);
+  const endedRef = useRef<boolean>(false);
+  const isMobileRef = useRef<boolean>(false);
+  isMobileRef.current = isMobile;
+  useEffect(() => { endedRef.current = ended; }, [ended]);
 
   // Acquire camera + mic
   const setupMedia = useCallback(async () => {
@@ -164,16 +173,20 @@ function InterviewPage() {
         const rms = Math.sqrt(sum / input.length);
         setLevel01((p) => p * 0.6 + rms * 0.4);
         // Barge-in: while AI is speaking, watch for sustained user speech
-        if (speakingRef.current) {
+        // Disable barge-in on mobile — phone speaker bleeds into mic and
+        // triggers false interrupts, causing the AI to skip questions.
+        if (speakingRef.current && !isMobileRef.current) {
           const dt = (4096 / ctx.sampleRate) * 1000;
-          if (rms > 0.035) bargeMsRef.current += dt;
+          if (rms > 0.08) bargeMsRef.current += dt;
           else bargeMsRef.current = Math.max(0, bargeMsRef.current - dt * 0.5);
-          if (bargeMsRef.current > 280) {
+          if (bargeMsRef.current > 500) {
             bargeMsRef.current = 0;
             stopTts(true);
           }
         }
         if (recordingRef.current) {
+          // Ignore any samples captured during the post-TTS cooldown window
+          if (Date.now() < cooldownUntilRef.current) return;
           samplesRef.current.push(new Float32Array(input));
           // simple silence detector
           const isSilent = rms < 0.012;
@@ -223,7 +236,10 @@ function InterviewPage() {
     speakingRef.current = false;
     setSpeaking(false);
     setMouthOpen(0);
-    if (bargedIn && !ended) startListening();
+    // Give the mic ~600ms after TTS stops to avoid capturing speaker bleed.
+    cooldownUntilRef.current = Date.now() + 600;
+    // On mobile: never auto-start listening — user must tap "Speak now".
+    if (bargedIn && !endedRef.current && !isMobileRef.current) startListening();
   };
 
   const playInterviewer = async (text: string) => {
@@ -276,19 +292,26 @@ function InterviewPage() {
       audio.onended = () => {
         URL.revokeObjectURL(url);
         stopTts(false);
-        if (!ended && micOn) startListening();
+        // Auto-listen on desktop only. On mobile, wait for the user to tap.
+        if (!endedRef.current && micOn && !isMobileRef.current) {
+          setTimeout(() => { if (!endedRef.current) startListening(); }, 650);
+        }
       };
       audio.onerror = () => stopTts(false);
+      // iOS/Android often leave the AudioContext suspended until a user
+      // gesture even after getUserMedia — resume it before playback.
+      try { await audioCtxRef.current?.resume(); } catch {}
       await audio.play();
     } catch (e: any) {
       console.error(e);
       setSpeaking(false);
       speakingRef.current = false;
-      if (!ended && micOn) startListening();
+      if (!endedRef.current && micOn && !isMobileRef.current) startListening();
     }
   };
 
   const startListening = () => {
+    if (recordingRef.current || speakingRef.current || processingRef.current || endedRef.current) return;
     samplesRef.current = [];
     silenceMsRef.current = 0;
     startedAtRef.current = Date.now();
@@ -300,10 +323,13 @@ function InterviewPage() {
     if (!recordingRef.current) return;
     recordingRef.current = false;
     setListening(false);
+    if (processingRef.current) return;
+    processingRef.current = true;
     const total = samplesRef.current.reduce((n, c) => n + c.length, 0);
     if (total < 4000) {
+      processingRef.current = false;
       // too short — restart listening
-      if (!ended) startListening();
+      if (!endedRef.current && !isMobileRef.current) startListening();
       return;
     }
     const merged = new Float32Array(total);
@@ -316,7 +342,8 @@ function InterviewPage() {
     const ctx = audioCtxRef.current!;
     const wav = encodeWav(merged, ctx.sampleRate);
     if (wav.size < 3000) {
-      if (!ended) startListening();
+      processingRef.current = false;
+      if (!endedRef.current && !isMobileRef.current) startListening();
       return;
     }
     setTranscribing(true);
@@ -326,18 +353,21 @@ function InterviewPage() {
       setTranscribing(false);
       const said: string = (res?.text ?? "").trim();
       if (!said) {
-        if (!ended) startListening();
+        processingRef.current = false;
+        if (!endedRef.current && !isMobileRef.current) startListening();
         return;
       }
       const next: Turn[] = [...turnsRef.current, { role: "candidate", text: said }];
       setTurns(next);
       await aiTurn(next, "next");
+      processingRef.current = false;
     } catch (e: any) {
       setTranscribing(false);
       setError(e?.message ?? "Transcription failed.");
-      if (!ended) startListening();
+      processingRef.current = false;
+      if (!endedRef.current && !isMobileRef.current) startListening();
     }
-  }, [ended, transcribe]);
+  }, [transcribe]);
 
   // Auto-stop after ~1.6s of silence while listening
   useEffect(() => {
@@ -354,6 +384,8 @@ function InterviewPage() {
   }, [listening, stopListening]);
 
   const aiTurn = async (history: Turn[], action: "start" | "next" | "end") => {
+    if (thinkingRef.current) return;
+    thinkingRef.current = true;
     setThinking(true);
     try {
       const res: any = await ask({
@@ -367,6 +399,7 @@ function InterviewPage() {
         },
       });
       setThinking(false);
+      thinkingRef.current = false;
       const reply: string = (res?.reply ?? res?.error ?? "").trim();
       if (!reply) {
         setError("The interviewer didn't respond. Try again.");
@@ -399,6 +432,7 @@ function InterviewPage() {
       }
     } catch (e: any) {
       setThinking(false);
+      thinkingRef.current = false;
       setError(e?.message ?? "AI error.");
     }
   };
@@ -687,9 +721,9 @@ function PreInterviewForm({
         </div>
 
         <div className="rounded-lg border border-border bg-surface-2/40 p-3 text-[11px] text-muted-foreground space-y-1">
-          <p>• Mic &amp; camera stay on. Aria pauses the moment you start speaking (barge-in enabled).</p>
+          <p>• Desktop: barge-in auto-listens. Mobile: tap “Speak now” after Aria finishes so speaker audio doesn't bleed into the mic.</p>
           <p>• ~25-30 min: intro → deep technical → behavioural → wrap-up + scorecard.</p>
-          <p>• You can interrupt Aria any time with “Interrupt &amp; speak”.</p>
+          <p>• Tap “Done answering” when you finish each response.</p>
         </div>
 
         <button
