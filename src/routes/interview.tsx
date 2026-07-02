@@ -137,6 +137,7 @@ function InterviewPage() {
   const bargeMsRef = useRef<number>(0);
   const cooldownUntilRef = useRef<number>(0);
   const processingRef = useRef<boolean>(false);
+  const thinkingRef = useRef<boolean>(false);
   const endedRef = useRef<boolean>(false);
   const isMobileRef = useRef<boolean>(false);
   isMobileRef.current = isMobile;
