@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, BookOpen, ArrowRight, Layers } from "lucide-react";
 
@@ -89,6 +91,17 @@ function TutorialPage() {
   const navigate = useNavigate();
   const [active, setActive] = useState<Module | null>(null);
 
+  const resume = useResumableState<{ moduleId: string | null }>(
+    "tutorial",
+    { moduleId: null },
+    { isEmpty: (s: any) => !s || !s.moduleId },
+  );
+
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ moduleId: active?.id ?? null });
+  }, [active, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
@@ -155,6 +168,22 @@ function TutorialPage() {
       </header>
 
       <main className="max-w-[1100px] mx-auto px-4 py-12">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={
+              MODULES.find((m) => m.id === resume.savedSnapshot!.state.moduleId)?.title ??
+              "Last module"
+            }
+            onResume={() => {
+              const id = resume.savedSnapshot!.state.moduleId;
+              const mod = MODULES.find((m) => m.id === id);
+              if (mod) setActive(mod);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-10">
           <h2 className="text-3xl font-bold tracking-tight">Learn MySQL, visually</h2>
           <p className="text-muted-foreground">
