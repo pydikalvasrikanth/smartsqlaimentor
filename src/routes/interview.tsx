@@ -503,6 +503,33 @@ function InterviewPage() {
       </header>
 
       {!started && (
+        <div className="max-w-[900px] mx-auto px-4 pt-4">
+          {resume.hasResumable && resume.savedSnapshot && (
+            <ResumePrompt
+              updatedAt={resume.savedSnapshot.updatedAt}
+              meta={
+                resume.savedSnapshot.state.turns?.length
+                  ? `${resume.savedSnapshot.state.turns.length} turns · ${resume.savedSnapshot.state.role}`
+                  : `Saved setup · ${resume.savedSnapshot.state.role}`
+              }
+              onResume={() => {
+                const s = resume.savedSnapshot!.state;
+                setRole(s.role);
+                setLevel(s.level);
+                setYears(s.years);
+                setCompetencies(s.competencies);
+                setVoice(s.voice);
+                setTurns(s.turns ?? []);
+                setEnded(s.ended);
+                setStarted(s.started && !s.ended);
+                resume.hydrate(resume.savedSnapshot);
+              }}
+              onDismiss={resume.dismiss}
+            />
+          )}
+        </div>
+      )}
+      {!started && (
         <PreInterviewForm
           role={role}
           setRole={setRole}
