@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
@@ -359,6 +361,45 @@ function PythonWorkspace() {
   const [visual, setVisual] = useState<any>(null);
   const [review, setReview] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
+
+  // Cross-device resume for tab / filters / typed code. In-session question is
+  // rebuilt from the engine when the user picks Next.
+  type PyResume = {
+    tab: "today" | "topic" | "targeted" | "data-eng" | "interview";
+    topicLevel: Level;
+    deLevel: Level;
+    interviewCompany: string;
+    interviewLevel: Level;
+    focusGoal: string;
+    code: string;
+  };
+  const resume = useResumableState<PyResume>(
+    "python",
+    {
+      tab: "today",
+      topicLevel: "intermediate",
+      deLevel: "intermediate",
+      interviewCompany: "Google",
+      interviewLevel: "intermediate",
+      focusGoal: "",
+      code: "",
+    },
+    {
+      isEmpty: (s: any) =>
+        !s ||
+        (s.tab === "today" &&
+          s.topicLevel === "intermediate" &&
+          s.deLevel === "intermediate" &&
+          s.interviewCompany === "Google" &&
+          s.interviewLevel === "intermediate" &&
+          !s.focusGoal &&
+          (!s.code || !s.code.trim())),
+    },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code });
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
