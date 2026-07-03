@@ -17,12 +17,15 @@ export const loadSessionState = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw error;
     if (!row) return null;
-    return { state: row.state as unknown, updatedAt: row.updated_at as string };
+    return {
+      state: (row.state ?? null) as Record<string, unknown> | null,
+      updatedAt: row.updated_at as string,
+    };
   });
 
 export const saveSessionState = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { key: string; state: unknown }) => {
+  .inputValidator((input: { key: string; state: Record<string, unknown> }) => {
     if (!input || typeof input.key !== "string" || !input.key)
       throw new Error("key required");
     return { key: input.key.slice(0, 128), state: input.state };
