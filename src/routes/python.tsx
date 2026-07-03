@@ -705,6 +705,24 @@ function PythonWorkspace() {
       </header>
 
       <main className="max-w-[1400px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.tab} tab`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTab(s.tab);
+              setTopicLevel(s.topicLevel);
+              setDeLevel(s.deLevel);
+              setInterviewCompany(s.interviewCompany);
+              setInterviewLevel(s.interviewLevel);
+              setFocusGoal(s.focusGoal);
+              if (s.code) setCode(s.code);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         {!question && (
           <div className="flex items-center gap-1 border-b border-border">
             <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
