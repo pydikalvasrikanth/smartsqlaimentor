@@ -135,8 +135,10 @@ function GcpWorkspace() {
               const s = resume.savedSnapshot!.state;
               setTopic(s.topic);
               setDiff(s.diff);
-              setIndex(s.index);
               setMarks(s.marks ?? {});
+              // topic/diff change triggers a reset effect that clears the index;
+              // restore the saved index after that reset flushes.
+              setTimeout(() => setIndex(s.index), 0);
               resume.hydrate(resume.savedSnapshot);
             }}
             onDismiss={resume.dismiss}
