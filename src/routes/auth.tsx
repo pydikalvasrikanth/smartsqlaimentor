@@ -6,17 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 
-const DEFAULT_LOVABLE_ORIGIN =
-  "https://project--93a75156-6283-48bf-a62b-5aa287cea47b-dev.lovable.app";
-
 function getAuthOrigin() {
-  if (typeof window === "undefined") return DEFAULT_LOVABLE_ORIGIN;
-  const { hostname, origin } = window.location;
-  if (hostname.endsWith(".lovable.app")) {
-    return hostname.startsWith("id-preview--") ? DEFAULT_LOVABLE_ORIGIN : origin;
-  }
-  if (hostname === "localhost" || hostname === "127.0.0.1") return origin;
-  return DEFAULT_LOVABLE_ORIGIN;
+  if (typeof window === "undefined") return "https://smartsqlaimentor.lovable.app";
+  return window.location.origin;
 }
 
 function getAuthRedirect(path = "/") {
