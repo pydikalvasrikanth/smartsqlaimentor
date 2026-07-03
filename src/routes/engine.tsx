@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
@@ -57,6 +59,16 @@ function EnginePage() {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
   const [tab, setTab] = useState<Tab>("preview");
+  const [aiPrompt, setAiPrompt] = useState<string | null>(null);
+  const resume = useResumableState<{ tab: Tab; aiPrompt: string | null }>(
+    "engine",
+    { tab: "preview", aiPrompt: null },
+    { isEmpty: (s: any) => !s || (s.tab === "preview" && !s.aiPrompt) },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ tab, aiPrompt });
+  }, [tab, aiPrompt, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
   if (loading || !user) return null;
 
   return (
@@ -90,11 +102,24 @@ function EnginePage() {
       </header>
 
       <main className="max-w-[1400px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.tab} tab`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTab(s.tab);
+              if (s.aiPrompt != null) setAiPrompt(s.aiPrompt);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         <h2 className="sr-only">
           {tab === "preview" ? "Data preview" : tab === "ai" ? "AI SQL compiler" : tab === "quality" ? "Data quality" : "Advanced lab"}
         </h2>
         {tab === "preview" && <PreviewTab />}
-        {tab === "ai" && <AITab />}
+        {tab === "ai" && <AITab initialPrompt={aiPrompt} onPromptChange={setAiPrompt} />}
         {tab === "quality" && <QualityTab />}
         {tab === "lab" && <LabTab />}
       </main>
@@ -163,9 +188,14 @@ function PreviewTab() {
 }
 
 /* ---------- AI SQL Compiler ---------- */
-function AITab() {
+function AITab({ initialPrompt, onPromptChange }: { initialPrompt?: string | null; onPromptChange?: (v: string) => void }) {
   const engine = useServerFn(runSqlEngine);
-  const [nl, setNl] = useState("Find the top 5 customers by total order amount in 2024.");
+  const [nl, setNl] = useState(
+    initialPrompt ?? "Find the top 5 customers by total order amount in 2024.",
+  );
+  useEffect(() => {
+    onPromptChange?.(nl);
+  }, [nl, onPromptChange]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [showBQ, setShowBQ] = useState(false);

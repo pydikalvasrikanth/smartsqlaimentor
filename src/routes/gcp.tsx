@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { Toaster, toast } from "sonner";
 import { Cloud, ArrowLeft, ArrowRight, Eye, EyeOff, LogOut, CheckCircle2, XCircle, Filter } from "lucide-react";
@@ -51,6 +53,25 @@ function GcpWorkspace() {
   const [index, setIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [marks, setMarks] = useState<Record<number, "right" | "wrong">>({});
+
+  const resume = useResumableState<{
+    topic: string;
+    diff: "All" | GcpDifficulty;
+    index: number;
+    marks: Record<number, "right" | "wrong">;
+  }>(
+    "gcp",
+    { topic: "All", diff: "All", index: 0, marks: {} },
+    {
+      isEmpty: (s: any) =>
+        !s || (s.index === 0 && s.topic === "All" && s.diff === "All" && Object.keys(s.marks ?? {}).length === 0),
+    },
+  );
+
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ topic, diff, index, marks });
+  }, [topic, diff, index, marks, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [authLoading, user, navigate]);
 
@@ -106,6 +127,23 @@ function GcpWorkspace() {
       </header>
 
       <main className="max-w-[1100px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`Question ${(resume.savedSnapshot.state.index ?? 0) + 1}`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTopic(s.topic);
+              setDiff(s.diff);
+              setMarks(s.marks ?? {});
+              // topic/diff change triggers a reset effect that clears the index;
+              // restore the saved index after that reset flushes.
+              setTimeout(() => setIndex(s.index), 0);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           <label className="text-muted-foreground">Topic</label>

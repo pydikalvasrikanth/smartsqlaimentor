@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
@@ -360,6 +362,45 @@ function PythonWorkspace() {
   const [review, setReview] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
+  // Cross-device resume for tab / filters / typed code. In-session question is
+  // rebuilt from the engine when the user picks Next.
+  type PyResume = {
+    tab: "today" | "topic" | "targeted" | "data-eng" | "interview";
+    topicLevel: Level;
+    deLevel: Level;
+    interviewCompany: string;
+    interviewLevel: Level;
+    focusGoal: string;
+    code: string;
+  };
+  const resume = useResumableState<PyResume>(
+    "python",
+    {
+      tab: "today",
+      topicLevel: "intermediate",
+      deLevel: "intermediate",
+      interviewCompany: "Google",
+      interviewLevel: "intermediate",
+      focusGoal: "",
+      code: "",
+    },
+    {
+      isEmpty: (s: any) =>
+        !s ||
+        (s.tab === "today" &&
+          s.topicLevel === "intermediate" &&
+          s.deLevel === "intermediate" &&
+          s.interviewCompany === "Google" &&
+          s.interviewLevel === "intermediate" &&
+          !s.focusGoal &&
+          (!s.code || !s.code.trim())),
+    },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code });
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
   }, [authLoading, user, navigate]);
@@ -664,6 +705,24 @@ function PythonWorkspace() {
       </header>
 
       <main className="max-w-[1400px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.tab} tab`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTab(s.tab);
+              setTopicLevel(s.topicLevel);
+              setDeLevel(s.deLevel);
+              setInterviewCompany(s.interviewCompany);
+              setInterviewLevel(s.interviewLevel);
+              setFocusGoal(s.focusGoal);
+              if (s.code) setCode(s.code);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         {!question && (
           <div className="flex items-center gap-1 border-b border-border">
             <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>

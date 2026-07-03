@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { loadSessionState, saveSessionState } from "@/lib/resume.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "sonner";
@@ -163,6 +164,39 @@ function TopicPage() {
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   const storageKey = user ? `practice:progress:${user.id}:${slug}` : "";
+  const cloudKey = `topic:${slug}`;
+
+  // On mount, if the cloud snapshot is newer than the local one, seed
+  // localStorage from it so the existing resume path can pick it up.
+  useEffect(() => {
+    if (!user || !storageKey) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const remote = await loadSessionState({ data: { key: cloudKey } });
+        if (!remote || cancelled) return;
+        const remoteAt = new Date(remote.updatedAt).getTime();
+        const parsed = JSON.parse(remote.state) as { savedAt?: number } | null;
+        if (!parsed) return;
+        let localAt = 0;
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw) localAt = (JSON.parse(raw)?.savedAt as number) ?? 0;
+        } catch {}
+        if (remoteAt > localAt) {
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(parsed));
+            setHasSavedProgress(true);
+          } catch {}
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, storageKey, cloudKey]);
 
   // Detect saved progress for this topic so we can offer Resume.
   useEffect(() => {
@@ -176,24 +210,26 @@ function TopicPage() {
   // Persist progress whenever it changes mid-session.
   useEffect(() => {
     if (!storageKey || !session || !question || !sessionQuestionId) return;
+    const snapshot = {
+      questionCount,
+      session,
+      question,
+      sessionQuestionId,
+      pastIds,
+      coveredConcepts,
+      userSql,
+      history,
+      historyIndex,
+      savedAt: Date.now(),
+    };
     try {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          questionCount,
-          session,
-          question,
-          sessionQuestionId,
-          pastIds,
-          coveredConcepts,
-          userSql,
-          history,
-          historyIndex,
-          savedAt: Date.now(),
-        }),
-      );
+      localStorage.setItem(storageKey, JSON.stringify(snapshot));
       setHasSavedProgress(true);
     } catch {}
+    if (user) {
+      // Cloud sync is best-effort and debounced by the effect's own dep changes.
+      saveSessionState({ data: { key: cloudKey, state: JSON.stringify(snapshot) } }).catch(() => {});
+    }
   }, [storageKey, session, question, sessionQuestionId, questionCount, pastIds, coveredConcepts, userSql, history, historyIndex]);
 
 

@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb } from "lucide-react";
@@ -114,6 +116,36 @@ function InterviewPage() {
   const [transcribing, setTranscribing] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
+
+  // Full interview resume: setup + transcript. In-flight audio/TTS never persists.
+  type InterviewResume = {
+    role: string;
+    level: "junior" | "mid" | "senior";
+    years: number;
+    competencies: string;
+    voice: "alloy" | "verse" | "shimmer" | "sage";
+    started: boolean;
+    ended: boolean;
+    turns: Turn[];
+  };
+  const resume = useResumableState<InterviewResume>(
+    "interview",
+    {
+      role: "Data Engineer",
+      level: "mid",
+      years: 3,
+      competencies: "Python, SQL, Spark, Airflow, BigQuery, Kafka",
+      voice: "alloy",
+      started: false,
+      ended: false,
+      turns: [],
+    },
+    { isEmpty: (s: any) => !s || (!s.started && (!s.turns || s.turns.length === 0)) },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({ role, level, years, competencies, voice, started, ended, turns });
+  }, [role, level, years, competencies, voice, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<MediaStream | null>(null);
@@ -470,6 +502,33 @@ function InterviewPage() {
         </div>
       </header>
 
+      {!started && (
+        <div className="max-w-[900px] mx-auto px-4 pt-4">
+          {resume.hasResumable && resume.savedSnapshot && (
+            <ResumePrompt
+              updatedAt={resume.savedSnapshot.updatedAt}
+              meta={
+                resume.savedSnapshot.state.turns?.length
+                  ? `${resume.savedSnapshot.state.turns.length} turns · ${resume.savedSnapshot.state.role}`
+                  : `Saved setup · ${resume.savedSnapshot.state.role}`
+              }
+              onResume={() => {
+                const s = resume.savedSnapshot!.state;
+                setRole(s.role);
+                setLevel(s.level);
+                setYears(s.years);
+                setCompetencies(s.competencies);
+                setVoice(s.voice);
+                setTurns(s.turns ?? []);
+                setEnded(s.ended);
+                setStarted(s.started && !s.ended);
+                resume.hydrate(resume.savedSnapshot);
+              }}
+              onDismiss={resume.dismiss}
+            />
+          )}
+        </div>
+      )}
       {!started && (
         <PreInterviewForm
           role={role}

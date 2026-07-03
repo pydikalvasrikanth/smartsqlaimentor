@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -244,6 +246,61 @@ function Workspace() {
   const [pythonMode, setPythonMode] = useState(false);
 
   const isInterviewMode = topic === INTERVIEW_TOPIC;
+
+  // Cross-device resume for filters + typed SQL. In-session question state is
+  // rebuilt from the engine when the user hits Start / Next.
+  type PracticeResume = {
+    tab: "today" | "free" | "topics" | "targeted" | "data-eng";
+    topic: string;
+    difficulty: string;
+    company: string;
+    focusGoal: string;
+    deLevel: number;
+    deCategory: string;
+    userSql: string;
+    pythonMode: boolean;
+  };
+  const resume = useResumableState<PracticeResume>(
+    "sql-practice",
+    {
+      tab: "today",
+      topic: "E-commerce orders",
+      difficulty: "beginner",
+      company: "Any",
+      focusGoal: "",
+      deLevel: 1,
+      deCategory: "mix",
+      userSql: "-- Write your SQL here\n",
+      pythonMode: false,
+    },
+    {
+      isEmpty: (s: any) =>
+        !s ||
+        (s.tab === "today" &&
+          s.topic === "E-commerce orders" &&
+          s.difficulty === "beginner" &&
+          s.company === "Any" &&
+          !s.focusGoal &&
+          s.deLevel === 1 &&
+          s.deCategory === "mix" &&
+          !s.pythonMode &&
+          (!s.userSql || s.userSql.trim() === "-- Write your SQL here")),
+    },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({
+      tab,
+      topic,
+      difficulty,
+      company,
+      focusGoal,
+      deLevel,
+      deCategory,
+      userSql,
+      pythonMode,
+    });
+  }, [tab, topic, difficulty, company, focusGoal, deLevel, deCategory, userSql, pythonMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const call = useCallback(
     async (command: any, payload: any) => {
@@ -1019,6 +1076,26 @@ function Workspace() {
       {showPlanner && <PlannerModal onCreated={() => { setShowPlanner(false); planQ.refetch(); }} />}
 
       <main className="max-w-[1400px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.tab} tab`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTab(s.tab);
+              setTopic(s.topic);
+              setDifficulty(s.difficulty);
+              setCompany(s.company);
+              setFocusGoal(s.focusGoal);
+              setDeLevel(s.deLevel);
+              setDeCategory(s.deCategory);
+              setUserSql(s.userSql);
+              setPythonMode(!!s.pythonMode);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         {/* Tabs */}
         <div className="flex items-center gap-1 border-b border-border">
           <TabBtn active={tab === "today"} onClick={() => setTab("today")} icon={<Calendar className="h-3.5 w-3.5" />}>

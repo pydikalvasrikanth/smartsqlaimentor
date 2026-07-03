@@ -265,6 +265,27 @@ export type Database = {
         }
         Relationships: []
       }
+      session_state: {
+        Row: {
+          section_key: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          section_key: string
+          state: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          section_key?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       topic_mastery: {
         Row: {
           current_tier: Database["public"]["Enums"]["skill_level"]

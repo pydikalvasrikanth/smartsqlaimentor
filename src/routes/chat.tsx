@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { chat } from "@/lib/chat.functions";
@@ -77,6 +79,22 @@ function ChatPage() {
   const [pending, setPending] = useState<Attachment[]>([]);
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<"chat" | "image">("chat");
+
+  // Persist chat: trim to last 40 messages, strip base64 image data URLs to keep the row small.
+  const resume = useResumableState<{ messages: Msg[]; mode: "chat" | "image"; input: string }>(
+    "chat",
+    { messages: [], mode: "chat", input: "" },
+    { isEmpty: (s: any) => !s || (s.messages?.length === 0 && !s.input) },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    const trimmed = messages.slice(-40).map((m) => ({
+      ...m,
+      attachments: m.attachments?.map((a) => ({ ...a, dataUrl: undefined, previewUrl: undefined })),
+    }));
+    resume.setState({ messages: trimmed, mode, input });
+  }, [messages, mode, input, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const fileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -187,6 +205,20 @@ function ChatPage() {
       </header>
 
       <main className="flex-1 max-w-[1100px] w-full mx-auto px-4 py-6 space-y-4 overflow-y-auto">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.messages?.length ?? 0} messages`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setMessages(s.messages ?? []);
+              setMode(s.mode ?? "chat");
+              setInput(s.input ?? "");
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
         {messages.length === 0 && (
           <div className="text-center text-sm text-muted-foreground mt-12 space-y-2">
             <p>Start a conversation. Tap the paperclip to attach images, files or videos.</p>
