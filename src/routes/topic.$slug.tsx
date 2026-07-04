@@ -12,7 +12,7 @@ import { runSqlEngine } from "@/lib/sql-engine.functions";
 import { getLearningState, logAttempt, initPractice, nextPractice, revealSolution, awardPoints, getProfilePoints } from "@/lib/plan.functions";
 import { TOPIC_BY_SLUG, TOPICS, TIER_ORDER, type Tier } from "@/lib/topic-catalog";
 import { SchemaPanel } from "@/components/sql/SchemaPanel";
-import { ResizableSplit } from "@/components/sql/ResizableSplit";
+import { ResizableAside, LeftPanelResizeHandle } from "@/components/sql/ResizableSplit";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";

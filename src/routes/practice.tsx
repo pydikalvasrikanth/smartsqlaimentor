@@ -23,7 +23,7 @@ import { PlannerModal } from "@/components/PlannerModal";
 import { PlanDashboard } from "@/components/PlanDashboard";
 import { Toolbar, INTERVIEW_TOPIC } from "@/components/sql/Toolbar";
 import { SchemaPanel } from "@/components/sql/SchemaPanel";
-import { ResizableSplit } from "@/components/sql/ResizableSplit";
+import { ResizableAside, LeftPanelResizeHandle } from "@/components/sql/ResizableSplit";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
