@@ -12,6 +12,7 @@ import { runSqlEngine } from "@/lib/sql-engine.functions";
 import { getLearningState, logAttempt, initPractice, nextPractice, revealSolution, awardPoints, getProfilePoints } from "@/lib/plan.functions";
 import { TOPIC_BY_SLUG, TOPICS, TIER_ORDER, type Tier } from "@/lib/topic-catalog";
 import { SchemaPanel } from "@/components/sql/SchemaPanel";
+import { ResizableAside, LeftPanelResizeHandle } from "@/components/sql/ResizableSplit";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
@@ -593,15 +594,17 @@ function TopicPage() {
         )}
 
         {session && (
-          <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4">
-            <aside className="lg:sticky lg:top-[100px] lg:h-[calc(100vh-120px)]">
+          <div className="flex flex-col lg:flex-row gap-4 min-w-0">
+            <ResizableAside className="lg:sticky lg:top-[100px] lg:h-[calc(100vh-120px)]">
               <SchemaPanel
                 schemaSql={session.schema_sql}
                 seedSql={session.seed_data_sql}
                 erdMermaid={session.erd_mermaid}
                 description={session.tables_description}
+              question={question ? { task: question.task, concept: question.concept, difficulty: question.difficulty } : null}
               />
-            </aside>
+            </ResizableAside>
+          <LeftPanelResizeHandle />
             <section className="space-y-4 min-w-0">
               <QuestionCard
                 question={question}
