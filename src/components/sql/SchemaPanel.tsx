@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { runSqlEngine } from "@/lib/sql-engine.functions";
-import { AiMessage } from "@/components/AiMessage";
 import { ErdDiagram } from "./ErdDiagram";
+import { TheoryContent } from "./TheoryContent";
 
 interface Props {
   schemaSql: string;
@@ -148,7 +148,7 @@ export function SchemaPanel({ schemaSql, seedSql, erdMermaid, description, quest
               </div>
             ) : theory ? (
               <>
-                <AiMessage content={theory} />
+                <TheoryContent content={theory} />
                 <button
                   onClick={loadTheory}
                   className="text-[11px] px-2 py-1 rounded-md border border-border hover:bg-accent text-muted-foreground hover:text-foreground"
