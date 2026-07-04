@@ -594,15 +594,17 @@ function TopicPage() {
         )}
 
         {session && (
-          <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4">
-            <aside className="lg:sticky lg:top-[100px] lg:h-[calc(100vh-120px)]">
+          <div className="flex flex-col lg:flex-row gap-4 min-w-0">
+            <ResizableAside className="lg:sticky lg:top-[100px] lg:h-[calc(100vh-120px)]">
               <SchemaPanel
                 schemaSql={session.schema_sql}
                 seedSql={session.seed_data_sql}
                 erdMermaid={session.erd_mermaid}
                 description={session.tables_description}
+              question={question ? { task: question.task, concept: question.concept, difficulty: question.difficulty } : null}
               />
-            </aside>
+            </ResizableAside>
+          <LeftPanelResizeHandle />
             <section className="space-y-4 min-w-0">
               <QuestionCard
                 question={question}
