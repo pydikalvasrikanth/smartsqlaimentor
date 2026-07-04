@@ -268,6 +268,20 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["overall_summary", "accuracy_note", "strengths", "weaknesses", "recommendation", "verdict"],
     },
   },
+  EXPLAIN_THEORY: {
+    name: "explain_theory",
+    description: "Produce an in-depth SQL theory explanation tailored to a specific practice question.",
+    parameters: {
+      type: "object",
+      properties: {
+        theory_markdown: {
+          type: "string",
+          description: "Markdown theory guide with sections for concept overview, syntax, mapping to this task, step-by-step approach, pitfalls, and related concepts. Never include the final answer SQL.",
+        },
+      },
+      required: ["theory_markdown"],
+    },
+  },
 };
 
 
@@ -385,6 +399,36 @@ Raw attempts (concept, correct, mistake tag, in order):
 ${JSON.stringify(payload.attempts)}
 
 Analyze their performance. Identify which concepts they are strong at and which they struggle with (use the mistake tags and accuracy). Give concrete, mentor-style advice for each weak area, then a clear verdict on whether they've mastered the goal or should keep practicing.`;
+    case "EXPLAIN_THEORY":
+      return `Practice question task: ${payload.task}
+Primary concept: ${payload.concept || "auto — infer the dominant SQL concept from the task"}
+Difficulty: ${payload.difficulty || "n/a"}
+Schema (may be empty):
+${payload.schema_sql || "(no schema provided)"}
+
+Write an IN-DEPTH SQL theory guide in Markdown that is directly relevant to the question above. Structure:
+
+### 1. Concept overview
+What the concept is, why it exists, and when a data engineer reaches for it.
+
+### 2. MySQL syntax
+The canonical MySQL 8 syntax with a small illustrative snippet inside a \`\`\`sql fenced block.
+
+### 3. How this question uses it
+Relate the concept to the ACTUAL tables/columns in the schema and the specific task. Explain what part of the problem forces this concept.
+
+### 4. Step-by-step approach
+Numbered mental model for solving THIS question. Describe the pipeline (which clause runs, what set it produces) WITHOUT writing the final answer SQL.
+
+### 5. Common pitfalls
+Bullet list of the traps students hit on this pattern (NULLs, duplicates, join direction, group scope, window frame, etc.).
+
+### 6. Related concepts
+2–4 adjacent concepts worth knowing next.
+
+Rules:
+- Keep it dense but readable. Short paragraphs, bullets, small \`sql\` snippets.
+- Never reveal the full solution SQL. Illustrative snippets should show the technique on a DIFFERENT toy example, not the exact answer.`;
     default:
       throw new Error(`Unknown command: ${command}`);
   }
@@ -448,6 +492,12 @@ const PayloadSchemas = {
     stats: z.any(),
     attempts: z.any(),
   }),
+  EXPLAIN_THEORY: z.object({
+    task: shortStr(2_000),
+    concept: shortStr(200).optional(),
+    difficulty: shortStr(50).optional(),
+    schema_sql: shortStr(50_000).optional(),
+  }),
 } as const;
 
 const InputSchema = z
@@ -462,6 +512,7 @@ const InputSchema = z
       "TEXT_TO_SQL",
       "OPTIMIZE_QUERY",
       "VISUALIZE_QUERY",
+      "EXPLAIN_THEORY",
     ]),
     payload: z.unknown(),
   })
