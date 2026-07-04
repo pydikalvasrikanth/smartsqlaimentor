@@ -1,23 +1,43 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 const STORAGE_KEY = "sql:leftPanelWidth";
 const MIN = 260;
 const MAX = 720;
 const DEFAULT = 360;
 
-/**
- * Shared hook that returns the current left-panel width (in px), a setter,
- * and a boolean for whether we're at desktop breakpoint. Width is persisted
- * to localStorage so it survives reloads across every SQL layout.
- */
-export function useLeftPanelWidth() {
-  const [width, setWidth] = useState<number>(() => {
-    if (typeof window === "undefined") return DEFAULT;
-    const n = Number(window.localStorage.getItem(STORAGE_KEY));
-    return Number.isFinite(n) && n >= MIN && n <= MAX ? n : DEFAULT;
-  });
-  const [isDesktop, setIsDesktop] = useState(false);
+// Module-level store so every aside + handle mounted on the page reads and
+// writes the SAME width value, regardless of where they live in the tree.
+let currentWidth: number = (() => {
+  if (typeof window === "undefined") return DEFAULT;
+  const n = Number(window.localStorage.getItem(STORAGE_KEY));
+  return Number.isFinite(n) && n >= MIN && n <= MAX ? n : DEFAULT;
+})();
+const listeners = new Set<() => void>();
+function setWidthGlobal(next: number) {
+  const clamped = Math.max(MIN, Math.min(MAX, next));
+  if (clamped === currentWidth) return;
+  currentWidth = clamped;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, String(clamped));
+  } catch {
+    /* ignore */
+  }
+  listeners.forEach((fn) => fn());
+}
+function subscribe(fn: () => void) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+function getSnapshot() {
+  return currentWidth;
+}
+function getServerSnapshot() {
+  return DEFAULT;
+}
 
+export function useLeftPanelWidth() {
+  const width = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
     const on = () => setIsDesktop(mq.matches);
@@ -25,16 +45,26 @@ export function useLeftPanelWidth() {
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
   }, []);
+  return { width, setWidth: setWidthGlobal, isDesktop, MIN, MAX };
+}
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, String(width));
-    } catch {
-      /* ignore */
-    }
-  }, [width]);
-
-  return { width, setWidth, isDesktop, MIN, MAX };
+/** Aside wrapper whose width tracks the shared resizable value. */
+export function ResizableAside({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const { width, isDesktop } = useLeftPanelWidth();
+  return (
+    <aside
+      className={`w-full lg:shrink-0 min-w-0 ${className}`}
+      style={isDesktop ? { width } : undefined}
+    >
+      {children}
+    </aside>
+  );
 }
 
 /**
@@ -43,7 +73,6 @@ export function useLeftPanelWidth() {
  * and the main section in a flex-row layout.
  */
 export function LeftPanelResizeHandle() {
-  const { setWidth } = useLeftPanelWidth();
   const dragging = useRef(false);
   const startX = useRef(0);
   const startW = useRef(DEFAULT);
@@ -55,8 +84,7 @@ export function LeftPanelResizeHandle() {
         "touches" in e && e.touches[0]
           ? e.touches[0].clientX
           : (e as MouseEvent).clientX;
-      const next = Math.max(MIN, Math.min(MAX, startW.current + (x - startX.current)));
-      setWidth(next);
+      setWidthGlobal(startW.current + (x - startX.current));
     }
     function up() {
       if (!dragging.current) return;
@@ -74,12 +102,10 @@ export function LeftPanelResizeHandle() {
       window.removeEventListener("touchmove", move as EventListener);
       window.removeEventListener("touchend", up);
     };
-  }, [setWidth]);
+  }, []);
 
   function begin(clientX: number) {
-    // Read the current width from storage so multiple handles stay in sync.
-    const n = Number(window.localStorage.getItem(STORAGE_KEY));
-    startW.current = Number.isFinite(n) && n >= MIN && n <= MAX ? n : DEFAULT;
+    startW.current = currentWidth;
     dragging.current = true;
     startX.current = clientX;
     document.body.style.userSelect = "none";
