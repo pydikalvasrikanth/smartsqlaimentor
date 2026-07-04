@@ -420,15 +420,34 @@ Relate the concept to the ACTUAL tables/columns in the schema and the specific t
 ### 4. Step-by-step approach
 Numbered mental model for solving THIS question. Describe the pipeline (which clause runs, what set it produces) WITHOUT writing the final answer SQL.
 
-### 5. Common pitfalls
+### 5. Visual flow (animated)
+Emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how rows travel through the query pipeline for THIS task. 5–8 nodes max. Each node label is short: "CLAUSE\\nwhat it does". Example shape (do NOT copy verbatim):
+\`\`\`mermaid
+flowchart LR
+  A[Source tables] --> B[JOIN\\nmatch keys]
+  B --> C[WHERE\\nfilter rows]
+  C --> D[GROUP BY\\nbucket]
+  D --> E[Result set]
+\`\`\`
+The renderer animates the arrows, so the flow becomes visually intuitive.
+
+### 6. Worked mini-example
+Use a TINY toy dataset (3–5 rows, invented — NOT the real schema) to demonstrate the concept end-to-end. Show it as GitHub-flavored markdown tables:
+1. **Input** table(s) — small.
+2. **After the key step** (e.g. after JOIN / after GROUP BY / after window function) — the intermediate rows.
+3. **Final output** — 2–4 rows.
+Add 1–2 sentences of narration between the tables explaining what changed. This must be a DIFFERENT toy scenario, never the exact answer to the practice task.
+
+### 7. Common pitfalls
 Bullet list of the traps students hit on this pattern (NULLs, duplicates, join direction, group scope, window frame, etc.).
 
-### 6. Related concepts
+### 8. Related concepts
 2–4 adjacent concepts worth knowing next.
 
 Rules:
 - Keep it dense but readable. Short paragraphs, bullets, small \`sql\` snippets.
-- Never reveal the full solution SQL. Illustrative snippets should show the technique on a DIFFERENT toy example, not the exact answer.`;
+- Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block, nothing else fancy.
+- Never reveal the full solution SQL. Illustrative snippets and the worked example must use a DIFFERENT toy scenario, not the exact answer.`;
     default:
       throw new Error(`Unknown command: ${command}`);
   }
