@@ -1369,6 +1369,45 @@ function PythonWorkspace() {
           "How do Python decorators work?",
         ]}
       />
+      <ProductTour
+        storageKey="sqlmentor:tour:python-v1"
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={[
+          {
+            title: "Welcome to the Python Interview Engine 🐍",
+            body: "Real FAANG-style questions graded by AI. Let me show you around in 20 seconds.",
+          },
+          {
+            target: "question",
+            title: "1. The question",
+            body: "Each session gives you 50 questions, difficulty ramping every 5. Read the task, function signature, and sample cases here.",
+            placement: "bottom",
+          },
+          {
+            target: "theory",
+            title: "2. Theory + animated flow",
+            body: "Not sure of the concept? Open the Theory tab for an in-depth explanation with an animated flow and a mini worked example — tailored to this exact question.",
+            placement: "bottom",
+          },
+          {
+            target: "editor",
+            title: "3. Code here",
+            body: "Full Python editor with auto-indent. Your typed code autosaves — refresh or come back on another device and Resume drops you back exactly where you left off.",
+            placement: "top",
+          },
+          {
+            target: "run",
+            title: "4. Run & get graded",
+            body: "Hit Run to have the AI mentally execute your code against every test case, grade it, and explain each failure. Use Hint for a Socratic nudge, Debug for what's wrong, Reveal for the answer, and AI Review for an idiomatic rewrite.",
+            placement: "bottom",
+          },
+          {
+            title: "5. Bonus — SQL version",
+            body: 'After you Reveal the Python solution, click "Show SQL version of this problem" — the same problem, re-modeled as tables and solved in MySQL 8. Great for interviews that switch between the two.',
+          },
+        ]}
+      />
     </div>
   );
 }
