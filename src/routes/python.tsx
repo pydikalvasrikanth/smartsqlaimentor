@@ -5,7 +5,7 @@ import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
@@ -13,6 +13,7 @@ import { PythonEditor } from "@/components/python/PythonEditor";
 import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
 import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
+import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
 export const Route = createFileRoute("/python")({
   head: () => ({
