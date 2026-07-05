@@ -10,6 +10,8 @@ import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
 import { PythonEditor } from "@/components/python/PythonEditor";
+import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
+import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ThemeToggle } from "@/hooks/use-theme";
 export const Route = createFileRoute("/python")({
