@@ -2,11 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
+import { ProductTour } from "@/components/ProductTour";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Bug, Eye, ArrowRight, Terminal, Database, LogOut, Calendar, Wrench, Zap, Workflow, ArrowLeft, BookOpen, Target, Sparkles, Square, Trophy, AlertTriangle, Boxes } from "lucide-react";
+import { Loader2, Play, Lightbulb, Bug, Eye, ArrowRight, Terminal, Database, LogOut, Calendar, Wrench, Zap, Workflow, ArrowLeft, BookOpen, Target, Sparkles, Square, Trophy, AlertTriangle, Boxes, HelpCircle } from "lucide-react";
 
 import { runSqlEngine } from "@/lib/sql-engine.functions";
 import {
@@ -245,6 +246,7 @@ function Workspace() {
   const [loading, setLoading] = useState<Loading>(null);
   const [questionCount, setQuestionCount] = useState(0); // 1..50 over the session
   const [pythonMode, setPythonMode] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const isInterviewMode = topic === INTERVIEW_TOPIC;
 
@@ -1094,6 +1096,14 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <button
+                onClick={() => setTourOpen(true)}
+                title="Take the tour"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
+              >
+                <HelpCircle className="h-3 w-3" />
+                <span className="hidden sm:inline">Tour</span>
+              </button>
               <ThemeToggle />
               <button
                 onClick={() => signOut()}
@@ -1112,6 +1122,14 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <button
+                onClick={() => setTourOpen(true)}
+                title="Take the tour"
+                className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+              >
+                <HelpCircle className="h-3 w-3" />
+                <span className="hidden sm:inline">Tour</span>
+              </button>
               <ThemeToggle />
               <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
                 {user.email}
@@ -1241,6 +1259,7 @@ function Workspace() {
 
         <div className="flex flex-col lg:flex-row gap-4 min-w-0">
           <ResizableAside className="lg:sticky lg:top-[72px] lg:h-[calc(100vh-92px)]">
+            <div data-tour="schema">
             <SchemaPanel
               schemaSql={session?.schema_sql || ""}
               seedSql={session?.seed_data_sql || ""}
@@ -1248,10 +1267,12 @@ function Workspace() {
               description={session?.tables_description || ""}
               question={question ? { task: question.task, concept: question.concept, difficulty: question.difficulty } : null}
             />
+            </div>
           </ResizableAside>
           <LeftPanelResizeHandle />
 
           <section className="space-y-4 min-w-0">
+            <div data-tour="question">
             <QuestionCard
               question={question}
               attempt={attempt}
@@ -1259,6 +1280,7 @@ function Workspace() {
                 <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
               ) : null}
             />
+            </div>
 
             {session && question && (
               <>
@@ -1270,7 +1292,7 @@ function Workspace() {
                     sql_task={question.task}
                   />
                 ) : (<>
-                <div className="space-y-2">
+                <div data-tour="editor" className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                       MySQL editor
@@ -1280,6 +1302,7 @@ function Workspace() {
                     </span>
                   </div>
                   <SqlEditor value={userSql} onChange={setUserSql} />
+                  <div data-tour="run">
                   <ActionBar
                     loading={loading}
                     onRun={handleRun}
@@ -1291,6 +1314,7 @@ function Workspace() {
                     onNext={handleNext}
                     questionCount={questionCount}
                   />
+                  </div>
 
                 </div>
 
@@ -1410,6 +1434,45 @@ function Workspace() {
           "Explain the difference between DELETE and TRUNCATE",
           "Show an example of a window function",
           "How do GRANT and REVOKE work?",
+        ]}
+      />
+      <ProductTour
+        storageKey="sqlmentor:tour:sql-v1"
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={[
+          {
+            title: "Welcome to SQL Practice 🚀",
+            body: "AI-graded MySQL 8 practice with real schemas, ERDs, and instant feedback. 20-second tour?",
+          },
+          {
+            target: "schema",
+            title: "1. Schema, ERD, seed & theory",
+            body: "Every question comes with a real schema. Open the Theory tab for an in-depth explanation with animated diagrams tuned to this exact question.",
+            placement: "right",
+          },
+          {
+            target: "question",
+            title: "2. The question",
+            body: "Read the task and the expected result shape. Toggle Python mode to solve the same problem in pandas instead.",
+            placement: "bottom",
+          },
+          {
+            target: "editor",
+            title: "3. Write your SQL",
+            body: "Full MySQL editor with autocomplete. Your query autosaves — refresh or switch device and Resume drops you back into the same question with your SQL intact.",
+            placement: "top",
+          },
+          {
+            target: "run",
+            title: "4. Run, get graded, iterate",
+            body: "Run compares your result to the expected one, grades semantically, and explains mistakes. Use Hint, Debug, Reveal, Optimize, and Visualize for deeper help.",
+            placement: "top",
+          },
+          {
+            title: "5. Explore the tabs",
+            body: "Today = your planned session · Free practice = pick any topic · Topic-wise = drill one concept · Targeted = tell the AI what to drill you on · Data Engineering = warehouse-scale problems.",
+          },
         ]}
       />
     </div>

@@ -5,7 +5,7 @@ import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes } from "lucide-react";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
@@ -13,6 +13,7 @@ import { PythonEditor } from "@/components/python/PythonEditor";
 import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
 import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
+import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
 export const Route = createFileRoute("/python")({
   head: () => ({
@@ -363,6 +364,8 @@ function PythonWorkspace() {
   const [visual, setVisual] = useState<any>(null);
   const [review, setReview] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [sqlSolution, setSqlSolution] = useState<any>(null);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
@@ -442,7 +445,7 @@ function PythonWorkspace() {
 
   function clearPanels() {
     setFeedback(null); setHint(null); setSolution(null);
-    setDebugInfo(null); setVisual(null); setReview(null);
+    setDebugInfo(null); setVisual(null); setReview(null); setSqlSolution(null);
   }
 
   function handleCreatePlan() {
@@ -689,6 +692,14 @@ function PythonWorkspace() {
     if (data) setReview(data);
   }
 
+  async function handleShowSql() {
+    if (!question || !sessionQid) return;
+    setLoading("to-sql");
+    const data = await call("PYTHON_TO_SQL", { session_question_id: sessionQid });
+    setLoading(null);
+    if (data) setSqlSolution(data);
+  }
+
   if (authLoading || !user) {
     return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
   }
@@ -714,6 +725,14 @@ function PythonWorkspace() {
             )}
             {question && <span className="px-2 py-0.5 rounded border border-border">{question.difficulty}</span>}
             {question?.concept && <span className="px-2 py-0.5 rounded border border-border text-primary-glow">{question.concept}</span>}
+            <button
+              onClick={() => setTourOpen(true)}
+              title="Take the tour"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
+            >
+              <HelpCircle className="h-3 w-3" />
+              <span className="hidden sm:inline">Tour</span>
+            </button>
             <ThemeToggle />
             <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" />
@@ -1049,7 +1068,7 @@ function PythonWorkspace() {
           <ResizableSplit
             left={
               <div className="space-y-3">
-              <div className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
+              <div data-tour="question" className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono">
                   <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{question.difficulty}</span>
                   {question.concept && <span className="text-muted-foreground">{question.concept}</span>}
@@ -1070,16 +1089,18 @@ function PythonWorkspace() {
               </div>
 
               {sessionQid && (
-                <PythonTheoryPanel
-                  sessionQuestionId={sessionQid}
-                  concept={question.concept}
-                />
+                <div data-tour="theory">
+                  <PythonTheoryPanel
+                    sessionQuestionId={sessionQid}
+                    concept={question.concept}
+                  />
+                </div>
               )}
               </div>
             }
             right={
               <>
-              <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+              <div data-tour="editor" className="rounded-lg border border-border bg-surface-1 overflow-hidden">
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
                   <span>solution.py</span>
                   <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
@@ -1087,7 +1108,7 @@ function PythonWorkspace() {
                 <PythonEditor value={code} onChange={setCode} minHeight={440} />
               </div>
               <div className="flex flex-wrap gap-2">
-                <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
+                <button data-tour="run" onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
                   {loading === "eval" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />} Run
                 </button>
                 <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
@@ -1204,6 +1225,63 @@ function PythonWorkspace() {
                         <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Space: {solution.space_complexity}</span>
                       </div>
                     )}
+                    <div className="pt-2 border-t border-border">
+                      {!sqlSolution ? (
+                        <button
+                          onClick={handleShowSql}
+                          disabled={!!loading}
+                          data-tour="to-sql"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 text-primary-glow text-sm hover:bg-primary/20 disabled:opacity-50"
+                        >
+                          {loading === "to-sql" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                          Show SQL version of this problem
+                        </button>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          SQL solution generated below — scroll down.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {sqlSolution && (
+                <div className="rounded-lg border border-primary/40 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-primary/15 to-primary-glow/10 border-b border-border flex items-center gap-2">
+                    <Database className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">SQL Solution (MySQL 8)</span>
+                    <span className="ml-auto text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Same problem · SQL edition</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {sqlSolution.schema_ddl && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Schema</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.schema_ddl}</pre>
+                      </div>
+                    )}
+                    {sqlSolution.sample_seed && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Sample data</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sample_seed}</pre>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Query</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sql_solution}</pre>
+                    </div>
+                    {sqlSolution.walkthrough && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Walkthrough</div>
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{sqlSolution.walkthrough}</p>
+                      </div>
+                    )}
+                    {sqlSolution.python_vs_sql && (
+                      <div className="rounded border border-border bg-surface-2 p-3">
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Python vs SQL</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sqlSolution.python_vs_sql}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1289,6 +1367,45 @@ function PythonWorkspace() {
           "Explain time complexity of binary search",
           "Give me a sliding window example",
           "How do Python decorators work?",
+        ]}
+      />
+      <ProductTour
+        storageKey="sqlmentor:tour:python-v1"
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={[
+          {
+            title: "Welcome to the Python Interview Engine 🐍",
+            body: "Real FAANG-style questions graded by AI. Let me show you around in 20 seconds.",
+          },
+          {
+            target: "question",
+            title: "1. The question",
+            body: "Each session gives you 50 questions, difficulty ramping every 5. Read the task, function signature, and sample cases here.",
+            placement: "bottom",
+          },
+          {
+            target: "theory",
+            title: "2. Theory + animated flow",
+            body: "Not sure of the concept? Open the Theory tab for an in-depth explanation with an animated flow and a mini worked example — tailored to this exact question.",
+            placement: "bottom",
+          },
+          {
+            target: "editor",
+            title: "3. Code here",
+            body: "Full Python editor with auto-indent. Your typed code autosaves — refresh or come back on another device and Resume drops you back exactly where you left off.",
+            placement: "top",
+          },
+          {
+            target: "run",
+            title: "4. Run & get graded",
+            body: "Hit Run to have the AI mentally execute your code against every test case, grade it, and explain each failure. Use Hint for a Socratic nudge, Debug for what's wrong, Reveal for the answer, and AI Review for an idiomatic rewrite.",
+            placement: "bottom",
+          },
+          {
+            title: "5. Bonus — SQL version",
+            body: 'After you Reveal the Python solution, click "Show SQL version of this problem" — the same problem, re-modeled as tables and solved in MySQL 8. Great for interviews that switch between the two.',
+          },
         ]}
       />
     </div>
