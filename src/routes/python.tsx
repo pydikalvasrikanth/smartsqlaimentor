@@ -374,6 +374,12 @@ function PythonWorkspace() {
     interviewLevel: Level;
     focusGoal: string;
     code: string;
+    question: PyQuestion | null;
+    sessionQid: string | null;
+    qIndex: number;
+    pastIds: number[];
+    covered: string[];
+    interviewMode: boolean;
   };
   const resume = useResumableState<PyResume>(
     "python",
@@ -385,6 +391,12 @@ function PythonWorkspace() {
       interviewLevel: "intermediate",
       focusGoal: "",
       code: "",
+      question: null,
+      sessionQid: null,
+      qIndex: 0,
+      pastIds: [],
+      covered: [],
+      interviewMode: false,
     },
     {
       isEmpty: (s: any) =>
@@ -395,13 +407,17 @@ function PythonWorkspace() {
           s.interviewCompany === "Google" &&
           s.interviewLevel === "intermediate" &&
           !s.focusGoal &&
-          (!s.code || !s.code.trim())),
+          (!s.code || !s.code.trim()) &&
+          !s.question),
     },
   );
   useEffect(() => {
     if (!resume.ready) return;
-    resume.setState({ tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code });
-  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    resume.setState({
+      tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code,
+      question, sessionQid, qIndex, pastIds, covered, interviewMode,
+    });
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
