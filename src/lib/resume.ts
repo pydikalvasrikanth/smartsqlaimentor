@@ -137,33 +137,60 @@ export function useResumableState<T>(
     [key, user, isEmpty],
   );
 
-  // Schedule debounced saves whenever state changes AFTER the user has made a
+  // Autosave checkpoint on every state change AFTER the user has made a
   // resume/dismiss decision (or when no saved snapshot existed at all).
+  //   • local write: SYNCHRONOUS every change → refresh never loses keystrokes
+  //   • cloud write: debounced ~800ms → avoids hammering the network while typing
   useEffect(() => {
     if (!ready) return;
     if (savedSnapshot && !decisionMade) return; // waiting for user's choice
+    const next = stateRef.current;
+    if (isEmpty && isEmpty(next)) {
+      removeLocal(key);
+    } else {
+      writeLocal(key, next); // immediate local checkpoint
+    }
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => flush(stateRef.current), debounceMs);
+    saveTimer.current = setTimeout(() => {
+      // Cloud sync (local already written above).
+      if (isEmpty && isEmpty(stateRef.current)) return;
+      if (user) {
+        saveSessionState({
+          data: { key, state: JSON.stringify(stateRef.current) },
+        }).catch(() => {});
+      }
+    }, debounceMs);
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [state, ready, decisionMade, savedSnapshot, flush, debounceMs]);
+  }, [state, ready, decisionMade, savedSnapshot, debounceMs, key, user, isEmpty]);
 
-  // Flush any pending write on unload so we don't lose the last edits.
+  // Flush on unload / tab hide so mobile Safari + hard refresh never lose edits.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handler = () => {
       if (!ready) return;
       if (savedSnapshot && !decisionMade) return;
-      writeLocal(key, stateRef.current);
+      const s = stateRef.current;
+      if (isEmpty && isEmpty(s)) removeLocal(key);
+      else writeLocal(key, s);
+    };
+    const visHandler = () => {
+      if (document.visibilityState === "hidden") handler();
     };
     window.addEventListener("beforeunload", handler);
     window.addEventListener("pagehide", handler);
+    document.addEventListener("visibilitychange", visHandler);
     return () => {
       window.removeEventListener("beforeunload", handler);
       window.removeEventListener("pagehide", handler);
+      document.removeEventListener("visibilitychange", visHandler);
     };
-  }, [key, ready, decisionMade, savedSnapshot]);
+  }, [key, ready, decisionMade, savedSnapshot, isEmpty]);
+
+  // Suppress unused-var warning for the older debounced flush helper — kept
+  // for API compatibility if callers want to force a flush later.
+  void flush;
 
   const setState = useCallback((updater: T | ((prev: T) => T)) => {
     setStateInternal((prev) => {
