@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "sonner";
-import { Loader2, Play, Lightbulb, Bug, Eye, ArrowRight, Terminal, Database, LogOut, Calendar, Wrench, Zap, Workflow, ArrowLeft, BookOpen, Target, Sparkles, Square, Trophy, AlertTriangle, Boxes } from "lucide-react";
+import { Loader2, Play, Lightbulb, Bug, Eye, ArrowRight, Terminal, Database, LogOut, Calendar, Wrench, Zap, Workflow, ArrowLeft, BookOpen, Target, Sparkles, Square, Trophy, AlertTriangle, Boxes, HelpCircle } from "lucide-react";
 
 import { runSqlEngine } from "@/lib/sql-engine.functions";
 import {
