@@ -1079,6 +1079,9 @@ function Workspace() {
               senior data engineer · in your browser
             </p>
           </div>
+          <div className="ml-4 hidden sm:block">
+            <HeaderTimer storageKey="header_timer:sql" />
+          </div>
           {session ? (
             <div className="ml-auto flex items-center gap-2 text-xs font-mono">
               <span className="text-muted-foreground">{difficulty} coverage</span>
