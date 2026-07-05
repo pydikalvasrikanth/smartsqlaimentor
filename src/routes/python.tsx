@@ -1191,9 +1191,6 @@ function PythonWorkspace() {
                 </div>
               )}
 
-              {hint && (
-                null
-              )}
               {feedback && !sqlSolution && (
                 <div className="rounded-lg border border-primary/30 bg-surface-1 overflow-hidden">
                   <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
