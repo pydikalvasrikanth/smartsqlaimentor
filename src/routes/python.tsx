@@ -1192,6 +1192,32 @@ function PythonWorkspace() {
               )}
 
               {hint && (
+                null
+              )}
+              {feedback && !sqlSolution && (
+                <div className="rounded-lg border border-primary/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Database className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">Want the SQL version?</span>
+                  </div>
+                  <div className="p-4 flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-sm text-muted-foreground">
+                      See the same problem re-modeled as tables and solved in MySQL 8 — with a walkthrough.
+                    </p>
+                    <button
+                      onClick={handleShowSql}
+                      disabled={!!loading}
+                      data-tour="to-sql"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 text-primary-glow text-sm hover:bg-primary/20 disabled:opacity-50"
+                    >
+                      {loading === "to-sql" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                      Show SQL version
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {hint && (
                 <div className="rounded-lg border border-amber-500/30 bg-surface-1 overflow-hidden">
                   <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-2">
                     <Lightbulb className="h-4 w-4 text-amber-400" />
