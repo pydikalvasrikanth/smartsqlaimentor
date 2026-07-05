@@ -190,6 +190,20 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["optimized_code", "improvements"],
     },
   },
+  PYTHON_THEORY: {
+    name: "python_theory",
+    description: "Produce an in-depth Python theory guide tailored to a specific practice question.",
+    parameters: {
+      type: "object",
+      properties: {
+        theory_markdown: {
+          type: "string",
+          description: "Markdown theory guide with concept overview, syntax, mapping to the task, mental model, animated mermaid flow, worked mini-example, pitfalls and related concepts. Never reveal the final solution code.",
+        },
+      },
+      required: ["theory_markdown"],
+    },
+  },
 };
 
 function buildUserPrompt(command: string, payload: any): string {
@@ -210,6 +224,53 @@ function buildUserPrompt(command: string, payload: any): string {
       return `Task:\n${payload.task}\n\nCode to trace:\n${payload.user_code}\n\nMentally execute the code on a representative sample input. Return concise step-by-step trace (max 12 steps) showing line, action, and the state of key variables.`;
     case "PYTHON_OPTIMIZE":
       return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior Python engineer reviewing this code. Provide a cleaner / more idiomatic / faster version with improvements list and complexity comparison.`;
+    case "PYTHON_THEORY":
+      return `Practice question task: ${payload.task}
+Primary concept: ${payload.concept || "auto — infer the dominant Python concept from the task"}
+Difficulty: ${payload.difficulty || "n/a"}
+
+Write an IN-DEPTH Python theory guide in Markdown that is directly relevant to the question above. Structure:
+
+### 1. Concept overview
+What the concept is, why Python offers it, and when engineers reach for it.
+
+### 2. Python syntax
+Canonical Python 3 syntax with a small illustrative snippet inside a \`\`\`python fenced block.
+
+### 3. How this question uses it
+Relate the concept to the SPECIFIC task above. Explain which part of the problem forces this pattern.
+
+### 4. Step-by-step approach
+Numbered mental model for solving THIS question — describe the algorithm as prose/pseudocode WITHOUT writing the final answer.
+
+### 5. Visual flow (animated)
+Emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how data moves through the algorithm for THIS task. 5–8 nodes max. Each node label is short: "STEP\\nwhat it does". Example shape (do NOT copy verbatim):
+\`\`\`mermaid
+flowchart LR
+  A[Input] --> B[Init state\\ndict / pointers]
+  B --> C[Iterate\\nprocess element]
+  C --> D[Update\\nstate]
+  D --> E[Return result]
+\`\`\`
+The renderer animates arrows so the flow becomes intuitive.
+
+### 6. Worked mini-example
+Use a TINY toy input (3–6 items — invented, NOT the exact test cases) to demonstrate the concept end-to-end. Show as GitHub-flavored markdown tables or short trace:
+1. **Input** — small.
+2. **After the key step** — intermediate state (e.g. hashmap contents, window bounds, stack).
+3. **Final output**.
+Add 1–2 sentences of narration between the steps. Must be a DIFFERENT toy scenario, never the exact answer.
+
+### 7. Common pitfalls
+Bullet list of traps students hit on this pattern (off-by-one, mutable default args, shallow copy, integer overflow-ish, recursion depth, etc.).
+
+### 8. Related concepts
+2–4 adjacent Python concepts worth knowing next.
+
+Rules:
+- Keep it dense but readable. Short paragraphs, bullets, small \`python\` snippets.
+- Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
+- Never reveal the full solution code.`;
     default:
       return JSON.stringify(payload);
   }
@@ -251,6 +312,9 @@ const PayloadSchemas = {
   PYTHON_OPTIMIZE: z.object({
     session_question_id: z.string().uuid(),
     user_code: z.string().max(10_000),
+  }),
+  PYTHON_THEORY: z.object({
+    session_question_id: z.string().uuid(),
   }),
 } as const;
 
@@ -369,11 +433,12 @@ export const runPythonEngine = createServerFn({ method: "POST" })
     if (
       command === "EVALUATE_PYTHON" ||
       command === "REVEAL_PYTHON_SOLUTION" ||
-      command === "PYTHON_OPTIMIZE"
+      command === "PYTHON_OPTIMIZE" ||
+      command === "PYTHON_THEORY"
     ) {
       const { data: row, error } = await supabaseAdmin
         .from("question_sessions")
-        .select("task, payload")
+        .select("task, payload, concept, difficulty")
         .eq("id", payload.session_question_id)
         .eq("user_id", userId)
         .maybeSingle();
@@ -382,6 +447,8 @@ export const runPythonEngine = createServerFn({ method: "POST" })
       const enriched = {
         ...payload,
         task: row.task,
+        concept: (row as any).concept ?? undefined,
+        difficulty: (row as any).difficulty ?? undefined,
         expected_solution: stored.expected_solution ?? "",
         test_cases: stored.test_cases ?? [],
       };
