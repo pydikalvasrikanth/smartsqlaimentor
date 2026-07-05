@@ -32,6 +32,7 @@ import { AiAssistant } from "@/components/AiAssistant";
 import { PythonModePanel } from "@/components/sql/PythonModePanel";
 import { PythonToggle } from "@/components/sql/PythonToggle";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
 import {
   SQL_TOPICS,
   SQL_TOPIC_BY_SLUG,
