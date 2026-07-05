@@ -725,6 +725,14 @@ function PythonWorkspace() {
             )}
             {question && <span className="px-2 py-0.5 rounded border border-border">{question.difficulty}</span>}
             {question?.concept && <span className="px-2 py-0.5 rounded border border-border text-primary-glow">{question.concept}</span>}
+            <button
+              onClick={() => setTourOpen(true)}
+              title="Take the tour"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
+            >
+              <HelpCircle className="h-3 w-3" />
+              <span className="hidden sm:inline">Tour</span>
+            </button>
             <ThemeToggle />
             <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" />
