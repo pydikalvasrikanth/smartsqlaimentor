@@ -374,6 +374,12 @@ function PythonWorkspace() {
     interviewLevel: Level;
     focusGoal: string;
     code: string;
+    question: PyQuestion | null;
+    sessionQid: string | null;
+    qIndex: number;
+    pastIds: number[];
+    covered: string[];
+    interviewMode: boolean;
   };
   const resume = useResumableState<PyResume>(
     "python",
@@ -385,6 +391,12 @@ function PythonWorkspace() {
       interviewLevel: "intermediate",
       focusGoal: "",
       code: "",
+      question: null,
+      sessionQid: null,
+      qIndex: 0,
+      pastIds: [],
+      covered: [],
+      interviewMode: false,
     },
     {
       isEmpty: (s: any) =>
@@ -395,13 +407,17 @@ function PythonWorkspace() {
           s.interviewCompany === "Google" &&
           s.interviewLevel === "intermediate" &&
           !s.focusGoal &&
-          (!s.code || !s.code.trim())),
+          (!s.code || !s.code.trim()) &&
+          !s.question),
     },
   );
   useEffect(() => {
     if (!resume.ready) return;
-    resume.setState({ tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code });
-  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    resume.setState({
+      tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code,
+      question, sessionQid, qIndex, pastIds, covered, interviewMode,
+    });
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
@@ -719,6 +735,14 @@ function PythonWorkspace() {
               setInterviewCompany(s.interviewCompany);
               setInterviewLevel(s.interviewLevel);
               setFocusGoal(s.focusGoal);
+              if (s.question) {
+                setQuestion(s.question);
+                setSessionQid(s.sessionQid);
+                setQIndex(s.qIndex || 0);
+                setPastIds(s.pastIds || []);
+                setCovered(s.covered || []);
+                setInterviewMode(!!s.interviewMode);
+              }
               if (s.code) setCode(s.code);
               resume.hydrate(resume.savedSnapshot);
             }}
@@ -1051,6 +1075,45 @@ function PythonWorkspace() {
                   concept={question.concept}
                 />
               )}
+              </div>
+            }
+            right={
+              <>
+              <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
+                  <span>solution.py</span>
+                  <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
+                </div>
+                <PythonEditor value={code} onChange={setCode} minHeight={440} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
+                  {loading === "eval" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />} Run
+                </button>
+                <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "visualize" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Workflow className="h-3.5 w-3.5" />} Visualize
+                </button>
+                <button onClick={handleHint} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "hint" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="h-3.5 w-3.5" />} Hint
+                </button>
+                <button onClick={handleDebug} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "debug" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bug className="h-3.5 w-3.5" />} Debug
+                </button>
+                <button onClick={handleReveal} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "solution" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />} Reveal
+                </button>
+                <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
+                </button>
+                {focusPlan && (
+                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                    <Square className="h-3.5 w-3.5" /> End focus
+                  </button>
+                )}
+                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
+                </button>
+              </div>
 
               {feedback && (
                 <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
@@ -1214,45 +1277,6 @@ function PythonWorkspace() {
                   </div>
                 </div>
               )}
-              </div>
-            }
-            right={
-              <>
-              <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
-                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
-                  <span>solution.py</span>
-                  <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
-                </div>
-                <PythonEditor value={code} onChange={setCode} minHeight={440} />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
-                  {loading === "eval" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />} Run
-                </button>
-                <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "visualize" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Workflow className="h-3.5 w-3.5" />} Visualize
-                </button>
-                <button onClick={handleHint} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "hint" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="h-3.5 w-3.5" />} Hint
-                </button>
-                <button onClick={handleDebug} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "debug" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bug className="h-3.5 w-3.5" />} Debug
-                </button>
-                <button onClick={handleReveal} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "solution" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />} Reveal
-                </button>
-                <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
-                </button>
-                {focusPlan && (
-                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                    <Square className="h-3.5 w-3.5" /> End focus
-                  </button>
-                )}
-                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
-                  {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
-                </button>
-              </div>
               </>
             }
           />
