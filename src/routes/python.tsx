@@ -364,6 +364,8 @@ function PythonWorkspace() {
   const [visual, setVisual] = useState<any>(null);
   const [review, setReview] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [sqlSolution, setSqlSolution] = useState<any>(null);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
