@@ -1096,6 +1096,14 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <button
+                onClick={() => setTourOpen(true)}
+                title="Take the tour"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
+              >
+                <HelpCircle className="h-3 w-3" />
+                <span className="hidden sm:inline">Tour</span>
+              </button>
               <ThemeToggle />
               <button
                 onClick={() => signOut()}
@@ -1114,6 +1122,14 @@ function Workspace() {
               <Link to="/engine" className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent">
                 <Database className="h-3 w-3" /> Intelligence Engine
               </Link>
+              <button
+                onClick={() => setTourOpen(true)}
+                title="Take the tour"
+                className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+              >
+                <HelpCircle className="h-3 w-3" />
+                <span className="hidden sm:inline">Tour</span>
+              </button>
               <ThemeToggle />
               <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
                 {user.email}
