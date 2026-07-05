@@ -1259,6 +1259,7 @@ function Workspace() {
 
         <div className="flex flex-col lg:flex-row gap-4 min-w-0">
           <ResizableAside className="lg:sticky lg:top-[72px] lg:h-[calc(100vh-92px)]">
+            <div data-tour="schema">
             <SchemaPanel
               schemaSql={session?.schema_sql || ""}
               seedSql={session?.seed_data_sql || ""}
@@ -1266,10 +1267,12 @@ function Workspace() {
               description={session?.tables_description || ""}
               question={question ? { task: question.task, concept: question.concept, difficulty: question.difficulty } : null}
             />
+            </div>
           </ResizableAside>
           <LeftPanelResizeHandle />
 
           <section className="space-y-4 min-w-0">
+            <div data-tour="question">
             <QuestionCard
               question={question}
               attempt={attempt}
@@ -1277,6 +1280,7 @@ function Workspace() {
                 <PythonToggle active={pythonMode} onToggle={() => setPythonMode(v => !v)} />
               ) : null}
             />
+            </div>
 
             {session && question && (
               <>
@@ -1288,7 +1292,7 @@ function Workspace() {
                     sql_task={question.task}
                   />
                 ) : (<>
-                <div className="space-y-2">
+                <div data-tour="editor" className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
                       MySQL editor
@@ -1298,6 +1302,7 @@ function Workspace() {
                     </span>
                   </div>
                   <SqlEditor value={userSql} onChange={setUserSql} />
+                  <div data-tour="run">
                   <ActionBar
                     loading={loading}
                     onRun={handleRun}
@@ -1309,6 +1314,7 @@ function Workspace() {
                     onNext={handleNext}
                     questionCount={questionCount}
                   />
+                  </div>
 
                 </div>
 
