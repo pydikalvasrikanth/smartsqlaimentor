@@ -246,6 +246,7 @@ function Workspace() {
   const [loading, setLoading] = useState<Loading>(null);
   const [questionCount, setQuestionCount] = useState(0); // 1..50 over the session
   const [pythonMode, setPythonMode] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   const isInterviewMode = topic === INTERVIEW_TOPIC;
 
