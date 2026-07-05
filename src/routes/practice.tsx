@@ -260,6 +260,24 @@ function Workspace() {
     deCategory: string;
     userSql: string;
     pythonMode: boolean;
+    // Active working state — restored so Resume drops you back into the
+    // exact question with your typed SQL intact.
+    question: Question | null;
+    session: Session | null;
+    sessionQuestionId: string | null;
+    pastIds: number[];
+    coveredConcepts: string[];
+    askedInterviewIds: number[];
+    questionCount: number;
+    topicSlug: string | null;
+    topicQ: number;
+    focusPlan: FocusPlan | null;
+    focusSlug: string | null;
+    focusIdx: number;
+    focusCount: number;
+    deConceptIdx: number;
+    deCount: number;
+    deActive: boolean;
   };
   const resume = useResumableState<PracticeResume>(
     "sql-practice",
@@ -273,6 +291,22 @@ function Workspace() {
       deCategory: "mix",
       userSql: "-- Write your SQL here\n",
       pythonMode: false,
+      question: null,
+      session: null,
+      sessionQuestionId: null,
+      pastIds: [],
+      coveredConcepts: [],
+      askedInterviewIds: [],
+      questionCount: 0,
+      topicSlug: null,
+      topicQ: 0,
+      focusPlan: null,
+      focusSlug: null,
+      focusIdx: 0,
+      focusCount: 0,
+      deConceptIdx: 0,
+      deCount: 0,
+      deActive: false,
     },
     {
       isEmpty: (s: any) =>
@@ -285,6 +319,9 @@ function Workspace() {
           s.deLevel === 1 &&
           s.deCategory === "mix" &&
           !s.pythonMode &&
+          !s.question &&
+          !s.focusPlan &&
+          !s.deActive &&
           (!s.userSql || s.userSql.trim() === "-- Write your SQL here")),
     },
   );
@@ -300,8 +337,24 @@ function Workspace() {
       deCategory,
       userSql,
       pythonMode,
+      question,
+      session,
+      sessionQuestionId,
+      pastIds,
+      coveredConcepts,
+      askedInterviewIds,
+      questionCount,
+      topicSlug,
+      topicQ,
+      focusPlan,
+      focusSlug,
+      focusIdx,
+      focusCount,
+      deConceptIdx,
+      deCount,
+      deActive,
     });
-  }, [tab, topic, difficulty, company, focusGoal, deLevel, deCategory, userSql, pythonMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tab, topic, difficulty, company, focusGoal, deLevel, deCategory, userSql, pythonMode, question, session, sessionQuestionId, pastIds, coveredConcepts, askedInterviewIds, questionCount, topicSlug, topicQ, focusPlan, focusSlug, focusIdx, focusCount, deConceptIdx, deCount, deActive, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const call = useCallback(
     async (command: any, payload: any) => {
@@ -1092,6 +1145,24 @@ function Workspace() {
               setDeCategory(s.deCategory);
               setUserSql(s.userSql);
               setPythonMode(!!s.pythonMode);
+              // Restore the active working session so the user lands back on
+              // the exact question with typed SQL, feedback panels cleared.
+              if (s.question) setQuestion(s.question);
+              if (s.session) setSession(s.session);
+              if (s.sessionQuestionId) setSessionQuestionId(s.sessionQuestionId);
+              setPastIds(s.pastIds || []);
+              setCoveredConcepts(s.coveredConcepts || []);
+              setAskedInterviewIds(s.askedInterviewIds || []);
+              setQuestionCount(s.questionCount || 0);
+              setTopicSlug(s.topicSlug ?? null);
+              setTopicQ(s.topicQ || 0);
+              setFocusPlan(s.focusPlan ?? null);
+              setFocusSlug(s.focusSlug ?? null);
+              setFocusIdx(s.focusIdx || 0);
+              setFocusCount(s.focusCount || 0);
+              setDeConceptIdx(s.deConceptIdx || 0);
+              setDeCount(s.deCount || 0);
+              setDeActive(!!s.deActive);
               resume.hydrate(resume.savedSnapshot);
             }}
             onDismiss={resume.dismiss}
