@@ -692,6 +692,14 @@ function PythonWorkspace() {
     if (data) setReview(data);
   }
 
+  async function handleShowSql() {
+    if (!question || !sessionQid) return;
+    setLoading("to-sql");
+    const data = await call("PYTHON_TO_SQL", { session_question_id: sessionQid });
+    setLoading(null);
+    if (data) setSqlSolution(data);
+  }
+
   if (authLoading || !user) {
     return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
   }
