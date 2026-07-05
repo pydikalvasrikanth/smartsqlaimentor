@@ -456,6 +456,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
           payload: {
             expected_solution: q.expected_solution ?? "",
             test_cases: q.test_cases ?? [],
+            function_signature: q.function_signature ?? "",
           },
         })
         .select("id")
