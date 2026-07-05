@@ -32,6 +32,7 @@ import { AiAssistant } from "@/components/AiAssistant";
 import { PythonModePanel } from "@/components/sql/PythonModePanel";
 import { PythonToggle } from "@/components/sql/PythonToggle";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
 import {
   SQL_TOPICS,
   SQL_TOPIC_BY_SLUG,
@@ -1078,6 +1079,9 @@ function Workspace() {
             <p className="text-xs text-muted-foreground font-mono">
               senior data engineer · in your browser
             </p>
+          </div>
+          <div className="ml-4 hidden sm:block">
+            <HeaderTimer storageKey="header_timer:sql" />
           </div>
           {session ? (
             <div className="ml-auto flex items-center gap-2 text-xs font-mono">

@@ -15,6 +15,7 @@ import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
@@ -716,6 +717,9 @@ function PythonWorkspace() {
           <div className="leading-tight">
             <h1 className="text-base font-semibold tracking-tight">Python Interview Engine</h1>
             <p className="text-xs text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
+          </div>
+          <div className="ml-6 hidden sm:block">
+            <HeaderTimer storageKey="header_timer:python" />
           </div>
           <div className="ml-auto flex items-center gap-2 text-xs font-mono">
             {question && (

@@ -84,6 +84,12 @@ export function useResumableState<T>(
   stateRef.current = state;
   const decidedRef = useRef(false);
   decidedRef.current = decisionMade;
+  // Flip on the first *user-initiated* setState so we can distinguish
+  // "React initialized with defaults" from "user has started editing".
+  // While the resume prompt is showing, we must still persist those edits
+  // — otherwise typing before choosing Resume/Start-fresh silently loses
+  // work on refresh.
+  const touchedRef = useRef(false);
 
   // Initial load: local + cloud (whichever is newer wins for the prompt)
   useEffect(() => {
@@ -143,7 +149,10 @@ export function useResumableState<T>(
   //   • cloud write: debounced ~800ms → avoids hammering the network while typing
   useEffect(() => {
     if (!ready) return;
-    if (savedSnapshot && !decisionMade) return; // waiting for user's choice
+    // While the resume prompt is up, only skip autosave if the user hasn't
+    // touched anything yet. As soon as they start editing, treat it as an
+    // implicit "start fresh" so their edits are checkpointed immediately.
+    if (savedSnapshot && !decisionMade && !touchedRef.current) return;
     const next = stateRef.current;
     if (isEmpty && isEmpty(next)) {
       removeLocal(key);
@@ -170,7 +179,7 @@ export function useResumableState<T>(
     if (typeof window === "undefined") return;
     const handler = () => {
       if (!ready) return;
-      if (savedSnapshot && !decisionMade) return;
+      if (savedSnapshot && !decisionMade && !touchedRef.current) return;
       const s = stateRef.current;
       if (isEmpty && isEmpty(s)) removeLocal(key);
       else writeLocal(key, s);
@@ -196,6 +205,9 @@ export function useResumableState<T>(
     setStateInternal((prev) => {
       const next =
         typeof updater === "function" ? (updater as (p: T) => T)(prev) : updater;
+      if (!touchedRef.current && !Object.is(next, prev)) {
+        touchedRef.current = true;
+      }
       return next;
     });
   }, []);
