@@ -445,7 +445,7 @@ function PythonWorkspace() {
 
   function clearPanels() {
     setFeedback(null); setHint(null); setSolution(null);
-    setDebugInfo(null); setVisual(null); setReview(null);
+    setDebugInfo(null); setVisual(null); setReview(null); setSqlSolution(null);
   }
 
   function handleCreatePlan() {
