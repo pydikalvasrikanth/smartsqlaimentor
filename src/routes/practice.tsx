@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
+import { ProductTour } from "@/components/ProductTour";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
