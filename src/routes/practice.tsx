@@ -1145,6 +1145,24 @@ function Workspace() {
               setDeCategory(s.deCategory);
               setUserSql(s.userSql);
               setPythonMode(!!s.pythonMode);
+              // Restore the active working session so the user lands back on
+              // the exact question with typed SQL, feedback panels cleared.
+              if (s.question) setQuestion(s.question);
+              if (s.session) setSession(s.session);
+              if (s.sessionQuestionId) setSessionQuestionId(s.sessionQuestionId);
+              setPastIds(s.pastIds || []);
+              setCoveredConcepts(s.coveredConcepts || []);
+              setAskedInterviewIds(s.askedInterviewIds || []);
+              setQuestionCount(s.questionCount || 0);
+              setTopicSlug(s.topicSlug ?? null);
+              setTopicQ(s.topicQ || 0);
+              setFocusPlan(s.focusPlan ?? null);
+              setFocusSlug(s.focusSlug ?? null);
+              setFocusIdx(s.focusIdx || 0);
+              setFocusCount(s.focusCount || 0);
+              setDeConceptIdx(s.deConceptIdx || 0);
+              setDeCount(s.deCount || 0);
+              setDeActive(!!s.deActive);
               resume.hydrate(resume.savedSnapshot);
             }}
             onDismiss={resume.dismiss}
