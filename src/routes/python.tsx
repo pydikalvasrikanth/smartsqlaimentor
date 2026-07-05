@@ -717,6 +717,9 @@ function PythonWorkspace() {
             <h1 className="text-base font-semibold tracking-tight">Python Interview Engine</h1>
             <p className="text-xs text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
           </div>
+          <div className="ml-6 hidden sm:block">
+            <HeaderTimer storageKey="header_timer:python" />
+          </div>
           <div className="ml-auto flex items-center gap-2 text-xs font-mono">
             {question && (
               <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
