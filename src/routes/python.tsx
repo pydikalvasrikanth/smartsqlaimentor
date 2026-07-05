@@ -15,6 +15,7 @@ import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
