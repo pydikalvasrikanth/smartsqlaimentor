@@ -1215,6 +1215,63 @@ function PythonWorkspace() {
                         <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Space: {solution.space_complexity}</span>
                       </div>
                     )}
+                    <div className="pt-2 border-t border-border">
+                      {!sqlSolution ? (
+                        <button
+                          onClick={handleShowSql}
+                          disabled={!!loading}
+                          data-tour="to-sql"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 text-primary-glow text-sm hover:bg-primary/20 disabled:opacity-50"
+                        >
+                          {loading === "to-sql" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                          Show SQL version of this problem
+                        </button>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          SQL solution generated below — scroll down.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {sqlSolution && (
+                <div className="rounded-lg border border-primary/40 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-primary/15 to-primary-glow/10 border-b border-border flex items-center gap-2">
+                    <Database className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">SQL Solution (MySQL 8)</span>
+                    <span className="ml-auto text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Same problem · SQL edition</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {sqlSolution.schema_ddl && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Schema</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.schema_ddl}</pre>
+                      </div>
+                    )}
+                    {sqlSolution.sample_seed && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Sample data</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sample_seed}</pre>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Query</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sql_solution}</pre>
+                    </div>
+                    {sqlSolution.walkthrough && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Walkthrough</div>
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{sqlSolution.walkthrough}</p>
+                      </div>
+                    )}
+                    {sqlSolution.python_vs_sql && (
+                      <div className="rounded border border-border bg-surface-2 p-3">
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Python vs SQL</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sqlSolution.python_vs_sql}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
