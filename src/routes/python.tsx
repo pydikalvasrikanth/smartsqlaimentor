@@ -735,6 +735,14 @@ function PythonWorkspace() {
               setInterviewCompany(s.interviewCompany);
               setInterviewLevel(s.interviewLevel);
               setFocusGoal(s.focusGoal);
+              if (s.question) {
+                setQuestion(s.question);
+                setSessionQid(s.sessionQid);
+                setQIndex(s.qIndex || 0);
+                setPastIds(s.pastIds || []);
+                setCovered(s.covered || []);
+                setInterviewMode(!!s.interviewMode);
+              }
               if (s.code) setCode(s.code);
               resume.hydrate(resume.savedSnapshot);
             }}
