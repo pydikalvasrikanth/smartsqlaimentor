@@ -204,6 +204,21 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["theory_markdown"],
     },
   },
+  PYTHON_TO_SQL: {
+    name: "python_to_sql",
+    description: "Reframe the same problem as SQL and provide a MySQL 8 solution.",
+    parameters: {
+      type: "object",
+      properties: {
+        schema_ddl: { type: "string", description: "CREATE TABLE(s) needed to model the same problem in SQL." },
+        sample_seed: { type: "string", description: "A few INSERT statements matching the Python test cases so the SQL is directly verifiable." },
+        sql_solution: { type: "string", description: "MySQL 8 query (or short script) that solves the same task the Python function solves." },
+        walkthrough: { type: "string", description: "Line-by-line explanation of the SQL solution and the mapping from Python logic to SQL semantics." },
+        python_vs_sql: { type: "string", description: "Short comparison — when each approach is more idiomatic." },
+      },
+      required: ["schema_ddl", "sql_solution", "walkthrough"],
+    },
+  },
 };
 
 function buildUserPrompt(command: string, payload: any): string {
@@ -271,6 +286,28 @@ Rules:
 - Keep it dense but readable. Short paragraphs, bullets, small \`python\` snippets.
 - Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
 - Never reveal the full solution code.`;
+    case "PYTHON_TO_SQL":
+      return `The user just finished a Python problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
+
+Python task:
+${payload.task}
+
+Python function signature: ${payload.function_signature || "(n/a)"}
+
+Test cases (Python literals):
+${JSON.stringify(payload.test_cases || [])}
+
+Reference Python solution (for context only — do not restate it):
+${payload.expected_solution || "(n/a)"}
+
+Deliver:
+1. **schema_ddl** — minimal CREATE TABLE statements that model the inputs of this problem as one or more relational tables (pick sensible column names + types).
+2. **sample_seed** — INSERT statements that mirror the Python test-case inputs so the SQL is directly verifiable.
+3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the Python function returns. If the Python function returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
+4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each Python step maps to a SQL clause.
+5. **python_vs_sql** — 2–3 sentences on when each approach is more idiomatic for this shape of problem.
+
+Rules: MySQL 8 dialect only. Use CTEs (\`WITH\`) when it improves clarity. Never use vendor-specific extensions from other engines.`;
     default:
       return JSON.stringify(payload);
   }
@@ -314,6 +351,9 @@ const PayloadSchemas = {
     user_code: z.string().max(10_000),
   }),
   PYTHON_THEORY: z.object({
+    session_question_id: z.string().uuid(),
+  }),
+  PYTHON_TO_SQL: z.object({
     session_question_id: z.string().uuid(),
   }),
 } as const;
@@ -434,7 +474,8 @@ export const runPythonEngine = createServerFn({ method: "POST" })
       command === "EVALUATE_PYTHON" ||
       command === "REVEAL_PYTHON_SOLUTION" ||
       command === "PYTHON_OPTIMIZE" ||
-      command === "PYTHON_THEORY"
+      command === "PYTHON_THEORY" ||
+      command === "PYTHON_TO_SQL"
     ) {
       const { data: row, error } = await supabaseAdmin
         .from("question_sessions")
@@ -443,7 +484,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         .eq("user_id", userId)
         .maybeSingle();
       if (error || !row) return { error: "Question session not found." };
-      const stored = (row.payload ?? {}) as { expected_solution?: string; test_cases?: any[] };
+      const stored = (row.payload ?? {}) as { expected_solution?: string; test_cases?: any[]; function_signature?: string };
       const enriched = {
         ...payload,
         task: row.task,
@@ -451,6 +492,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         difficulty: (row as any).difficulty ?? undefined,
         expected_solution: stored.expected_solution ?? "",
         test_cases: stored.test_cases ?? [],
+        function_signature: stored.function_signature ?? "",
       };
       return callPythonEngine(command, enriched);
     }
