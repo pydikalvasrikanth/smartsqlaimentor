@@ -5,7 +5,7 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2 } from "lucide-react";
 import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
 
@@ -104,7 +104,8 @@ function InterviewPage() {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
   const [years, setYears] = useState(3);
   const [competencies, setCompetencies] = useState("Python, SQL, Spark, Airflow, BigQuery, Kafka");
-  const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage">("alloy");
+  const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable">("alloy");
+  const [sessionLength, setSessionLength] = useState<"short" | "standard" | "full">("full");
   const [started, setStarted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -120,13 +121,19 @@ function InterviewPage() {
   const [report, setReport] = useState<Report | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
 
+  // Live coding scratchpad
+  const [codeTask, setCodeTask] = useState<{ lang: "python" | "sql" | "text"; title: string } | null>(null);
+  const [codeText, setCodeText] = useState("");
+  const [codeSubmitting, setCodeSubmitting] = useState(false);
+
   // Full interview resume: setup + transcript. In-flight audio/TTS never persists.
   type InterviewResume = {
     role: string;
     level: "junior" | "mid" | "senior";
     years: number;
     competencies: string;
-    voice: "alloy" | "verse" | "shimmer" | "sage";
+    voice: "alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable";
+    sessionLength: "short" | "standard" | "full";
     started: boolean;
     ended: boolean;
     turns: Turn[];
@@ -139,6 +146,7 @@ function InterviewPage() {
       years: 3,
       competencies: "Python, SQL, Spark, Airflow, BigQuery, Kafka",
       voice: "alloy",
+      sessionLength: "full",
       started: false,
       ended: false,
       turns: [],
@@ -147,8 +155,8 @@ function InterviewPage() {
   );
   useEffect(() => {
     if (!resume.ready) return;
-    resume.setState({ role, level, years, competencies, voice, started, ended, turns });
-  }, [role, level, years, competencies, voice, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    resume.setState({ role, level, years, competencies, voice, sessionLength, started, ended, turns });
+  }, [role, level, years, competencies, voice, sessionLength, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<MediaStream | null>(null);
@@ -431,6 +439,7 @@ function InterviewPage() {
           competencies,
           history: history.map((t) => ({ role: t.role, text: t.text })),
           action,
+          sessionLength,
         },
       });
       setThinking(false);
@@ -440,11 +449,19 @@ function InterviewPage() {
         setError("The interviewer didn't respond. Try again.");
         return;
       }
+      // Detect live-coding task marker on line 1: [CODE_TASK lang=python|sql title="…"]
+      const codeMatch = reply.match(/^\s*\[CODE_TASK\s+lang=(python|sql|text)(?:\s+title="([^"]*)")?\]\s*/i);
+      let spokenReply = reply;
+      if (codeMatch) {
+        spokenReply = reply.slice(codeMatch[0].length).trim();
+        setCodeTask({ lang: codeMatch[1].toLowerCase() as any, title: codeMatch[2] || "Coding task" });
+        setCodeText("");
+      }
       const next: Turn[] = [...history, { role: "interviewer", text: reply }];
       setTurns(next);
       if (action === "end") {
         setEnded(true);
-        await playInterviewer(reply);
+        await playInterviewer(spokenReply);
         // kick off scorecard pass
         setReportLoading(true);
         try {
@@ -459,11 +476,27 @@ function InterviewPage() {
           });
           if (rep?.report) setReport(rep.report as Report);
           else if (rep?.error) setError(rep.error);
+          // Save to local history
+          try {
+            if (rep?.report) {
+              const item = {
+                id: Date.now(),
+                at: new Date().toISOString(),
+                role, level, years, competencies, sessionLength,
+                report: rep.report,
+                turns: next.length,
+              };
+              const raw = localStorage.getItem("interview:history");
+              const list = raw ? JSON.parse(raw) : [];
+              list.unshift(item);
+              localStorage.setItem("interview:history", JSON.stringify(list.slice(0, 20)));
+            }
+          } catch {}
         } finally {
           setReportLoading(false);
         }
       } else {
-        playInterviewer(reply);
+        playInterviewer(spokenReply);
       }
     } catch (e: any) {
       setThinking(false);
@@ -485,6 +518,24 @@ function InterviewPage() {
     setListening(false);
     stopTts(false);
     await aiTurn(turnsRef.current, "end");
+  };
+
+  // Submit the live-coding editor as the candidate's next answer.
+  const submitCode = async () => {
+    if (codeSubmitting || !codeTask) return;
+    const code = codeText.trim();
+    if (!code) return;
+    setCodeSubmitting(true);
+    try {
+      const payload = `[SUBMITTED CODE]\n\`\`\`${codeTask.lang}\n${code}\n\`\`\``;
+      const next: Turn[] = [...turnsRef.current, { role: "candidate", text: payload }];
+      setTurns(next);
+      setCodeTask(null);
+      setCodeText("");
+      await aiTurn(next, "next");
+    } finally {
+      setCodeSubmitting(false);
+    }
   };
 
   if (loading || !user) {
@@ -522,6 +573,7 @@ function InterviewPage() {
                 setYears(s.years);
                 setCompetencies(s.competencies);
                 setVoice(s.voice);
+                if (s.sessionLength) setSessionLength(s.sessionLength);
                 setTurns(s.turns ?? []);
                 setEnded(s.ended);
                 setStarted(s.started && !s.ended);
@@ -530,6 +582,7 @@ function InterviewPage() {
               onDismiss={resume.dismiss}
             />
           )}
+          <PastInterviewsPanel />
         </div>
       )}
       {!started && (
@@ -544,6 +597,8 @@ function InterviewPage() {
           setCompetencies={setCompetencies}
           voice={voice}
           setVoice={setVoice}
+          sessionLength={sessionLength}
+          setSessionLength={setSessionLength}
           onBegin={begin}
         />
       )}
@@ -612,10 +667,49 @@ function InterviewPage() {
               </div>
             ) : (
               <p className="text-base leading-relaxed whitespace-pre-wrap">
-                {turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? ""}
+                {(turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? "")
+                  .replace(/^\s*\[CODE_TASK[^\]]*\]\s*/i, "")}
               </p>
             )}
           </div>
+
+          {/* Live coding scratchpad */}
+          {codeTask && !ended && (
+            <div className="rounded-2xl border border-primary/40 bg-surface-1 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-surface-2/60">
+                <div className="flex items-center gap-2 text-xs font-semibold">
+                  <Code2 className="h-3.5 w-3.5 text-primary" />
+                  Live coding · <span className="font-mono uppercase text-primary">{codeTask.lang}</span>
+                  <span className="text-muted-foreground font-normal truncate">— {codeTask.title}</span>
+                </div>
+                <button
+                  onClick={() => setCodeTask(null)}
+                  className="text-[11px] text-muted-foreground hover:text-foreground"
+                >Skip</button>
+              </div>
+              <textarea
+                value={codeText}
+                onChange={(e) => setCodeText(e.target.value)}
+                spellCheck={false}
+                rows={12}
+                placeholder={codeTask.lang === "sql" ? "-- Write your query here" : "# Write your solution here"}
+                className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
+              />
+              <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-border">
+                <span className="text-[11px] text-muted-foreground">
+                  Aria can see your code. Submit when ready — she'll dry-run inputs and probe edge cases.
+                </span>
+                <button
+                  onClick={submitCode}
+                  disabled={codeSubmitting || !codeText.trim()}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  {codeSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  Submit code
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
@@ -700,13 +794,14 @@ function InterviewPage() {
 // Pre-interview form
 // ---------------------------------------------------------------------------
 function PreInterviewForm({
-  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, onBegin,
+  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, sessionLength, setSessionLength, onBegin,
 }: {
   role: string; setRole: (v: string) => void;
   level: "junior" | "mid" | "senior"; setLevel: (v: "junior" | "mid" | "senior") => void;
   years: number; setYears: (v: number) => void;
   competencies: string; setCompetencies: (v: string) => void;
-  voice: "alloy" | "verse" | "shimmer" | "sage"; setVoice: (v: any) => void;
+  voice: string; setVoice: (v: any) => void;
+  sessionLength: "short" | "standard" | "full"; setSessionLength: (v: "short" | "standard" | "full") => void;
   onBegin: () => void;
 }) {
   return (
@@ -765,6 +860,22 @@ function PreInterviewForm({
               <option value="sage">Sage (warm)</option>
               <option value="verse">Verse (crisp)</option>
               <option value="shimmer">Shimmer (bright)</option>
+              <option value="nova">Nova (energetic)</option>
+              <option value="echo">Echo (measured)</option>
+              <option value="onyx">Onyx (deep)</option>
+              <option value="fable">Fable (storytelling)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Session length</label>
+            <select
+              value={sessionLength}
+              onChange={(e) => setSessionLength(e.target.value as any)}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            >
+              <option value="short">Short (~10 min · 5 Q)</option>
+              <option value="standard">Standard (~25 min · 10 Q)</option>
+              <option value="full">Full loop (~45 min · tech + coding + design + behavioural)</option>
             </select>
           </div>
           <div className="sm:col-span-2">
@@ -839,6 +950,9 @@ function ScoreCard({ report, loading }: { report: Report | null; loading: boolea
       {report.competencies && report.competencies.length > 0 && (
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold mb-2"><Target className="h-3.5 w-3.5" /> Per-competency</div>
+          <div className="mb-4">
+            <RadarChart data={report.competencies.map((c) => ({ label: c.name, value: c.score }))} />
+          </div>
           <div className="space-y-2">
             {report.competencies.map((c, i) => (
               <div key={i}>
@@ -894,6 +1008,160 @@ function Section({ icon, title, items, tone }: { icon: React.ReactNode; title: s
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Radar chart (SVG) — per-competency visualisation
+// ---------------------------------------------------------------------------
+function RadarChart({ data, max = 10 }: { data: { label: string; value: number }[]; max?: number }) {
+  const pts = data.slice(0, 8);
+  if (pts.length < 3) return null;
+  const size = 260;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 40;
+  const angle = (i: number) => (Math.PI * 2 * i) / pts.length - Math.PI / 2;
+  const point = (i: number, v: number) => {
+    const rr = (Math.max(0, Math.min(max, v)) / max) * r;
+    return [cx + Math.cos(angle(i)) * rr, cy + Math.sin(angle(i)) * rr] as const;
+  };
+  const rings = [0.25, 0.5, 0.75, 1];
+  const poly = pts.map((p, i) => point(i, p.value).join(",")).join(" ");
+  return (
+    <div className="w-full flex justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[320px] h-auto">
+        {rings.map((f, i) => (
+          <polygon
+            key={i}
+            points={pts.map((_, k) => [cx + Math.cos(angle(k)) * r * f, cy + Math.sin(angle(k)) * r * f].join(",")).join(" ")}
+            fill="none"
+            stroke="currentColor"
+            className="text-border"
+            strokeWidth={1}
+          />
+        ))}
+        {pts.map((_, i) => {
+          const [x, y] = [cx + Math.cos(angle(i)) * r, cy + Math.sin(angle(i)) * r];
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="currentColor" className="text-border" strokeWidth={1} />;
+        })}
+        <polygon points={poly} fill="hsl(var(--primary) / 0.25)" stroke="hsl(var(--primary))" strokeWidth={1.5} />
+        {pts.map((p, i) => {
+          const [px, py] = point(i, p.value);
+          const [lx, ly] = [cx + Math.cos(angle(i)) * (r + 18), cy + Math.sin(angle(i)) * (r + 18)];
+          const anchor = Math.abs(Math.cos(angle(i))) < 0.3 ? "middle" : Math.cos(angle(i)) > 0 ? "start" : "end";
+          const label = p.label.length > 16 ? p.label.slice(0, 15) + "…" : p.label;
+          return (
+            <g key={i}>
+              <circle cx={px} cy={py} r={2.5} fill="hsl(var(--primary))" />
+              <text
+                x={lx}
+                y={ly}
+                fontSize={9}
+                textAnchor={anchor}
+                dominantBaseline="middle"
+                className="fill-muted-foreground"
+              >{label}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Past interviews — restored from localStorage
+// ---------------------------------------------------------------------------
+type PastInterview = {
+  id: number;
+  at: string;
+  role: string;
+  level: string;
+  turns: number;
+  sessionLength: string;
+  report: Report;
+};
+
+function PastInterviewsPanel() {
+  const [items, setItems] = useState<PastInterview[]>([]);
+  const [open, setOpen] = useState<PastInterview | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("interview:history");
+      if (raw) setItems(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  const remove = (id: number) => {
+    const next = items.filter((i) => i.id !== id);
+    setItems(next);
+    localStorage.setItem("interview:history", JSON.stringify(next));
+  };
+  const clearAll = () => {
+    if (!confirm("Delete all past interview reports?")) return;
+    setItems([]);
+    localStorage.removeItem("interview:history");
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-surface-1 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <History className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold">Past interviews ({items.length})</h3>
+        <button onClick={clearAll} className="ml-auto text-[11px] text-muted-foreground hover:text-destructive inline-flex items-center gap-1">
+          <Trash2 className="h-3 w-3" /> Clear
+        </button>
+      </div>
+      <div className="space-y-1.5 max-h-72 overflow-y-auto">
+        {items.map((it) => {
+          const score = typeof it.report.overall_score === "number" ? it.report.overall_score.toFixed(1) : "—";
+          const rec = (it.report.recommendation || "").toLowerCase();
+          const tone = rec.includes("strong_hire")
+            ? "text-emerald-400"
+            : rec.includes("no_hire") ? "text-red-400" : rec.includes("hire") ? "text-sky-400" : "text-muted-foreground";
+          return (
+            <div key={it.id} className="flex items-center gap-3 rounded-md border border-border bg-surface-2/40 px-3 py-2 hover:bg-surface-2/70 transition-colors">
+              <button className="flex-1 text-left" onClick={() => setOpen(it)}>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-mono font-bold">{score}</span>
+                  <span className="font-medium">{it.role}</span>
+                  <span className="text-muted-foreground">· {it.level} · {it.sessionLength}</span>
+                  <span className={`ml-auto text-[10px] font-mono uppercase ${tone}`}>{it.report.recommendation || ""}</span>
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">
+                  {new Date(it.at).toLocaleString()} · {it.turns} turns
+                </div>
+              </button>
+              <button onClick={() => remove(it.id)} aria-label="Delete" className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => setOpen(null)}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-background p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <h4 className="text-sm font-semibold">{open.role} · {open.level}</h4>
+              <span className="text-[10px] text-muted-foreground">{new Date(open.at).toLocaleString()}</span>
+              <button onClick={() => setOpen(null)} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Close</button>
+            </div>
+            <ScoreCard report={open.report} loading={false} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
