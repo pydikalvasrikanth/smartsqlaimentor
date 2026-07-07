@@ -520,6 +520,24 @@ function InterviewPage() {
     await aiTurn(turnsRef.current, "end");
   };
 
+  // Submit the live-coding editor as the candidate's next answer.
+  const submitCode = async () => {
+    if (codeSubmitting || !codeTask) return;
+    const code = codeText.trim();
+    if (!code) return;
+    setCodeSubmitting(true);
+    try {
+      const payload = `[SUBMITTED CODE]\n\`\`\`${codeTask.lang}\n${code}\n\`\`\``;
+      const next: Turn[] = [...turnsRef.current, { role: "candidate", text: payload }];
+      setTurns(next);
+      setCodeTask(null);
+      setCodeText("");
+      await aiTurn(next, "next");
+    } finally {
+      setCodeSubmitting(false);
+    }
+  };
+
   if (loading || !user) {
     return <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">Loading…</div>;
   }
