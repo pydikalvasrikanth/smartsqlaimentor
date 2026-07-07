@@ -950,6 +950,9 @@ function ScoreCard({ report, loading }: { report: Report | null; loading: boolea
       {report.competencies && report.competencies.length > 0 && (
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold mb-2"><Target className="h-3.5 w-3.5" /> Per-competency</div>
+          <div className="mb-4">
+            <RadarChart data={report.competencies.map((c) => ({ label: c.name, value: c.score }))} />
+          </div>
           <div className="space-y-2">
             {report.competencies.map((c, i) => (
               <div key={i}>
