@@ -1011,3 +1011,157 @@ function Section({ icon, title, items, tone }: { icon: React.ReactNode; title: s
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Radar chart (SVG) — per-competency visualisation
+// ---------------------------------------------------------------------------
+function RadarChart({ data, max = 10 }: { data: { label: string; value: number }[]; max?: number }) {
+  const pts = data.slice(0, 8);
+  if (pts.length < 3) return null;
+  const size = 260;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 40;
+  const angle = (i: number) => (Math.PI * 2 * i) / pts.length - Math.PI / 2;
+  const point = (i: number, v: number) => {
+    const rr = (Math.max(0, Math.min(max, v)) / max) * r;
+    return [cx + Math.cos(angle(i)) * rr, cy + Math.sin(angle(i)) * rr] as const;
+  };
+  const rings = [0.25, 0.5, 0.75, 1];
+  const poly = pts.map((p, i) => point(i, p.value).join(",")).join(" ");
+  return (
+    <div className="w-full flex justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[320px] h-auto">
+        {rings.map((f, i) => (
+          <polygon
+            key={i}
+            points={pts.map((_, k) => [cx + Math.cos(angle(k)) * r * f, cy + Math.sin(angle(k)) * r * f].join(",")).join(" ")}
+            fill="none"
+            stroke="currentColor"
+            className="text-border"
+            strokeWidth={1}
+          />
+        ))}
+        {pts.map((_, i) => {
+          const [x, y] = [cx + Math.cos(angle(i)) * r, cy + Math.sin(angle(i)) * r];
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="currentColor" className="text-border" strokeWidth={1} />;
+        })}
+        <polygon points={poly} fill="hsl(var(--primary) / 0.25)" stroke="hsl(var(--primary))" strokeWidth={1.5} />
+        {pts.map((p, i) => {
+          const [px, py] = point(i, p.value);
+          const [lx, ly] = [cx + Math.cos(angle(i)) * (r + 18), cy + Math.sin(angle(i)) * (r + 18)];
+          const anchor = Math.abs(Math.cos(angle(i))) < 0.3 ? "middle" : Math.cos(angle(i)) > 0 ? "start" : "end";
+          const label = p.label.length > 16 ? p.label.slice(0, 15) + "…" : p.label;
+          return (
+            <g key={i}>
+              <circle cx={px} cy={py} r={2.5} fill="hsl(var(--primary))" />
+              <text
+                x={lx}
+                y={ly}
+                fontSize={9}
+                textAnchor={anchor}
+                dominantBaseline="middle"
+                className="fill-muted-foreground"
+              >{label}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Past interviews — restored from localStorage
+// ---------------------------------------------------------------------------
+type PastInterview = {
+  id: number;
+  at: string;
+  role: string;
+  level: string;
+  turns: number;
+  sessionLength: string;
+  report: Report;
+};
+
+function PastInterviewsPanel() {
+  const [items, setItems] = useState<PastInterview[]>([]);
+  const [open, setOpen] = useState<PastInterview | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("interview:history");
+      if (raw) setItems(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  const remove = (id: number) => {
+    const next = items.filter((i) => i.id !== id);
+    setItems(next);
+    localStorage.setItem("interview:history", JSON.stringify(next));
+  };
+  const clearAll = () => {
+    if (!confirm("Delete all past interview reports?")) return;
+    setItems([]);
+    localStorage.removeItem("interview:history");
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-surface-1 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <History className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold">Past interviews ({items.length})</h3>
+        <button onClick={clearAll} className="ml-auto text-[11px] text-muted-foreground hover:text-destructive inline-flex items-center gap-1">
+          <Trash2 className="h-3 w-3" /> Clear
+        </button>
+      </div>
+      <div className="space-y-1.5 max-h-72 overflow-y-auto">
+        {items.map((it) => {
+          const score = typeof it.report.overall_score === "number" ? it.report.overall_score.toFixed(1) : "—";
+          const rec = (it.report.recommendation || "").toLowerCase();
+          const tone = rec.includes("strong_hire")
+            ? "text-emerald-400"
+            : rec.includes("no_hire") ? "text-red-400" : rec.includes("hire") ? "text-sky-400" : "text-muted-foreground";
+          return (
+            <div key={it.id} className="flex items-center gap-3 rounded-md border border-border bg-surface-2/40 px-3 py-2 hover:bg-surface-2/70 transition-colors">
+              <button className="flex-1 text-left" onClick={() => setOpen(it)}>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-mono font-bold">{score}</span>
+                  <span className="font-medium">{it.role}</span>
+                  <span className="text-muted-foreground">· {it.level} · {it.sessionLength}</span>
+                  <span className={`ml-auto text-[10px] font-mono uppercase ${tone}`}>{it.report.recommendation || ""}</span>
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">
+                  {new Date(it.at).toLocaleString()} · {it.turns} turns
+                </div>
+              </button>
+              <button onClick={() => remove(it.id)} aria-label="Delete" className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4"
+          onClick={() => setOpen(null)}
+        >
+          <div
+            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-background p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <h4 className="text-sm font-semibold">{open.role} · {open.level}</h4>
+              <span className="text-[10px] text-muted-foreground">{new Date(open.at).toLocaleString()}</span>
+              <button onClick={() => setOpen(null)} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Close</button>
+            </div>
+            <ScoreCard report={open.report} loading={false} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
