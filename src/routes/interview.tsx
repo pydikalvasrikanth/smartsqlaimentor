@@ -733,13 +733,14 @@ function InterviewPage() {
 // Pre-interview form
 // ---------------------------------------------------------------------------
 function PreInterviewForm({
-  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, onBegin,
+  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, sessionLength, setSessionLength, onBegin,
 }: {
   role: string; setRole: (v: string) => void;
   level: "junior" | "mid" | "senior"; setLevel: (v: "junior" | "mid" | "senior") => void;
   years: number; setYears: (v: number) => void;
   competencies: string; setCompetencies: (v: string) => void;
-  voice: "alloy" | "verse" | "shimmer" | "sage"; setVoice: (v: any) => void;
+  voice: string; setVoice: (v: any) => void;
+  sessionLength: "short" | "standard" | "full"; setSessionLength: (v: "short" | "standard" | "full") => void;
   onBegin: () => void;
 }) {
   return (
@@ -798,6 +799,22 @@ function PreInterviewForm({
               <option value="sage">Sage (warm)</option>
               <option value="verse">Verse (crisp)</option>
               <option value="shimmer">Shimmer (bright)</option>
+              <option value="nova">Nova (energetic)</option>
+              <option value="echo">Echo (measured)</option>
+              <option value="onyx">Onyx (deep)</option>
+              <option value="fable">Fable (storytelling)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Session length</label>
+            <select
+              value={sessionLength}
+              onChange={(e) => setSessionLength(e.target.value as any)}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm"
+            >
+              <option value="short">Short (~10 min · 5 Q)</option>
+              <option value="standard">Standard (~25 min · 10 Q)</option>
+              <option value="full">Full loop (~45 min · tech + coding + design + behavioural)</option>
             </select>
           </div>
           <div className="sm:col-span-2">
