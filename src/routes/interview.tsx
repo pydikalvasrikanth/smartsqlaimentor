@@ -666,10 +666,49 @@ function InterviewPage() {
               </div>
             ) : (
               <p className="text-base leading-relaxed whitespace-pre-wrap">
-                {turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? ""}
+                {(turns.filter((t) => t.role === "interviewer").slice(-1)[0]?.text ?? "")
+                  .replace(/^\s*\[CODE_TASK[^\]]*\]\s*/i, "")}
               </p>
             )}
           </div>
+
+          {/* Live coding scratchpad */}
+          {codeTask && !ended && (
+            <div className="rounded-2xl border border-primary/40 bg-surface-1 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-surface-2/60">
+                <div className="flex items-center gap-2 text-xs font-semibold">
+                  <Code2 className="h-3.5 w-3.5 text-primary" />
+                  Live coding · <span className="font-mono uppercase text-primary">{codeTask.lang}</span>
+                  <span className="text-muted-foreground font-normal truncate">— {codeTask.title}</span>
+                </div>
+                <button
+                  onClick={() => setCodeTask(null)}
+                  className="text-[11px] text-muted-foreground hover:text-foreground"
+                >Skip</button>
+              </div>
+              <textarea
+                value={codeText}
+                onChange={(e) => setCodeText(e.target.value)}
+                spellCheck={false}
+                rows={12}
+                placeholder={codeTask.lang === "sql" ? "-- Write your query here" : "# Write your solution here"}
+                className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
+              />
+              <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-border">
+                <span className="text-[11px] text-muted-foreground">
+                  Aria can see your code. Submit when ready — she'll dry-run inputs and probe edge cases.
+                </span>
+                <button
+                  onClick={submitCode}
+                  disabled={codeSubmitting || !codeText.trim()}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  {codeSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  Submit code
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
