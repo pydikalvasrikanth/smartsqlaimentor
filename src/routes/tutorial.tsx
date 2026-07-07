@@ -22,6 +22,23 @@ export const Route = createFileRoute("/tutorial")({
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/tutorial" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/tutorial" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LearningResource",
+          name: "MySQL Visual Learning — Interactive Tutorials",
+          description:
+            "Learn MySQL visually: DDL, DML, joins, window functions, CTEs and indexes with animated, step-by-step explanations.",
+          learningResourceType: "Interactive tutorial",
+          teaches: "MySQL",
+          url: "https://smartsqlaimentor.lovable.app/tutorial",
+          inLanguage: "en",
+          educationalLevel: "Beginner to Advanced",
+        }),
+      },
+    ],
   }),
   component: TutorialPage,
 });
