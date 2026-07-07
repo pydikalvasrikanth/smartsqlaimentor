@@ -5,7 +5,7 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2 } from "lucide-react";
 import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
 
@@ -104,7 +104,8 @@ function InterviewPage() {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
   const [years, setYears] = useState(3);
   const [competencies, setCompetencies] = useState("Python, SQL, Spark, Airflow, BigQuery, Kafka");
-  const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage">("alloy");
+  const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable">("alloy");
+  const [sessionLength, setSessionLength] = useState<"short" | "standard" | "full">("full");
   const [started, setStarted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -120,13 +121,19 @@ function InterviewPage() {
   const [report, setReport] = useState<Report | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
 
+  // Live coding scratchpad
+  const [codeTask, setCodeTask] = useState<{ lang: "python" | "sql" | "text"; title: string } | null>(null);
+  const [codeText, setCodeText] = useState("");
+  const [codeSubmitting, setCodeSubmitting] = useState(false);
+
   // Full interview resume: setup + transcript. In-flight audio/TTS never persists.
   type InterviewResume = {
     role: string;
     level: "junior" | "mid" | "senior";
     years: number;
     competencies: string;
-    voice: "alloy" | "verse" | "shimmer" | "sage";
+    voice: "alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable";
+    sessionLength: "short" | "standard" | "full";
     started: boolean;
     ended: boolean;
     turns: Turn[];
@@ -139,6 +146,7 @@ function InterviewPage() {
       years: 3,
       competencies: "Python, SQL, Spark, Airflow, BigQuery, Kafka",
       voice: "alloy",
+      sessionLength: "full",
       started: false,
       ended: false,
       turns: [],
@@ -147,8 +155,8 @@ function InterviewPage() {
   );
   useEffect(() => {
     if (!resume.ready) return;
-    resume.setState({ role, level, years, competencies, voice, started, ended, turns });
-  }, [role, level, years, competencies, voice, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    resume.setState({ role, level, years, competencies, voice, sessionLength, started, ended, turns });
+  }, [role, level, years, competencies, voice, sessionLength, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<MediaStream | null>(null);
