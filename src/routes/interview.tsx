@@ -577,6 +577,8 @@ function InterviewPage() {
           setCompetencies={setCompetencies}
           voice={voice}
           setVoice={setVoice}
+          sessionLength={sessionLength}
+          setSessionLength={setSessionLength}
           onBegin={begin}
         />
       )}
