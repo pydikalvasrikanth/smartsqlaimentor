@@ -555,6 +555,7 @@ function InterviewPage() {
                 setYears(s.years);
                 setCompetencies(s.competencies);
                 setVoice(s.voice);
+                if (s.sessionLength) setSessionLength(s.sessionLength);
                 setTurns(s.turns ?? []);
                 setEnded(s.ended);
                 setStarted(s.started && !s.ended);
