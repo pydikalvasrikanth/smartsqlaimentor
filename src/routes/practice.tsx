@@ -1103,6 +1103,7 @@ function Workspace() {
               <button
                 onClick={() => setTourOpen(true)}
                 title="Take the tour"
+                aria-label="Take the tour"
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
               >
                 <HelpCircle className="h-3 w-3" />
@@ -1129,6 +1130,7 @@ function Workspace() {
               <button
                 onClick={() => setTourOpen(true)}
                 title="Take the tour"
+                aria-label="Take the tour"
                 className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent"
               >
                 <HelpCircle className="h-3 w-3" />

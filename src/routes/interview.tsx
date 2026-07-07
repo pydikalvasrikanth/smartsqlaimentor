@@ -14,6 +14,9 @@ export const Route = createFileRoute("/interview")({
     meta: [
       { title: "Live AI Interview — Data Engineer mock interview" },
       { name: "description", content: "Take a live AI-driven data engineering interview with voice + camera. The AI asks, you answer out loud — get scored at the end." },
+      { property: "og:title", content: "Live AI Interview — Data Engineer mock interview" },
+      { property: "og:description", content: "Take a live AI-driven data engineering interview with voice + camera. The AI asks, you answer out loud — get scored at the end." },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/interview" },
       { name: "robots", content: "noindex" },
     ],
   }),
