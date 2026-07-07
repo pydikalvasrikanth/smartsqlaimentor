@@ -582,6 +582,7 @@ function InterviewPage() {
               onDismiss={resume.dismiss}
             />
           )}
+          <PastInterviewsPanel />
         </div>
       )}
       {!started && (
