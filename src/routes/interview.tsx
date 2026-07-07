@@ -439,6 +439,7 @@ function InterviewPage() {
           competencies,
           history: history.map((t) => ({ role: t.role, text: t.text })),
           action,
+          sessionLength,
         },
       });
       setThinking(false);
@@ -448,11 +449,19 @@ function InterviewPage() {
         setError("The interviewer didn't respond. Try again.");
         return;
       }
+      // Detect live-coding task marker on line 1: [CODE_TASK lang=python|sql title="…"]
+      const codeMatch = reply.match(/^\s*\[CODE_TASK\s+lang=(python|sql|text)(?:\s+title="([^"]*)")?\]\s*/i);
+      let spokenReply = reply;
+      if (codeMatch) {
+        spokenReply = reply.slice(codeMatch[0].length).trim();
+        setCodeTask({ lang: codeMatch[1].toLowerCase() as any, title: codeMatch[2] || "Coding task" });
+        setCodeText("");
+      }
       const next: Turn[] = [...history, { role: "interviewer", text: reply }];
       setTurns(next);
       if (action === "end") {
         setEnded(true);
-        await playInterviewer(reply);
+        await playInterviewer(spokenReply);
         // kick off scorecard pass
         setReportLoading(true);
         try {
@@ -467,11 +476,27 @@ function InterviewPage() {
           });
           if (rep?.report) setReport(rep.report as Report);
           else if (rep?.error) setError(rep.error);
+          // Save to local history
+          try {
+            if (rep?.report) {
+              const item = {
+                id: Date.now(),
+                at: new Date().toISOString(),
+                role, level, years, competencies, sessionLength,
+                report: rep.report,
+                turns: next.length,
+              };
+              const raw = localStorage.getItem("interview:history");
+              const list = raw ? JSON.parse(raw) : [];
+              list.unshift(item);
+              localStorage.setItem("interview:history", JSON.stringify(list.slice(0, 20)));
+            }
+          } catch {}
         } finally {
           setReportLoading(false);
         }
       } else {
-        playInterviewer(reply);
+        playInterviewer(spokenReply);
       }
     } catch (e: any) {
       setThinking(false);
