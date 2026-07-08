@@ -8,12 +8,41 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { lazy, Suspense, useEffect, useState } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
-import { FloatingTimer } from "@/components/FloatingTimer";
-import { FeedbackFab } from "@/components/FeedbackFab";
-import { CopyProtection } from "@/components/CopyProtection";
 import appCss from "../styles.css?url";
+
+// Defer always-mounted UI chrome so it doesn't block initial paint / TTI.
+const FloatingTimer = lazy(() =>
+  import("@/components/FloatingTimer").then((m) => ({ default: m.FloatingTimer })),
+);
+const FeedbackFab = lazy(() =>
+  import("@/components/FeedbackFab").then((m) => ({ default: m.FeedbackFab })),
+);
+const CopyProtection = lazy(() =>
+  import("@/components/CopyProtection").then((m) => ({ default: m.CopyProtection })),
+);
+
+function DeferredChrome() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const idle = (window as any).requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1));
+    const id = idle(() => setReady(true));
+    return () => {
+      const cancel = (window as any).cancelIdleCallback ?? clearTimeout;
+      cancel(id);
+    };
+  }, []);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <FloatingTimer />
+      <FeedbackFab />
+      <CopyProtection />
+    </Suspense>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -141,9 +170,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <Outlet />
-          <FloatingTimer />
-          <FeedbackFab />
-          <CopyProtection />
+          <DeferredChrome />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

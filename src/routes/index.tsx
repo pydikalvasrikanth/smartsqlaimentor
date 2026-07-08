@@ -69,11 +69,31 @@ function SubjectPicker() {
   useEffect(() => { if (!loading && !user) navigate({ to: "/auth" }); }, [loading, user, navigate]);
 
   if (loading || !user) {
-    return <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">Loading…</div>;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="max-w-[1200px] mx-auto px-4 py-12 animate-pulse">
+          <div className="h-8 w-64 bg-muted rounded-md mx-auto mb-4" />
+          <div className="h-4 w-96 max-w-full bg-muted/70 rounded mx-auto mb-12" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-64 rounded-2xl border border-border bg-surface-1" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Subtle ambient background — refines existing look without changing palette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-0 overflow-hidden"
+      >
+        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute top-1/3 -right-32 h-80 w-80 rounded-full bg-primary-glow/10 blur-3xl" />
+      </div>
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
           <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
@@ -98,16 +118,17 @@ function SubjectPicker() {
           <p className="text-muted-foreground">Each track is powered by an AI mentor that generates questions, grades your work, and tracks weak spots. Plans, mastery, and difficulty ramps are personal to you.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
           {SUBJECTS.map((s) => {
             const Icon = s.icon;
             return (
               <Link
                 key={s.id}
                 to={s.to}
-                className="group rounded-2xl border border-border bg-surface-1 p-6 hover:border-primary/60 hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.3)] transition-all flex flex-col"
+                preload="intent"
+                className="group rounded-2xl border border-border bg-surface-1/80 backdrop-blur-sm p-6 hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200 flex flex-col"
               >
-                <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${s.accent} grid place-items-center mb-4`}>
+                <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${s.accent} grid place-items-center mb-4 shadow-sm group-hover:scale-105 transition-transform`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">{s.title}</h3>
