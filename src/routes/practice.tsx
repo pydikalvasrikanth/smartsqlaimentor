@@ -52,6 +52,7 @@ import {
   pickDeConcept,
   buildDePrompt,
 } from "@/lib/data-engineering";
+import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 
 export const Route = createFileRoute("/practice")({
   head: () => ({
