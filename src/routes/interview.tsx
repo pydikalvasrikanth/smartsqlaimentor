@@ -101,6 +101,7 @@ function InterviewPage() {
   const transcribe = useServerFn(interviewTranscribe);
   const synthesize = useServerFn(interviewSpeak);
   const buildReport = useServerFn(interviewReport);
+  const buildCorrections = useServerFn(interviewCorrections);
 
   const [role, setRole] = useState("Data Engineer");
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
@@ -478,7 +479,18 @@ function InterviewPage() {
           });
           if (rep?.report) setReport(rep.report as Report);
           else if (rep?.error) setError(rep.error);
-          // Save to local history
+          // Fetch model answers + explanations for each Q/A pair
+          let corrections: any[] | undefined;
+          try {
+            const corr: any = await buildCorrections({
+              data: {
+                role, level, experienceYears: years, competencies,
+                history: next.map((t) => ({ role: t.role, text: t.text })),
+              },
+            });
+            if (corr?.items) corrections = corr.items;
+          } catch {}
+          // Save to local history — include full transcript so past view is complete
           try {
             if (rep?.report) {
               const item = {
@@ -487,6 +499,8 @@ function InterviewPage() {
                 role, level, years, competencies, sessionLength,
                 report: rep.report,
                 turns: next.length,
+                transcript: next,
+                corrections,
               };
               const raw = localStorage.getItem("interview:history");
               const list = raw ? JSON.parse(raw) : [];
