@@ -373,7 +373,7 @@ function PythonWorkspace() {
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
   type PyResume = {
-    tab: "today" | "topic" | "targeted" | "data-eng" | "interview";
+    tab: "today" | "topic" | "targeted" | "data-eng" | "interview" | "solved";
     topicLevel: Level;
     deLevel: Level;
     interviewCompany: string;
