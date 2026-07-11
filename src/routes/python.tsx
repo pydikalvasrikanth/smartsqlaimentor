@@ -16,6 +16,8 @@ import { AiAssistant } from "@/components/AiAssistant";
 import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
+import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
@@ -338,7 +340,7 @@ function PythonWorkspace() {
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview" | "solved">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [deLevel, setDeLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
