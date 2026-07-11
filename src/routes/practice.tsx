@@ -52,6 +52,7 @@ import {
   pickDeConcept,
   buildDePrompt,
 } from "@/lib/data-engineering";
+import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 
 export const Route = createFileRoute("/practice")({
   head: () => ({
@@ -209,7 +210,7 @@ function Workspace() {
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
   }, [authLoading, user, navigate]);
-  const [tab, setTab] = useState<"today" | "free" | "topics" | "targeted" | "data-eng">("today");
+  const [tab, setTab] = useState<"today" | "free" | "topics" | "targeted" | "data-eng" | "solved">("today");
   const [showPlanner, setShowPlanner] = useState(false);
   const [topic, setTopic] = useState("E-commerce orders");
   const [difficulty, setDifficulty] = useState("beginner");
@@ -254,7 +255,7 @@ function Workspace() {
   // Cross-device resume for filters + typed SQL. In-session question state is
   // rebuilt from the engine when the user hits Start / Next.
   type PracticeResume = {
-    tab: "today" | "free" | "topics" | "targeted" | "data-eng";
+    tab: "today" | "free" | "topics" | "targeted" | "data-eng" | "solved";
     topic: string;
     difficulty: string;
     company: string;
@@ -1209,7 +1210,12 @@ function Workspace() {
           <TabBtn active={tab === "data-eng"} onClick={() => setTab("data-eng")} icon={<Boxes className="h-3.5 w-3.5" />}>
             Data Engineering
           </TabBtn>
+          <TabBtn active={tab === "solved"} onClick={() => setTab("solved")} icon={<Trophy className="h-3.5 w-3.5" />}>
+            Solved
+          </TabBtn>
         </div>
+
+        {tab === "solved" && <SolvedLibrary />}
 
         {tab === "today" && (
           planQ.isLoading ? (
