@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
 
+type Subject = "sql" | "python";
+
 interface Solved {
   id: string;
   created_at: string;
@@ -9,6 +11,7 @@ interface Solved {
   difficulty: string;
   question_text: string | null;
   user_sql: string | null;
+  user_answer: string | null;
 }
 
 // SQL functions we recognise. Matched case-insensitively as WORD(
@@ -59,7 +62,49 @@ function highlightSql(sql: string): string {
   return escaped;
 }
 
-export function SolvedLibrary() {
+const PY_KEYWORDS = [
+  "def","return","if","elif","else","for","while","in","not","and","or","is","None","True","False",
+  "import","from","as","class","try","except","finally","raise","with","lambda","yield","pass","break","continue","global","nonlocal","assert","async","await",
+];
+const PY_BUILTINS = [
+  "len","range","print","enumerate","zip","map","filter","sorted","sum","min","max","abs","round","any","all","list","dict","set","tuple","str","int","float","bool","type","isinstance","open","input","reversed","iter","next","hash","id","repr","format","divmod","pow","frozenset","bytes","bytearray","memoryview","object","super","property","staticmethod","classmethod","getattr","setattr","hasattr","delattr","vars","dir","callable","chr","ord","bin","oct","hex","complex","slice","zip",
+];
+// Common library/method names Python engineers use
+const PY_LIBS = [
+  "Counter","defaultdict","deque","OrderedDict","namedtuple","heapq","bisect","itertools","functools","math","re","json","os","sys","random","datetime","time","collections","string","copy","typing","pandas","pd","numpy","np","DataFrame","Series","array","zeros","ones","concat","merge","groupby","apply","read_csv","to_csv","read_parquet","reduce","lru_cache","partial","chain","permutations","combinations","product","accumulate",
+];
+
+function extractPythonSymbols(code: string): string[] {
+  const found = new Set<string>();
+  const all = [...PY_BUILTINS, ...PY_LIBS];
+  for (const name of all) {
+    const re = new RegExp(`\\b${name}\\b`);
+    if (re.test(code)) found.add(name);
+  }
+  return Array.from(found).sort();
+}
+
+function highlightPython(code: string): string {
+  let escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // triple + single strings
+  escaped = escaped.replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"[^"\n]*"|'[^'\n]*')/g, `<span class="text-emerald-300">$1</span>`);
+  // comments
+  escaped = escaped.replace(/(#[^\n]*)/g, `<span class="text-slate-500 italic">$1</span>`);
+  // numbers
+  escaped = escaped.replace(/\b(\d+(?:\.\d+)?)\b/g, `<span class="text-orange-300">$1</span>`);
+  for (const kw of PY_KEYWORDS.sort((a, b) => b.length - a.length)) {
+    const re = new RegExp(`\\b(${kw})\\b`, "g");
+    escaped = escaped.replace(re, `<span class="text-sky-300 font-semibold">$1</span>`);
+  }
+  for (const b of PY_BUILTINS) {
+    const re = new RegExp(`\\b(${b})\\b`, "g");
+    escaped = escaped.replace(re, `<span class="text-fuchsia-300">$1</span>`);
+  }
+  return escaped;
+}
+
+export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
+  const isPython = subject === "python";
   const [rows, setRows] = useState<Solved[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -70,8 +115,8 @@ export function SolvedLibrary() {
     (async () => {
       const { data, error } = await supabase
         .from("attempts")
-        .select("id, created_at, topic_slug, difficulty, question_text, user_sql")
-        .eq("subject", "sql")
+        .select("id, created_at, topic_slug, difficulty, question_text, user_sql, user_answer")
+        .eq("subject", subject)
         .eq("is_correct", true)
         .order("created_at", { ascending: false })
         .limit(500);
@@ -82,7 +127,11 @@ export function SolvedLibrary() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [subject]);
+
+  const codeOf = (r: Solved) => (isPython ? r.user_answer : r.user_sql) ?? "";
+  const extractFns = (code: string) => (isPython ? extractPythonSymbols(code) : extractFunctions(code));
+  const highlight = (code: string) => (isPython ? highlightPython(code) : highlightSql(code));
 
   // Dedup: keep latest correct submission per question text
   const unique = useMemo(() => {
@@ -104,7 +153,7 @@ export function SolvedLibrary() {
     return unique.filter(
       (r) =>
         r.question_text?.toLowerCase().includes(q) ||
-        r.user_sql?.toLowerCase().includes(q) ||
+        codeOf(r).toLowerCase().includes(q) ||
         r.topic_slug.toLowerCase().includes(q),
     );
   }, [unique, filter]);
@@ -112,8 +161,9 @@ export function SolvedLibrary() {
   const allFunctions = useMemo(() => {
     const set = new Set<string>();
     for (const r of unique) {
-      if (!r.user_sql) continue;
-      for (const fn of extractFunctions(r.user_sql)) set.add(fn);
+      const code = codeOf(r);
+      if (!code) continue;
+      for (const fn of extractFns(code)) set.add(fn);
     }
     return Array.from(set).sort();
   }, [unique]);
@@ -145,7 +195,9 @@ export function SolvedLibrary() {
       <div className="rounded-xl border border-border bg-surface-2/60 p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold tracking-tight">Functions you've used</h3>
+          <h3 className="text-sm font-semibold tracking-tight">
+            {isPython ? "Functions & libraries you've used" : "Functions you've used"}
+          </h3>
           <span className="text-[11px] font-mono text-muted-foreground">
             {allFunctions.length} unique
           </span>
@@ -182,7 +234,8 @@ export function SolvedLibrary() {
       <ul className="space-y-2">
         {filtered.map((r) => {
           const isOpen = !!open[r.id];
-          const fns = r.user_sql ? extractFunctions(r.user_sql) : [];
+          const code = codeOf(r);
+          const fns = code ? extractFns(code) : [];
           return (
             <li key={r.id} className="rounded-lg border border-border bg-surface-1 overflow-hidden">
               <button
@@ -196,7 +249,7 @@ export function SolvedLibrary() {
                 )}
                 <CheckCircle2 className="h-4 w-4 mt-0.5 text-success shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground line-clamp-2">
+                  <p className="text-[12px] font-bold text-foreground line-clamp-2">
                     {r.question_text || "(no question text saved)"}
                   </p>
                   <div className="flex flex-wrap gap-1.5 mt-1.5 text-[10px] font-mono text-muted-foreground">
@@ -226,10 +279,10 @@ export function SolvedLibrary() {
                   <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wide mt-2 mb-1">
                     Your solution
                   </p>
-                  <pre className="text-xs bg-background rounded-md p-3 border border-border overflow-x-auto">
+                  <pre className="text-[11px] font-bold bg-background rounded-md p-3 border border-border overflow-x-auto leading-relaxed">
                     <code
                       className="font-mono text-foreground"
-                      dangerouslySetInnerHTML={{ __html: highlightSql(r.user_sql ?? "") }}
+                      dangerouslySetInnerHTML={{ __html: highlight(code) }}
                     />
                   </pre>
                 </div>

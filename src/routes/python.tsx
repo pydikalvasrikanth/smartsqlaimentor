@@ -16,6 +16,8 @@ import { AiAssistant } from "@/components/AiAssistant";
 import { ProductTour } from "@/components/ProductTour";
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
+import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
@@ -338,7 +340,7 @@ function PythonWorkspace() {
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
   const [plan, setPlan] = useState<PyPlan | null>(null);
-  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview">("today");
+  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview" | "solved">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [deLevel, setDeLevel] = useState<Level>("intermediate");
   const [interviewCompany, setInterviewCompany] = useState<string>("Google");
@@ -371,7 +373,7 @@ function PythonWorkspace() {
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
   type PyResume = {
-    tab: "today" | "topic" | "targeted" | "data-eng" | "interview";
+    tab: "today" | "topic" | "targeted" | "data-eng" | "interview" | "solved";
     topicLevel: Level;
     deLevel: Level;
     interviewCompany: string;
@@ -653,6 +655,21 @@ function PythonWorkspace() {
     setFeedback(data);
     if (data.is_correct) toast.success("All tests pass");
     else toast.error(`${data.passed}/${data.total} tests passed`);
+    // Log to attempts table so the Solved tab can show this question.
+    try {
+      await supabase.from("attempts").insert({
+        user_id: user!.id,
+        subject: "python",
+        topic_slug: String(question.concept || "python").slice(0, 100),
+        concept: question.concept ?? null,
+        difficulty: (question.difficulty as any) ?? "beginner",
+        question_text: question.task,
+        user_answer: code,
+        is_correct: !!data.is_correct,
+      });
+    } catch (e) {
+      console.warn("Failed to log python attempt", e);
+    }
   }
 
   async function handleHint() {
@@ -789,11 +806,18 @@ function PythonWorkspace() {
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
+            <button onClick={() => setTab("solved")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "solved" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <CheckCircle2 className="h-3.5 w-3.5" /> Solved
+            </button>
           </div>
         )}
 
         {!question && tab === "today" && plan && (
           <PyPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
+        )}
+
+        {!question && tab === "solved" && (
+          <SolvedLibrary subject="python" />
         )}
 
         {!question && tab === "topic" && (
