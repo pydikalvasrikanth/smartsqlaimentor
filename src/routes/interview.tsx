@@ -5,9 +5,11 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2 } from "lucide-react";
-import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
+import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2, MessageSquare, CheckCircle2 } from "lucide-react";
+import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport, interviewCorrections } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
+import { SqlEditor } from "@/components/sql/SqlEditor";
+import { PythonEditor } from "@/components/python/PythonEditor";
 
 export const Route = createFileRoute("/interview")({
   head: () => ({
@@ -99,6 +101,7 @@ function InterviewPage() {
   const transcribe = useServerFn(interviewTranscribe);
   const synthesize = useServerFn(interviewSpeak);
   const buildReport = useServerFn(interviewReport);
+  const buildCorrections = useServerFn(interviewCorrections);
 
   const [role, setRole] = useState("Data Engineer");
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
@@ -476,7 +479,18 @@ function InterviewPage() {
           });
           if (rep?.report) setReport(rep.report as Report);
           else if (rep?.error) setError(rep.error);
-          // Save to local history
+          // Fetch model answers + explanations for each Q/A pair
+          let corrections: any[] | undefined;
+          try {
+            const corr: any = await buildCorrections({
+              data: {
+                role, level, experienceYears: years, competencies,
+                history: next.map((t) => ({ role: t.role, text: t.text })),
+              },
+            });
+            if (corr?.items) corrections = corr.items;
+          } catch {}
+          // Save to local history — include full transcript so past view is complete
           try {
             if (rep?.report) {
               const item = {
@@ -485,6 +499,8 @@ function InterviewPage() {
                 role, level, years, competencies, sessionLength,
                 report: rep.report,
                 turns: next.length,
+                transcript: next,
+                corrections,
               };
               const raw = localStorage.getItem("interview:history");
               const list = raw ? JSON.parse(raw) : [];
@@ -687,14 +703,20 @@ function InterviewPage() {
                   className="text-[11px] text-muted-foreground hover:text-foreground"
                 >Skip</button>
               </div>
-              <textarea
-                value={codeText}
-                onChange={(e) => setCodeText(e.target.value)}
-                spellCheck={false}
-                rows={12}
-                placeholder={codeTask.lang === "sql" ? "-- Write your query here" : "# Write your solution here"}
-                className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
-              />
+              {codeTask.lang === "sql" ? (
+                <SqlEditor value={codeText} onChange={setCodeText} height="320px" />
+              ) : codeTask.lang === "python" ? (
+                <PythonEditor value={codeText} onChange={setCodeText} minHeight={320} />
+              ) : (
+                <textarea
+                  value={codeText}
+                  onChange={(e) => setCodeText(e.target.value)}
+                  spellCheck={false}
+                  rows={12}
+                  placeholder="Write your solution here"
+                  className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
+                />
+              )}
               <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-border">
                 <span className="text-[11px] text-muted-foreground">
                   Aria can see your code. Submit when ready — she'll dry-run inputs and probe edge cases.
@@ -1082,11 +1104,17 @@ type PastInterview = {
   turns: number;
   sessionLength: string;
   report: Report;
+  competencies?: string;
+  years?: number;
+  transcript?: Turn[];
+  corrections?: Array<{ question: string; your_answer: string; model_answer: string; explanation: string }>;
 };
 
 function PastInterviewsPanel() {
   const [items, setItems] = useState<PastInterview[]>([]);
   const [open, setOpen] = useState<PastInterview | null>(null);
+  const [correctionsLoading, setCorrectionsLoading] = useState(false);
+  const buildCorrections = useServerFn(interviewCorrections);
 
   useEffect(() => {
     try {
@@ -1107,6 +1135,34 @@ function PastInterviewsPanel() {
   };
 
   if (items.length === 0) return null;
+
+  const persist = (next: PastInterview[]) => {
+    setItems(next);
+    try { localStorage.setItem("interview:history", JSON.stringify(next)); } catch {}
+  };
+
+  const fetchCorrections = async () => {
+    if (!open || !open.transcript || open.corrections || correctionsLoading) return;
+    setCorrectionsLoading(true);
+    try {
+      const res: any = await buildCorrections({
+        data: {
+          role: open.role,
+          level: open.level as any,
+          experienceYears: open.years ?? 3,
+          competencies: open.competencies ?? "",
+          history: open.transcript.map((t) => ({ role: t.role, text: t.text })),
+        },
+      });
+      if (res?.items) {
+        const updated: PastInterview = { ...open, corrections: res.items };
+        setOpen(updated);
+        persist(items.map((i) => (i.id === open.id ? updated : i)));
+      }
+    } finally {
+      setCorrectionsLoading(false);
+    }
+  };
 
   return (
     <div className="mt-4 rounded-2xl border border-border bg-surface-1 p-4">
@@ -1150,7 +1206,7 @@ function PastInterviewsPanel() {
           onClick={() => setOpen(null)}
         >
           <div
-            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-background p-4"
+            className="w-full max-w-3xl max-h-[88vh] overflow-y-auto rounded-2xl border border-border bg-background p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 mb-3">
@@ -1159,6 +1215,77 @@ function PastInterviewsPanel() {
               <button onClick={() => setOpen(null)} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Close</button>
             </div>
             <ScoreCard report={open.report} loading={false} />
+
+            {open.transcript && open.transcript.length > 0 && (
+              <div className="mt-5 rounded-xl border border-border bg-surface-1 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  <h5 className="text-sm font-semibold">Full transcript</h5>
+                  <span className="text-[10px] text-muted-foreground">({open.transcript.length} turns)</span>
+                </div>
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  {open.transcript.map((t, i) => (
+                    <div key={i} className={t.role === "interviewer" ? "" : "pl-3 border-l-2 border-primary/60"}>
+                      <p className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">
+                        {t.role === "interviewer" ? "Aria" : "You"}
+                      </p>
+                      <p className="text-[13px] whitespace-pre-wrap leading-relaxed">
+                        {t.text.replace(/^\s*\[CODE_TASK[^\]]*\]\s*/i, "")}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {open.transcript && open.transcript.length > 0 && (
+              <div className="mt-5 rounded-xl border border-border bg-surface-1 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  <h5 className="text-sm font-semibold">Corrected answers & explanations</h5>
+                  {!open.corrections && (
+                    <button
+                      onClick={fetchCorrections}
+                      disabled={correctionsLoading}
+                      className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-[11px] text-primary-foreground disabled:opacity-50"
+                    >
+                      {correctionsLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                      {correctionsLoading ? "Generating…" : "Generate"}
+                    </button>
+                  )}
+                </div>
+                {open.corrections ? (
+                  <div className="space-y-4">
+                    {open.corrections.map((c, i) => (
+                      <div key={i} className="rounded-lg border border-border bg-surface-2/40 p-3 space-y-2">
+                        <div>
+                          <div className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">Q{i + 1} · Aria asked</div>
+                          <p className="text-[13px] leading-relaxed">{c.question}</p>
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-mono uppercase text-muted-foreground mb-0.5">Your answer</div>
+                          <p className="text-[13px] leading-relaxed whitespace-pre-wrap text-muted-foreground">{c.your_answer || "—"}</p>
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-mono uppercase text-emerald-400 mb-0.5">Model answer</div>
+                          <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{c.model_answer}</p>
+                        </div>
+                        {c.explanation && (
+                          <div>
+                            <div className="text-[10px] font-mono uppercase text-sky-400 mb-0.5">Why</div>
+                            <p className="text-[12px] leading-relaxed text-muted-foreground">{c.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {correctionsLoading ? "Aria is preparing ideal answers…" : "Click Generate to get an ideal answer + explanation for each question."}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
