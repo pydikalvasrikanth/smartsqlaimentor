@@ -300,3 +300,65 @@ export const interviewReport = createServerFn({ method: "POST" })
     if (!report) return { error: "Could not parse evaluation." };
     return { report };
   });
+
+// ---------------------------------------------------------------------------
+// Model-answer corrections: given the full transcript, produce an ideal
+// answer + explanation for each interviewer question the candidate answered.
+// ---------------------------------------------------------------------------
+const CORRECTIONS_SYSTEM = `You are a senior interview coach. You receive a full mock-interview transcript. For every INTERVIEWER question that received a CANDIDATE answer, produce a concise, high-quality model answer (as a strong senior candidate would give at a top MNC) and a brief explanation of WHY that answer is strong / what the candidate missed.
+
+Rules:
+- Skip pure filler turns (intros, "thank you", wrap-up).
+- If the question was a coding task, the model_answer should be the ideal code solution (in the same language) with a 1-2 sentence approach, and explanation should cover complexity + edge cases.
+- Keep model_answer under ~180 words, explanation under ~80 words.
+- Return ONLY a JSON object — no markdown, no prose:
+{
+  "items": [
+    { "question": string, "your_answer": string, "model_answer": string, "explanation": string }
+  ]
+}`;
+
+export const interviewCorrections = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ReportInput.parse(d))
+  .handler(async ({ data }) => {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) return { error: "LOVABLE_API_KEY is not configured." };
+    const transcript = data.history
+      .map((t) => `${t.role === "interviewer" ? "INTERVIEWER" : "CANDIDATE"}: ${t.text}`)
+      .join("\n\n");
+    const messages = [
+      { role: "system", content: CORRECTIONS_SYSTEM },
+      {
+        role: "user",
+        content: `TARGET_ROLE: ${data.role}\nLEVEL: ${data.level}\n\n--- TRANSCRIPT ---\n${transcript}\n--- END ---\n\nProduce the JSON now.`,
+      },
+    ];
+    const resp = await fetch(`${GATEWAY}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: CHAT_MODEL,
+        messages,
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (resp.status === 429) return { error: "Rate limit. Try again shortly." };
+    if (resp.status === 402) return { error: "AI credits exhausted." };
+    if (!resp.ok) {
+      const t = await resp.text().catch(() => "");
+      console.error("corrections error", resp.status, t);
+      return { error: `Corrections failed (${resp.status}).` };
+    }
+    const json: any = await resp.json();
+    const raw: string = json?.choices?.[0]?.message?.content ?? "{}";
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
+    }
+    if (!parsed?.items) return { error: "Could not parse corrections." };
+    return { items: parsed.items as Array<{ question: string; your_answer: string; model_answer: string; explanation: string }> };
+  });
