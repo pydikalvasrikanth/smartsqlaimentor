@@ -703,14 +703,20 @@ function InterviewPage() {
                   className="text-[11px] text-muted-foreground hover:text-foreground"
                 >Skip</button>
               </div>
-              <textarea
-                value={codeText}
-                onChange={(e) => setCodeText(e.target.value)}
-                spellCheck={false}
-                rows={12}
-                placeholder={codeTask.lang === "sql" ? "-- Write your query here" : "# Write your solution here"}
-                className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
-              />
+              {codeTask.lang === "sql" ? (
+                <SqlEditor value={codeText} onChange={setCodeText} height="320px" />
+              ) : codeTask.lang === "python" ? (
+                <PythonEditor value={codeText} onChange={setCodeText} minHeight={320} />
+              ) : (
+                <textarea
+                  value={codeText}
+                  onChange={(e) => setCodeText(e.target.value)}
+                  spellCheck={false}
+                  rows={12}
+                  placeholder="Write your solution here"
+                  className="w-full bg-background text-foreground font-mono text-[13px] leading-relaxed px-4 py-3 outline-none resize-y min-h-[220px]"
+                />
+              )}
               <div className="flex items-center justify-between gap-2 px-4 py-2 border-t border-border">
                 <span className="text-[11px] text-muted-foreground">
                   Aria can see your code. Submit when ready — she'll dry-run inputs and probe edge cases.
