@@ -791,11 +791,18 @@ function PythonWorkspace() {
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
             </button>
+            <button onClick={() => setTab("solved")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "solved" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <CheckCircle2 className="h-3.5 w-3.5" /> Solved
+            </button>
           </div>
         )}
 
         {!question && tab === "today" && plan && (
           <PyPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
+        )}
+
+        {!question && tab === "solved" && (
+          <SolvedLibrary subject="python" />
         )}
 
         {!question && tab === "topic" && (
