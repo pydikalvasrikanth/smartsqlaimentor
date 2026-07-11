@@ -5,9 +5,11 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2 } from "lucide-react";
-import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport } from "@/lib/interview.functions";
+import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2, MessageSquare, CheckCircle2 } from "lucide-react";
+import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport, interviewCorrections } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
+import { SqlEditor } from "@/components/sql/SqlEditor";
+import { PythonEditor } from "@/components/python/PythonEditor";
 
 export const Route = createFileRoute("/interview")({
   head: () => ({
