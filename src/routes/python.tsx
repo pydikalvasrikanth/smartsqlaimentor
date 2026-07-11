@@ -655,6 +655,21 @@ function PythonWorkspace() {
     setFeedback(data);
     if (data.is_correct) toast.success("All tests pass");
     else toast.error(`${data.passed}/${data.total} tests passed`);
+    // Log to attempts table so the Solved tab can show this question.
+    try {
+      await supabase.from("attempts").insert({
+        user_id: user!.id,
+        subject: "python",
+        topic_slug: String(question.concept || "python").slice(0, 100),
+        concept: question.concept ?? null,
+        difficulty: (question.difficulty as any) ?? "beginner",
+        question_text: question.task,
+        user_answer: code,
+        is_correct: !!data.is_correct,
+      });
+    } catch (e) {
+      console.warn("Failed to log python attempt", e);
+    }
   }
 
   async function handleHint() {
