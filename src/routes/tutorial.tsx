@@ -65,10 +65,10 @@ const MODULES: Module[] = [
   },
   {
     id: "foundations",
-    file: "/mysql-tutorial-foundations.html",
+    file: "/mysql-visual-explainer.html",
     badge: "PART 2 · FOUNDATIONS & BEYOND",
-    title: "DDL · DML · DCL · TCL & More",
-    desc: "Everything else, basics to advanced: building & changing tables, modifying data, permissions, transactions and pivots.",
+    title: "MySQL Visual Explainer",
+    desc: "Full visual walkthrough of MySQL: foundations, DDL/DML/DCL/TCL, transactions, functions and more — one interactive explainer.",
     topics: [
       "CREATE / ALTER / DROP",
       "Data Types & Constraints",
@@ -81,25 +81,6 @@ const MODULES: Module[] = [
       "Quiz",
     ],
     accent: "from-emerald-500 to-orange-500",
-  },
-  {
-    id: "functions",
-    file: "/mysql-tutorial-functions.html",
-    badge: "PART 3 · FUNCTIONS & TYPES LAB",
-    title: "Data Types & All Functions",
-    desc: "The complete reference: every data type explained with 3D flip cards, plus live input→output demos for string, date, math, aggregate, window, control-flow, CAST and operator functions.",
-    topics: [
-      "Data Type Explorer",
-      "String Functions",
-      "Date & Time Functions",
-      "Numeric & Math",
-      "Aggregate & Window",
-      "IF / CASE / COALESCE",
-      "CAST & CONVERT",
-      "Operators & LIKE",
-      "Quiz",
-    ],
-    accent: "from-violet-500 to-pink-500",
   },
 ];
 
