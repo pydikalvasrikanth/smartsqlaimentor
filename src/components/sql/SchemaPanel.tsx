@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { runSqlEngine } from "@/lib/sql-engine.functions";
-import { ErdDiagram } from "./ErdDiagram";
+const ErdDiagram = lazy(() => import("./ErdDiagram").then((m) => ({ default: m.ErdDiagram })));
 import { TheoryContent } from "./TheoryContent";
 
 interface Props {
