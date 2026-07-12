@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Database } from "lucide-react";
 
 interface Question {
@@ -13,7 +14,7 @@ interface Props {
   rightSlot?: React.ReactNode;
 }
 
-export function QuestionCard({ question, attempt, rightSlot }: Props) {
+function QuestionCardImpl({ question, attempt, rightSlot }: Props) {
   if (!question) {
     return (
       <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -57,3 +58,4 @@ export function QuestionCard({ question, attempt, rightSlot }: Props) {
     </div>
   );
 }
+export const QuestionCard = memo(QuestionCardImpl);

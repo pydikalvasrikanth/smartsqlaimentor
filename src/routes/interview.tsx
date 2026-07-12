@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
@@ -8,8 +8,17 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Mic, MicOff, Video, VideoOff, Square, Play, Loader2, ArrowLeft, Volume2, Sparkles, Award, AlertTriangle, Target, Lightbulb, Code2, Send, History, Trash2, MessageSquare, CheckCircle2 } from "lucide-react";
 import { interviewTurn, interviewTranscribe, interviewSpeak, interviewReport, interviewCorrections } from "@/lib/interview.functions";
 import { InterviewAvatar } from "@/components/interview/InterviewAvatar";
-import { SqlEditor } from "@/components/sql/SqlEditor";
-import { PythonEditor } from "@/components/python/PythonEditor";
+const SqlEditor = lazy(() =>
+  import("@/components/sql/SqlEditor").then((m) => ({ default: m.SqlEditor })),
+);
+const PythonEditor = lazy(() =>
+  import("@/components/python/PythonEditor").then((m) => ({ default: m.PythonEditor })),
+);
+const EditorFallback = () => (
+  <div className="h-[320px] grid place-items-center text-xs text-muted-foreground font-mono bg-[#1e1e1e]">
+    Loading editor…
+  </div>
+);
 
 export const Route = createFileRoute("/interview")({
   head: () => ({
@@ -704,9 +713,13 @@ function InterviewPage() {
                 >Skip</button>
               </div>
               {codeTask.lang === "sql" ? (
-                <SqlEditor value={codeText} onChange={setCodeText} height="320px" />
+                <Suspense fallback={<EditorFallback />}>
+                  <SqlEditor value={codeText} onChange={setCodeText} height="320px" />
+                </Suspense>
               ) : codeTask.lang === "python" ? (
-                <PythonEditor value={codeText} onChange={setCodeText} minHeight={320} />
+                <Suspense fallback={<EditorFallback />}>
+                  <PythonEditor value={codeText} onChange={setCodeText} minHeight={320} />
+                </Suspense>
               ) : (
                 <textarea
                   value={codeText}

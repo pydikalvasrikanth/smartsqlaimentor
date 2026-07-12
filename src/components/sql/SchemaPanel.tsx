@@ -108,7 +108,11 @@ export function SchemaPanel({ schemaSql, seedSql, erdMermaid, description, quest
       </div>
       <div className="flex-1 overflow-auto p-3 min-h-0">
         {tab === "erd" && (
-          erdMermaid ? <ErdDiagram chart={erdMermaid} /> : <Empty />
+          erdMermaid ? (
+            <Suspense fallback={<div className="text-xs text-muted-foreground p-3 font-mono">Loading ERD…</div>}>
+              <ErdDiagram chart={erdMermaid} />
+            </Suspense>
+          ) : <Empty />
         )}
         {tab === "schema" && (
           <pre className="text-xs font-mono whitespace-pre-wrap text-foreground/85">
