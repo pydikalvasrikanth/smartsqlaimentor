@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Database, Code2, Cloud, ArrowRight, LogOut, Sparkles, Mic, MessageSquare } from "lucide-react";
+import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, MessageSquare } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 interface Subject {
   id: string;
-  to: "/practice" | "/python" | "/gcp";
+  to: "/practice" | "/python" | "/java" | "/gcp";
   title: string;
   tagline: string;
   description: string;
@@ -52,6 +52,16 @@ const SUBJECTS: Subject[] = [
     icon: Code2,
     accent: "from-yellow-500 to-emerald-500",
     highlights: ["50-question progressive session", "AI hints + complexity analysis", "Beginner → Advanced ramp"],
+  },
+  {
+    id: "java",
+    to: "/java",
+    title: "Java",
+    tagline: "Java 17/21 · AI graded",
+    description: "Modern Java coding practice: records, streams, concurrency, Spring Boot & JPA. AI grades your code against hidden tests.",
+    icon: Coffee,
+    accent: "from-red-500 to-amber-500",
+    highlights: ["Records, sealed types, virtual threads", "Collections, Streams & concurrency drills", "Backend & Spring Boot scenarios"],
   },
   {
     id: "gcp",
