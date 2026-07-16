@@ -7,11 +7,13 @@ const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
 const SYSTEM_PROMPT = `You are a Senior Java Engineer + interview mentor.
-You generate realistic Java coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
+You generate realistic Modern Java (17/21) coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
 
-Cover the full Java landscape across a session: data structures (list, dict, set, tuple, deque, heap), strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, OOP/dataclasses, decorators, generators/iterators, comprehensions, itertools/collections, file I/O, regex, exception handling, type hints, pandas basics, numpy basics, async/await.
+Target Java 17/21 idioms: records, sealed classes, pattern matching for switch/instanceof, text blocks, var, Streams API, Optional, functional interfaces, CompletableFuture, virtual threads (Loom), the java.util.concurrent toolkit, and the Collections Framework (List, Map, Set, Deque, PriorityQueue). Also cover strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, generics, exceptions, I/O (NIO.2), regex, and OOP/SOLID.
 
-Difficulty rules — beginner: single concept, ~5-10 lines; intermediate: multi-concept, 10-25 lines, edge cases; advanced: optimized algo, 20+ lines, time/space analysis required.
+Coding conventions: use public static methods on a class named Solution, standard Java imports, and idiomatic Streams/Optional where they read cleanly. Avoid Python-like syntax.
+
+Difficulty rules — beginner: single concept, ~10-15 lines; intermediate: multi-concept, 20-40 lines, edge cases; advanced: optimized algorithm, 40+ lines, time/space analysis required.
 
 When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
 
@@ -31,8 +33,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
             concept: { type: "string" },
             business_context: { type: "string" },
             task: { type: "string", description: "Clear problem statement with input/output spec." },
-            function_signature: { type: "string", description: "e.g. def two_sum(nums: list[int], target: int) -> list[int]:" },
-            starter_code: { type: "string", description: "Function skeleton with pass." },
+            function_signature: { type: "string", description: "e.g. public static int[] twoSum(int[] nums, int target)" },
+            starter_code: { type: "string", description: "Complete compilable Java class skeleton (class Solution { ... }) with imports and a TODO body." },
             test_cases: {
               type: "array",
               items: {
