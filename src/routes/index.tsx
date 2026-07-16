@@ -86,8 +86,8 @@ function SubjectPicker() {
         <div className="max-w-[1200px] mx-auto px-4 py-12 animate-pulse">
           <div className="h-8 w-64 bg-muted rounded-md mx-auto mb-4" />
           <div className="h-4 w-96 max-w-full bg-muted/70 rounded mx-auto mb-12" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[0, 1, 2].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[0, 1, 2, 3].map((i) => (
               <div key={i} className="h-64 rounded-2xl border border-border bg-surface-1" />
             ))}
           </div>
@@ -160,7 +160,7 @@ function SubjectPicker() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative">
           {SUBJECTS.map((s, i) => {
             const Icon = s.icon;
             return (
