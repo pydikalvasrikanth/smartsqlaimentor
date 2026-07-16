@@ -646,7 +646,7 @@ function JavaWorkspace() {
   async function handleRun() {
     if (!question || !sessionQid) return;
     setLoading("eval");
-    const data = await call("EVALUATE_PYTHON", {
+    const data = await call("EVALUATE_JAVA", {
       session_question_id: sessionQid,
       user_code: code,
     });

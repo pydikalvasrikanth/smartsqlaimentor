@@ -82,8 +82,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["question"],
     },
   },
-  EVALUATE_PYTHON: {
-    name: "evaluate_python",
+  EVALUATE_JAVA: {
+    name: "evaluate_java",
     description: "Mentally run user code against test cases and grade.",
     parameters: {
       type: "object",
@@ -227,7 +227,7 @@ function buildUserPrompt(command: string, payload: any): string {
       return `Generate a Java interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
     case "NEXT_JAVA_QUESTION":
       return `Generate the next Java question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
-    case "EVALUATE_PYTHON":
+    case "EVALUATE_JAVA":
       return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code against each test case. Compare actual vs expected. Grade fairly.`;
     case "JAVA_HINT":
       return `Task:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint.`;
@@ -327,7 +327,7 @@ const PayloadSchemas = {
     previous_question_ids: z.array(z.number()).max(500).optional(),
     company: z.string().max(100).optional(),
   }),
-  EVALUATE_PYTHON: z.object({
+  EVALUATE_JAVA: z.object({
     session_question_id: z.string().uuid(),
     user_code: z.string().max(10_000),
   }),
@@ -472,7 +472,7 @@ export const runJavaEngine = createServerFn({ method: "POST" })
     // browser cannot read. We fetch it with the service-role client, scoped to
     // the signed-in user's id so one user can never load another user's row.
     if (
-      command === "EVALUATE_PYTHON" ||
+      command === "EVALUATE_JAVA" ||
       command === "REVEAL_JAVA_SOLUTION" ||
       command === "JAVA_OPTIMIZE" ||
       command === "JAVA_THEORY" ||
