@@ -50,29 +50,17 @@ export const Route = createFileRoute("/java")({
 });
 
 const JAVA_CONCEPTS: Record<string, string[]> = {
-  beginner: ["lists", "dict", "set", "strings", "loops", "comprehensions", "tuple", "slicing", "basic-recursion", "sorting", "two-pointers-easy", "hashing-easy", "math-basic", "input-parsing", "file-io-basic"],
-  intermediate: ["sliding-window", "two-pointers", "binary-search", "stack", "queue", "deque", "heap", "hashmap-counting", "recursion", "backtracking-easy", "linked-list", "tree-traversal", "regex", "decorators", "generators"],
-  advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "segment-tree", "topological-sort", "kmp", "bit-manipulation", "system-design-mini", "concurrency-asyncio", "oop-design", "pandas-numpy"],
+  beginner: ["arrays", "strings", "arraylist", "hashmap", "hashset", "loops", "primitives", "autoboxing", "control-flow", "varargs", "sorting", "two-pointers", "hashing", "recursion", "math"],
+  intermediate: ["sliding-window", "binary-search", "stack", "queue", "deque", "priorityqueue", "linked-list", "tree-traversal", "bst", "regex", "generics", "stream-api", "lambdas", "optional", "records", "switch-expressions", "pattern-matching", "exceptions", "collectors"],
+  advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "topological-sort", "bit-manipulation", "system-design-mini", "concurrency", "completablefuture", "virtual-threads", "concurrent-collections", "spring-boot", "spring-data-jpa"],
 };
 
 const TOTAL = 50;
 type Level = "beginner" | "intermediate" | "advanced";
 const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
 
-// Top employers that commonly run Java coding interviews.
-const JAVA_COMPANIES: string[] = [
-  "Google","Amazon","Meta","Microsoft","Apple","Netflix","Uber","Airbnb","LinkedIn","Twitter / X",
-  "Stripe","Shopify","Square","Pinterest","Reddit","Snap","Spotify","Dropbox","Salesforce","Adobe",
-  "Oracle","IBM","Intel","NVIDIA","AMD","Cisco","SAP","ServiceNow","Atlassian","GitHub",
-  "GitLab","HashiCorp","Cloudflare","Datadog","Snowflake","Databricks","MongoDB","Elastic","Twilio","Coinbase",
-  "Robinhood","PayPal","eBay","Walmart Labs","Target Tech","Best Buy","DoorDash","Instacart","Lyft","Grubhub",
-  "Tesla","SpaceX","Booking.com","Expedia","Airwallex","Revolut","Wise","Plaid","Brex","Ramp",
-  "Affirm","Klarna","Goldman Sachs","JPMorgan","Morgan Stanley","Citadel","Two Sigma","Jane Street","Jump Trading","DRW",
-  "Bloomberg","Capital One","American Express","Mastercard","Visa","Wells Fargo","Bank of America","HSBC","Barclays","Deutsche Bank",
-  "TCS","Infosys","Wipro","HCL","Tech Mahindra","Cognizant","Accenture","Capgemini","Deloitte","EY",
-  "Flipkart","Swiggy","Zomato","Paytm","Razorpay","PhonePe","Ola","BYJU's","Freshworks","Zoho",
-  "Samsung","Sony","Huawei","Alibaba","Tencent","Baidu","Rakuten","LINE","Yandex","Mercado Libre",
-];
+// Companies list intentionally left empty for now — will be populated later.
+const JAVA_COMPANIES: string[] = [];
 
 // Topic-wise practice catalog focused on what a Data Engineer must know.
 // Each topic = a target_concept passed to the AI engine.
