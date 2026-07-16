@@ -784,10 +784,10 @@ function JavaWorkspace() {
                 <Library className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Topic-wise Java practice for Data Engineers</h2>
+                <h2 className="text-lg font-semibold">Topic-wise Java practice</h2>
                 <p className="text-sm text-muted-foreground">
-                  Pick any topic or library. AI generates a focused question and grades your solution.
-                  Covers core Java, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
+                  Pick any topic. AI generates a focused Java 17/21 question and grades your solution.
+                  Covers core Java, collections, streams, concurrency, modern language features, DSA, Spring Boot & testing.
                 </p>
               </div>
             </div>
@@ -849,7 +849,7 @@ function JavaWorkspace() {
                 value={focusGoal}
                 onChange={(e) => setFocusGoal(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
-                placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
+                placeholder='e.g. "Drill me on Streams and Collectors" or "Make me a concurrency pro"'
                 className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
                 disabled={loading === "init"}
               />
@@ -865,10 +865,11 @@ function JavaWorkspace() {
             <div className="flex flex-wrap gap-1.5">
               {[
                 "Test my Java basics",
-                "Drill me on decorators and generators",
-                "Make me confident with pandas groupby & joins",
-                "I want to be a pro at recursion and DP",
-                "Practice asyncio like a pro",
+                "Drill me on Streams, Collectors and Optional",
+                "Make me confident with concurrency and CompletableFuture",
+                "I want to be a pro at recursion and DP in Java",
+                "Practice Spring Boot REST + JPA",
+                "Master records, sealed classes and pattern matching",
               ].map((ex) => (
                 <button
                   key={ex}
@@ -889,8 +890,8 @@ function JavaWorkspace() {
                 <Boxes className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Data Engineering — Java on the job</h2>
-                <p className="text-sm text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
+                <h2 className="text-lg font-semibold">Backend Java — on the job</h2>
+                <p className="text-sm text-muted-foreground">Production-style backend scenarios: services, persistence, streaming, concurrency & reliability. Pick a level, then a scenario.</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -905,26 +906,28 @@ function JavaWorkspace() {
             </div>
             <div className="space-y-3">
               {[
-                { group: "Batch ETL / ELT", scenarios: [
-                  "Build a pandas pipeline that ingests CSVs, deduplicates, and writes partitioned Parquet",
-                  "Write a PySpark job that joins dimension and fact tables, then aggregates daily revenue",
-                  "Implement an incremental load using watermark columns and upserts",
+                { group: "REST Services (Spring Boot)", scenarios: [
+                  "Design a Spring Boot REST controller with validation, DTO mapping and error handling",
+                  "Add pagination, sorting and filtering to a Spring Data JPA repository endpoint",
+                  "Implement idempotent POST /orders using request keys",
                 ]},
-                { group: "Streaming", scenarios: [
-                  "Process a Kafka stream of clickstream events with windowed aggregations",
-                  "Handle late-arriving events with watermarks and stateful processing",
+                { group: "Persistence & JPA", scenarios: [
+                  "Model a one-to-many Order → OrderItem in JPA with cascade and lazy loading",
+                  "Write a JPQL query with join fetch to avoid N+1",
+                  "Implement optimistic locking with @Version",
                 ]},
-                { group: "Orchestration", scenarios: [
-                  "Design an Airflow DAG with retries, SLAs, and dynamic task mapping",
-                  "Backfill a partitioned table for a date range with idempotent tasks",
+                { group: "Concurrency & Async", scenarios: [
+                  "Fan out N remote calls with CompletableFuture and combine with timeout",
+                  "Rate-limit a worker pool using Semaphore + ExecutorService",
+                  "Refactor blocking I/O to virtual threads (Loom) and measure",
                 ]},
-                { group: "Warehousing & Modeling", scenarios: [
-                  "Implement SCD Type 2 logic in Java over a dimension table",
-                  "Generate a star schema loader with surrogate keys and referential checks",
+                { group: "Streaming & Messaging", scenarios: [
+                  "Consume Kafka events with a Spring Kafka listener, dedupe, and persist",
+                  "Implement a retry + DLQ policy for failed messages",
                 ]},
-                { group: "Data Quality & Reliability", scenarios: [
-                  "Write data-quality checks (null, uniqueness, range, freshness) with clear failure modes",
-                  "Detect and quarantine schema drift in incoming JSON events",
+                { group: "Reliability & Observability", scenarios: [
+                  "Add circuit breaker + retry to a downstream call with Resilience4j",
+                  "Instrument a service with Micrometer metrics and structured logs",
                 ]},
               ].map((g) => (
                 <div key={g.group} className="space-y-1.5">
