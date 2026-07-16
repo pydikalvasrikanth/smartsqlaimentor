@@ -761,7 +761,7 @@ function JavaWorkspace() {
               <Boxes className="h-3.5 w-3.5" /> Data Engineering
             </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Building2 className="h-3.5 w-3.5" /> Interview ({JAVA_COMPANIES.length} companies)
+              <Building2 className="h-3.5 w-3.5" /> Interview
             </button>
             <button onClick={() => setTab("solved")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "solved" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <CheckCircle2 className="h-3.5 w-3.5" /> Solved
@@ -947,41 +947,16 @@ function JavaWorkspace() {
           </div>
         )}
         {!question && tab === "interview" && (
-          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
-                <Building2 className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold">Company-style Java interview</h2>
-                <p className="text-sm text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
-              </div>
+          <div className="rounded-xl border border-dashed border-border bg-surface-1 p-8 text-center space-y-3">
+            <div className="h-10 w-10 mx-auto rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+              <Building2 className="h-5 w-5 text-primary-foreground" />
             </div>
-            <div className="space-y-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
-              <div className="grid grid-cols-3 gap-2">
-                {LEVEL_ORDER.map((l) => (
-                  <button key={l} onClick={() => setInterviewLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${interviewLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
-                    <div className="text-base font-semibold capitalize">{l}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Company ({JAVA_COMPANIES.length})</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 max-h-72 overflow-y-auto p-1">
-                {JAVA_COMPANIES.map((c) => (
-                  <button key={c} onClick={() => setInterviewCompany(c)} className={`text-sm px-2.5 py-1.5 rounded border text-left truncate transition-colors ${interviewCompany === c ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button onClick={handleStartInterview} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold disabled:opacity-50">
-              {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-              Start {interviewCompany} interview
-            </button>
-            <p className="text-xs text-muted-foreground">Topic-wise, Targeted and Data Engineering tabs (matching the SQL practice page) are coming next.</p>
+            <h2 className="text-lg font-semibold">Company-style Java interview — coming soon</h2>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              The company list is being curated. In the meantime, use the <span className="font-mono text-primary-glow">Today</span>,
+              {" "}<span className="font-mono text-primary-glow">Topic-wise</span>, <span className="font-mono text-primary-glow">Targeted</span>,
+              or <span className="font-mono text-primary-glow">Data Engineering</span> tabs to drill Java questions with AI grading.
+            </p>
           </div>
         )}
 
