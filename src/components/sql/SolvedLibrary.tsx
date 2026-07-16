@@ -199,8 +199,8 @@ export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
     return unique.filter(
       (r) =>
         r.question_text?.toLowerCase().includes(q) ||
-        codeOf(r).toLowerCase().includes(q) ||
-        r.topic_slug.toLowerCase().includes(q),
+        (codeOf(r) ?? "").toLowerCase().includes(q) ||
+        (r.topic_slug ?? "").toLowerCase().includes(q),
     );
   }, [unique, filter]);
 
