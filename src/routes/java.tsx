@@ -489,7 +489,7 @@ function JavaWorkspace() {
   async function handleStartFocus() {
     const goal = focusGoal.trim();
     if (goal.length < 2) {
-      toast.error('Tell me what you\'d like to practice, e.g. "drill me on decorators".');
+      toast.error('Tell me what you\'d like to practice, e.g. "drill me on Streams".');
       return;
     }
     await runFocus(goal);
@@ -1065,7 +1065,7 @@ function JavaWorkspace() {
               <>
               <div data-tour="editor" className="rounded-lg border border-border bg-surface-1 overflow-hidden">
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
-                  <span>solution.py</span>
+                  <span>Solution.java</span>
                   <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
                 </div>
                 <JavaEditor value={code} onChange={setCode} minHeight={440} />
@@ -1352,7 +1352,7 @@ function JavaWorkspace() {
         suggestions={[
           "Explain time complexity of binary search",
           "Give me a sliding window example",
-          "How do Java decorators work?",
+          "What are Java records and sealed classes?",
         ]}
       />
       <ProductTour
