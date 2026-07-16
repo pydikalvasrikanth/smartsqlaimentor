@@ -6,19 +6,19 @@ import { z } from "zod";
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
-const SYSTEM_PROMPT = `You are a Senior Python Engineer + interview mentor.
-You generate realistic Python coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
+const SYSTEM_PROMPT = `You are a Senior Java Engineer + interview mentor.
+You generate realistic Java coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
 
-Cover the full Python landscape across a session: data structures (list, dict, set, tuple, deque, heap), strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, OOP/dataclasses, decorators, generators/iterators, comprehensions, itertools/collections, file I/O, regex, exception handling, type hints, pandas basics, numpy basics, async/await.
+Cover the full Java landscape across a session: data structures (list, dict, set, tuple, deque, heap), strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, OOP/dataclasses, decorators, generators/iterators, comprehensions, itertools/collections, file I/O, regex, exception handling, type hints, pandas basics, numpy basics, async/await.
 
 Difficulty rules — beginner: single concept, ~5-10 lines; intermediate: multi-concept, 10-25 lines, edge cases; advanced: optimized algo, 20+ lines, time/space analysis required.
 
 When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
 
 const TOOLS_BY_COMMAND: Record<string, any> = {
-  INIT_PYTHON_ENVIRONMENT: {
-    name: "init_python_environment",
-    description: "Generate a complete Python practice question with starter code and tests.",
+  INIT_JAVA_ENVIRONMENT: {
+    name: "init_java_environment",
+    description: "Generate a complete Java practice question with starter code and tests.",
     parameters: {
       type: "object",
       properties: {
@@ -38,14 +38,14 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
               items: {
                 type: "object",
                 properties: {
-                  input_repr: { type: "string", description: "Python literal repr of the call args." },
-                  expected_repr: { type: "string", description: "Python literal repr of expected output." },
+                  input_repr: { type: "string", description: "Java literal repr of the call args." },
+                  expected_repr: { type: "string", description: "Java literal repr of expected output." },
                   explanation: { type: "string" },
                 },
                 required: ["input_repr", "expected_repr"],
               },
             },
-            expected_solution: { type: "string", description: "Reference Python solution." },
+            expected_solution: { type: "string", description: "Reference Java solution." },
             time_complexity: { type: "string" },
             space_complexity: { type: "string" },
           },
@@ -55,9 +55,9 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["question"],
     },
   },
-  NEXT_PYTHON_QUESTION: {
-    name: "next_python_question",
-    description: "Generate the next Python question, avoiding repeats.",
+  NEXT_JAVA_QUESTION: {
+    name: "next_java_question",
+    description: "Generate the next Java question, avoiding repeats.",
     parameters: {
       type: "object",
       properties: {
@@ -111,8 +111,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["is_correct", "passed", "total", "explanation"],
     },
   },
-  PYTHON_HINT: {
-    name: "python_hint",
+  JAVA_HINT: {
+    name: "java_hint",
     description: "Give a single Socratic hint without revealing the solution.",
     parameters: {
       type: "object",
@@ -123,8 +123,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["hint"],
     },
   },
-  REVEAL_PYTHON_SOLUTION: {
-    name: "reveal_python_solution",
+  REVEAL_JAVA_SOLUTION: {
+    name: "reveal_java_solution",
     description: "Reveal solution with line-by-line walkthrough.",
     parameters: {
       type: "object",
@@ -137,8 +137,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["solution", "walkthrough"],
     },
   },
-  PYTHON_DEBUG: {
-    name: "python_debug",
+  JAVA_DEBUG: {
+    name: "java_debug",
     description: "Identify the bug in user code and educate without giving full solution.",
     parameters: {
       type: "object",
@@ -150,8 +150,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["error_analysis", "educational_fix"],
     },
   },
-  PYTHON_VISUALIZE: {
-    name: "python_visualize",
+  JAVA_VISUALIZE: {
+    name: "java_visualize",
     description: "Trace execution step by step for a sample input.",
     parameters: {
       type: "object",
@@ -175,8 +175,8 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["steps", "summary"],
     },
   },
-  PYTHON_OPTIMIZE: {
-    name: "python_optimize",
+  JAVA_OPTIMIZE: {
+    name: "java_optimize",
     description: "Senior-engineer review: cleaner / faster idiomatic rewrite.",
     parameters: {
       type: "object",
@@ -190,9 +190,9 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["optimized_code", "improvements"],
     },
   },
-  PYTHON_THEORY: {
-    name: "python_theory",
-    description: "Produce an in-depth Python theory guide tailored to a specific practice question.",
+  JAVA_THEORY: {
+    name: "java_theory",
+    description: "Produce an in-depth Java theory guide tailored to a specific practice question.",
     parameters: {
       type: "object",
       properties: {
@@ -204,17 +204,17 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
       required: ["theory_markdown"],
     },
   },
-  PYTHON_TO_SQL: {
-    name: "python_to_sql",
+  JAVA_TO_SQL: {
+    name: "java_to_sql",
     description: "Reframe the same problem as SQL and provide a MySQL 8 solution.",
     parameters: {
       type: "object",
       properties: {
         schema_ddl: { type: "string", description: "CREATE TABLE(s) needed to model the same problem in SQL." },
-        sample_seed: { type: "string", description: "A few INSERT statements matching the Python test cases so the SQL is directly verifiable." },
-        sql_solution: { type: "string", description: "MySQL 8 query (or short script) that solves the same task the Python function solves." },
-        walkthrough: { type: "string", description: "Line-by-line explanation of the SQL solution and the mapping from Python logic to SQL semantics." },
-        python_vs_sql: { type: "string", description: "Short comparison — when each approach is more idiomatic." },
+        sample_seed: { type: "string", description: "A few INSERT statements matching the Java test cases so the SQL is directly verifiable." },
+        sql_solution: { type: "string", description: "MySQL 8 query (or short script) that solves the same task the Java function solves." },
+        walkthrough: { type: "string", description: "Line-by-line explanation of the SQL solution and the mapping from Java logic to SQL semantics." },
+        java_vs_sql: { type: "string", description: "Short comparison — when each approach is more idiomatic." },
       },
       required: ["schema_ddl", "sql_solution", "walkthrough"],
     },
@@ -223,34 +223,34 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
 
 function buildUserPrompt(command: string, payload: any): string {
   switch (command) {
-    case "INIT_PYTHON_ENVIRONMENT":
-      return `Generate a Python interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
-    case "NEXT_PYTHON_QUESTION":
-      return `Generate the next Python question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
+    case "INIT_JAVA_ENVIRONMENT":
+      return `Generate a Java interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
+    case "NEXT_JAVA_QUESTION":
+      return `Generate the next Java question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_PYTHON":
       return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code against each test case. Compare actual vs expected. Grade fairly.`;
-    case "PYTHON_HINT":
+    case "JAVA_HINT":
       return `Task:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint.`;
-    case "REVEAL_PYTHON_SOLUTION":
+    case "REVEAL_JAVA_SOLUTION":
       return `Task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nProvide the solution with a clear line-by-line walkthrough.`;
-    case "PYTHON_DEBUG":
+    case "JAVA_DEBUG":
       return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nIdentify the bug. Do NOT give the full solution — just explain what's wrong and the concept to apply.`;
-    case "PYTHON_VISUALIZE":
+    case "JAVA_VISUALIZE":
       return `Task:\n${payload.task}\n\nCode to trace:\n${payload.user_code}\n\nMentally execute the code on a representative sample input. Return concise step-by-step trace (max 12 steps) showing line, action, and the state of key variables.`;
-    case "PYTHON_OPTIMIZE":
-      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior Python engineer reviewing this code. Provide a cleaner / more idiomatic / faster version with improvements list and complexity comparison.`;
-    case "PYTHON_THEORY":
+    case "JAVA_OPTIMIZE":
+      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior Java engineer reviewing this code. Provide a cleaner / more idiomatic / faster version with improvements list and complexity comparison.`;
+    case "JAVA_THEORY":
       return `Practice question task: ${payload.task}
-Primary concept: ${payload.concept || "auto — infer the dominant Python concept from the task"}
+Primary concept: ${payload.concept || "auto — infer the dominant Java concept from the task"}
 Difficulty: ${payload.difficulty || "n/a"}
 
-Write an IN-DEPTH Python theory guide in Markdown that is directly relevant to the question above. Structure:
+Write an IN-DEPTH Java theory guide in Markdown that is directly relevant to the question above. Structure:
 
 ### 1. Concept overview
-What the concept is, why Python offers it, and when engineers reach for it.
+What the concept is, why Java offers it, and when engineers reach for it.
 
-### 2. Python syntax
-Canonical Python 3 syntax with a small illustrative snippet inside a \`\`\`python fenced block.
+### 2. Java syntax
+Canonical Java 3 syntax with a small illustrative snippet inside a \`\`\`java fenced block.
 
 ### 3. How this question uses it
 Relate the concept to the SPECIFIC task above. Explain which part of the problem forces this pattern.
@@ -280,32 +280,32 @@ Add 1–2 sentences of narration between the steps. Must be a DIFFERENT toy scen
 Bullet list of traps students hit on this pattern (off-by-one, mutable default args, shallow copy, integer overflow-ish, recursion depth, etc.).
 
 ### 8. Related concepts
-2–4 adjacent Python concepts worth knowing next.
+2–4 adjacent Java concepts worth knowing next.
 
 Rules:
-- Keep it dense but readable. Short paragraphs, bullets, small \`python\` snippets.
+- Keep it dense but readable. Short paragraphs, bullets, small \`java\` snippets.
 - Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
 - Never reveal the full solution code.`;
-    case "PYTHON_TO_SQL":
-      return `The user just finished a Python problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
+    case "JAVA_TO_SQL":
+      return `The user just finished a Java problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
 
-Python task:
+Java task:
 ${payload.task}
 
-Python function signature: ${payload.function_signature || "(n/a)"}
+Java function signature: ${payload.function_signature || "(n/a)"}
 
-Test cases (Python literals):
+Test cases (Java literals):
 ${JSON.stringify(payload.test_cases || [])}
 
-Reference Python solution (for context only — do not restate it):
+Reference Java solution (for context only — do not restate it):
 ${payload.expected_solution || "(n/a)"}
 
 Deliver:
 1. **schema_ddl** — minimal CREATE TABLE statements that model the inputs of this problem as one or more relational tables (pick sensible column names + types).
-2. **sample_seed** — INSERT statements that mirror the Python test-case inputs so the SQL is directly verifiable.
-3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the Python function returns. If the Python function returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
-4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each Python step maps to a SQL clause.
-5. **python_vs_sql** — 2–3 sentences on when each approach is more idiomatic for this shape of problem.
+2. **sample_seed** — INSERT statements that mirror the Java test-case inputs so the SQL is directly verifiable.
+3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the Java function returns. If the Java function returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
+4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each Java step maps to a SQL clause.
+5. **java_vs_sql** — 2–3 sentences on when each approach is more idiomatic for this shape of problem.
 
 Rules: MySQL 8 dialect only. Use CTEs (\`WITH\`) when it improves clarity. Never use vendor-specific extensions from other engines.`;
     default:
@@ -314,13 +314,13 @@ Rules: MySQL 8 dialect only. Use CTEs (\`WITH\`) when it improves clarity. Never
 }
 
 const PayloadSchemas = {
-  INIT_PYTHON_ENVIRONMENT: z.object({
+  INIT_JAVA_ENVIRONMENT: z.object({
     difficulty: z.string().max(50),
     target_concept: z.string().max(200),
     topic: z.string().max(500).optional(),
     company: z.string().max(100).optional(),
   }),
-  NEXT_PYTHON_QUESTION: z.object({
+  NEXT_JAVA_QUESTION: z.object({
     target_difficulty: z.string().max(50),
     target_concept: z.string().max(200),
     covered_concepts: z.array(z.string().max(100)).max(200).optional(),
@@ -331,29 +331,29 @@ const PayloadSchemas = {
     session_question_id: z.string().uuid(),
     user_code: z.string().max(10_000),
   }),
-  PYTHON_HINT: z.object({
+  JAVA_HINT: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
   }),
-  REVEAL_PYTHON_SOLUTION: z.object({
+  REVEAL_JAVA_SOLUTION: z.object({
     session_question_id: z.string().uuid(),
   }),
-  PYTHON_DEBUG: z.object({
+  JAVA_DEBUG: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
   }),
-  PYTHON_VISUALIZE: z.object({
+  JAVA_VISUALIZE: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
   }),
-  PYTHON_OPTIMIZE: z.object({
+  JAVA_OPTIMIZE: z.object({
     session_question_id: z.string().uuid(),
     user_code: z.string().max(10_000),
   }),
-  PYTHON_THEORY: z.object({
+  JAVA_THEORY: z.object({
     session_question_id: z.string().uuid(),
   }),
-  PYTHON_TO_SQL: z.object({
+  JAVA_TO_SQL: z.object({
     session_question_id: z.string().uuid(),
   }),
 } as const;
@@ -371,7 +371,7 @@ const InputSchema = z
     return { command: v.command, payload: schema.parse(v.payload) };
   });
 
-async function callPythonEngine(
+async function callJavaEngine(
   command: keyof typeof PayloadSchemas,
   payload: any,
 ): Promise<{ data?: any; error?: string }> {
@@ -424,7 +424,7 @@ function stripSolution(question: any) {
   return rest;
 }
 
-export const runPythonEngine = createServerFn({ method: "POST" })
+export const runJavaEngine = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data, context }) => {
@@ -434,8 +434,8 @@ export const runPythonEngine = createServerFn({ method: "POST" })
 
     // Question generation: persist the answer key server-side and return only
     // a session id + a sanitized question (no expected_solution) to the client.
-    if (command === "INIT_PYTHON_ENVIRONMENT" || command === "NEXT_PYTHON_QUESTION") {
-      const res = await callPythonEngine(command, payload);
+    if (command === "INIT_JAVA_ENVIRONMENT" || command === "NEXT_JAVA_QUESTION") {
+      const res = await callJavaEngine(command, payload);
       if (res.error || !res.data) return res;
       const q = res.data.question;
       if (!q || typeof q.task !== "string" || !q.task.trim()) {
@@ -447,8 +447,8 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         .from("question_sessions")
         .insert({
           user_id: userId,
-          subject: "python",
-          topic_slug: String(q.concept || "python").slice(0, 100),
+          subject: "java",
+          topic_slug: String(q.concept || "java").slice(0, 100),
           concept: q.concept ?? null,
           difficulty,
           task: q.task,
@@ -473,10 +473,10 @@ export const runPythonEngine = createServerFn({ method: "POST" })
     // the signed-in user's id so one user can never load another user's row.
     if (
       command === "EVALUATE_PYTHON" ||
-      command === "REVEAL_PYTHON_SOLUTION" ||
-      command === "PYTHON_OPTIMIZE" ||
-      command === "PYTHON_THEORY" ||
-      command === "PYTHON_TO_SQL"
+      command === "REVEAL_JAVA_SOLUTION" ||
+      command === "JAVA_OPTIMIZE" ||
+      command === "JAVA_THEORY" ||
+      command === "JAVA_TO_SQL"
     ) {
       const { data: row, error } = await supabaseAdmin
         .from("question_sessions")
@@ -495,9 +495,9 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         test_cases: stored.test_cases ?? [],
         function_signature: stored.function_signature ?? "",
       };
-      return callPythonEngine(command, enriched);
+      return callJavaEngine(command, enriched);
     }
 
     // Non-sensitive commands (hint, debug, visualize) carry no answer key.
-    return callPythonEngine(command, payload);
+    return callJavaEngine(command, payload);
   });

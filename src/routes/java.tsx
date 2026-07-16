@@ -6,11 +6,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
 import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle } from "lucide-react";
-import { runPythonEngine } from "@/lib/python-engine.functions";
-import { planPythonFocus } from "@/lib/python-plan.functions";
-import { AnimatedTrace } from "@/components/python/AnimatedTrace";
-import { PythonEditor } from "@/components/python/PythonEditor";
-import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
+import { runJavaEngine } from "@/lib/java-engine.functions";
+import { planJavaFocus } from "@/lib/java-plan.functions";
+import { AnimatedTrace } from "@/components/java/AnimatedTrace";
+import { JavaEditor } from "@/components/java/JavaEditor";
+import { JavaTheoryPanel } from "@/components/java/JavaTheoryPanel";
 import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ProductTour } from "@/components/ProductTour";
@@ -18,17 +18,17 @@ import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 import { supabase } from "@/integrations/supabase/client";
-export const Route = createFileRoute("/python")({
+export const Route = createFileRoute("/java")({
   head: () => ({
     meta: [
-      { title: "Python Interview Engine — AI mentor practice" },
-      { name: "description", content: "Python coding interview practice with AI-graded feedback, hints, and complexity analysis." },
-      { property: "og:title", content: "Python Interview Engine" },
-      { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 50-question sessions." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/python" },
+      { title: "Java Interview Engine — AI mentor practice" },
+      { name: "description", content: "Java coding interview practice with AI-graded feedback, hints, and complexity analysis." },
+      { property: "og:title", content: "Java Interview Engine" },
+      { property: "og:description", content: "AI-graded Java coding practice: hints, complexity analysis, and progressive 50-question sessions." },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/java" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/python" },
+      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/java" },
     ],
     scripts: [
       {
@@ -36,20 +36,20 @@ export const Route = createFileRoute("/python")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LearningResource",
-          name: "Python Interview Engine",
-          description: "AI-graded Python coding interview practice with hints, complexity analysis, and difficulty ramping.",
-          url: "https://smartsqlaimentor.lovable.app/python",
+          name: "Java Interview Engine",
+          description: "AI-graded Java coding interview practice with hints, complexity analysis, and difficulty ramping.",
+          url: "https://smartsqlaimentor.lovable.app/java",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
-          teaches: "Python, data structures, algorithms, OOP, system design",
+          teaches: "Java, data structures, algorithms, OOP, system design",
         }),
       },
     ],
   }),
-  component: PythonWorkspace,
+  component: JavaWorkspace,
 });
 
-const PY_CONCEPTS: Record<string, string[]> = {
+const JAVA_CONCEPTS: Record<string, string[]> = {
   beginner: ["lists", "dict", "set", "strings", "loops", "comprehensions", "tuple", "slicing", "basic-recursion", "sorting", "two-pointers-easy", "hashing-easy", "math-basic", "input-parsing", "file-io-basic"],
   intermediate: ["sliding-window", "two-pointers", "binary-search", "stack", "queue", "deque", "heap", "hashmap-counting", "recursion", "backtracking-easy", "linked-list", "tree-traversal", "regex", "decorators", "generators"],
   advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "segment-tree", "topological-sort", "kmp", "bit-manipulation", "system-design-mini", "concurrency-asyncio", "oop-design", "pandas-numpy"],
@@ -59,8 +59,8 @@ const TOTAL = 50;
 type Level = "beginner" | "intermediate" | "advanced";
 const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
 
-// Top employers that commonly run Python coding interviews.
-const PY_COMPANIES: string[] = [
+// Top employers that commonly run Java coding interviews.
+const JAVA_COMPANIES: string[] = [
   "Google","Amazon","Meta","Microsoft","Apple","Netflix","Uber","Airbnb","LinkedIn","Twitter / X",
   "Stripe","Shopify","Square","Pinterest","Reddit","Snap","Spotify","Dropbox","Salesforce","Adobe",
   "Oracle","IBM","Intel","NVIDIA","AMD","Cisco","SAP","ServiceNow","Atlassian","GitHub",
@@ -82,7 +82,7 @@ const DE_TOPIC_GROUPS: Array<{
   topics: Array<{ slug: string; label: string; level: Level }>;
 }> = [
   {
-    group: "Core Python",
+    group: "Core Java",
     blurb: "Language fundamentals every DE writes daily.",
     topics: [
       { slug: "lists", label: "Lists & slicing", level: "beginner" },
@@ -165,13 +165,13 @@ const DE_TOPIC_GROUPS: Array<{
     ],
   },
   {
-    group: "SQL with Python",
-    blurb: "Bridging Python and warehouses.",
+    group: "SQL with Java",
+    blurb: "Bridging Java and warehouses.",
     topics: [
       { slug: "sqlalchemy", label: "SQLAlchemy core & ORM", level: "intermediate" },
       { slug: "psycopg2", label: "psycopg2 / Postgres client", level: "intermediate" },
-      { slug: "duckdb-python", label: "DuckDB in Python", level: "intermediate" },
-      { slug: "bigquery-client", label: "BigQuery Python client", level: "intermediate" },
+      { slug: "duckdb-java", label: "DuckDB in Java", level: "intermediate" },
+      { slug: "bigquery-client", label: "BigQuery Java client", level: "intermediate" },
       { slug: "snowflake-connector", label: "Snowflake connector", level: "intermediate" },
       { slug: "pandas-to-sql", label: "Pandas ↔ SQL round-tripping", level: "intermediate" },
     ],
@@ -185,7 +185,7 @@ const DE_TOPIC_GROUPS: Array<{
       { slug: "airflow-sensors", label: "Sensors & deferrable tasks", level: "advanced" },
       { slug: "prefect-flows", label: "Prefect flows & tasks", level: "intermediate" },
       { slug: "dagster-assets", label: "Dagster software-defined assets", level: "advanced" },
-      { slug: "dbt-python", label: "dbt Python models", level: "intermediate" },
+      { slug: "dbt-java", label: "dbt Java models", level: "intermediate" },
       { slug: "luigi", label: "Luigi pipelines", level: "intermediate" },
     ],
   },
@@ -193,8 +193,8 @@ const DE_TOPIC_GROUPS: Array<{
     group: "Streaming & Messaging",
     blurb: "Real-time event ingestion & processing.",
     topics: [
-      { slug: "kafka-python", label: "Kafka producer/consumer (confluent-kafka)", level: "advanced" },
-      { slug: "kafka-streams-py", label: "Faust / Kafka streams in Python", level: "advanced" },
+      { slug: "kafka-java", label: "Kafka producer/consumer (confluent-kafka)", level: "advanced" },
+      { slug: "kafka-streams-py", label: "Faust / Kafka streams in Java", level: "advanced" },
       { slug: "pubsub", label: "GCP Pub/Sub client", level: "intermediate" },
       { slug: "kinesis", label: "AWS Kinesis client", level: "intermediate" },
       { slug: "rabbitmq-pika", label: "RabbitMQ / pika", level: "intermediate" },
@@ -251,7 +251,7 @@ const DE_TOPIC_GROUPS: Array<{
     group: "DevOps for DE",
     blurb: "Ship and operate pipelines safely.",
     topics: [
-      { slug: "docker-python", label: "Dockerizing Python jobs", level: "intermediate" },
+      { slug: "docker-java", label: "Dockerizing Java jobs", level: "intermediate" },
       { slug: "venv-poetry", label: "venv / poetry / uv", level: "beginner" },
       { slug: "ci-cd", label: "CI/CD for data pipelines", level: "intermediate" },
       { slug: "secrets-mgmt", label: "Secrets & config management", level: "intermediate" },
@@ -260,28 +260,28 @@ const DE_TOPIC_GROUPS: Array<{
   },
 ];
 
-interface PyPlan {
+interface JvPlan {
   days: number;
   level: Level;
   startedAt: number;
   completedDays: number[];
 }
-const PLAN_KEY = "py_plan_v1";
-function loadPlan(): PyPlan | null {
+const PLAN_KEY = "java_plan_v1";
+function loadPlan(): JvPlan | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(PLAN_KEY);
-    return raw ? (JSON.parse(raw) as PyPlan) : null;
+    return raw ? (JSON.parse(raw) as JvPlan) : null;
   } catch {
     return null;
   }
 }
-function savePlan(p: PyPlan | null) {
+function savePlan(p: JvPlan | null) {
   if (typeof window === "undefined") return;
   if (p) localStorage.setItem(PLAN_KEY, JSON.stringify(p));
   else localStorage.removeItem(PLAN_KEY);
 }
-function dayNumberFor(p: PyPlan) {
+function dayNumberFor(p: JvPlan) {
   const elapsed = Date.now() - p.startedAt;
   return Math.min(p.days, Math.floor(elapsed / 86_400_000) + 1);
 }
@@ -296,7 +296,7 @@ function difficultyForDay(day: number, totalDays: number, target: Level): string
 }
 function conceptForDay(day: number, target: Level): string {
   const tier = difficultyForDay(day, day, target) as Level;
-  const pool = PY_CONCEPTS[tier];
+  const pool = JAVA_CONCEPTS[tier];
   return pool[(day - 1) % pool.length];
 }
 
@@ -311,13 +311,13 @@ function diffForIndex(i: number, target: Level = "advanced"): string {
 }
 function pickConcept(i: number, covered: string[]): string {
   const tier = diffForIndex(i) as Level;
-  const pool = PY_CONCEPTS[tier];
+  const pool = JAVA_CONCEPTS[tier];
   const fresh = pool.filter((c) => !covered.includes(c));
   if (fresh.length) return fresh[(i * 7) % fresh.length];
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-interface PyQuestion {
+interface JvQuestion {
   question_id: number;
   difficulty: string;
   concept?: string;
@@ -331,15 +331,15 @@ interface PyQuestion {
   space_complexity?: string;
 }
 
-function PythonWorkspace() {
-  const engine = useServerFn(runPythonEngine);
-  const planFocusFn = useServerFn(planPythonFocus);
+function JavaWorkspace() {
+  const engine = useServerFn(runJavaEngine);
+  const planFocusFn = useServerFn(planJavaFocus);
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
-  const [plan, setPlan] = useState<PyPlan | null>(null);
+  const [plan, setPlan] = useState<JvPlan | null>(null);
   const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview" | "solved">("today");
   const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
   const [deLevel, setDeLevel] = useState<Level>("intermediate");
@@ -354,7 +354,7 @@ function PythonWorkspace() {
   const [focusIdx, setFocusIdx] = useState(0);
   const [focusCount, setFocusCount] = useState(0);
 
-  const [question, setQuestion] = useState<PyQuestion | null>(null);
+  const [question, setQuestion] = useState<JvQuestion | null>(null);
   const [sessionQid, setSessionQid] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [pastIds, setPastIds] = useState<number[]>([]);
@@ -372,7 +372,7 @@ function PythonWorkspace() {
 
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
-  type PyResume = {
+  type JvResume = {
     tab: "today" | "topic" | "targeted" | "data-eng" | "interview" | "solved";
     topicLevel: Level;
     deLevel: Level;
@@ -380,15 +380,15 @@ function PythonWorkspace() {
     interviewLevel: Level;
     focusGoal: string;
     code: string;
-    question: PyQuestion | null;
+    question: JvQuestion | null;
     sessionQid: string | null;
     qIndex: number;
     pastIds: number[];
     covered: string[];
     interviewMode: boolean;
   };
-  const resume = useResumableState<PyResume>(
-    "python",
+  const resume = useResumableState<JvResume>(
+    "java",
     {
       tab: "today",
       topicLevel: "intermediate",
@@ -440,7 +440,7 @@ function PythonWorkspace() {
       if (res?.error) { toast.error(res.error); return null; }
       return res?.data;
     } catch (e: any) {
-      console.error("Python engine call failed", e);
+      console.error("Java engine call failed", e);
       toast.error(e?.message ?? "Network error — please try again.");
       return null;
     }
@@ -452,7 +452,7 @@ function PythonWorkspace() {
   }
 
   function handleCreatePlan() {
-    const p: PyPlan = { days: planDays, level: planLevel, startedAt: Date.now(), completedDays: [] };
+    const p: JvPlan = { days: planDays, level: planLevel, startedAt: Date.now(), completedDays: [] };
     savePlan(p);
     setPlan(p);
     setTab("today");
@@ -475,7 +475,7 @@ function PythonWorkspace() {
     setInterviewMode(false);
     const startDiff = opts?.difficulty ?? diffForIndex(1, planLevel);
     const concept = opts?.concept ?? pickConcept(1, []);
-    const data = await call("INIT_PYTHON_ENVIRONMENT", { difficulty: startDiff, target_concept: concept });
+    const data = await call("INIT_JAVA_ENVIRONMENT", { difficulty: startDiff, target_concept: concept });
     setLoading(null);
     if (!data) return;
     setQuestion(data.question);
@@ -491,7 +491,7 @@ function PythonWorkspace() {
     setLoading("init");
     clearPanels();
     const concept = pickConcept(1, []);
-    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
       difficulty: interviewLevel,
       target_concept: concept,
       company: interviewCompany,
@@ -513,7 +513,7 @@ function PythonWorkspace() {
     clearPanels();
     setInterviewMode(false);
     setFocusPlan(null);
-    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
       difficulty,
       target_concept: topicSlug,
       topic: topicLabel,
@@ -554,7 +554,7 @@ function PythonWorkspace() {
     let fp = planRes?.data as FocusPlan | undefined;
     if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
     if (overrideLevel) fp = { ...fp, difficulty: overrideLevel };
-    const data = await call("INIT_PYTHON_ENVIRONMENT", {
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
       difficulty: fp.difficulty,
       target_concept: fp.concepts[0],
       topic: fp.focus_title,
@@ -578,7 +578,7 @@ function PythonWorkspace() {
     const nextIdx = (focusIdx + 1) % focusPlan.concepts.length;
     const concept = focusPlan.concepts[nextIdx];
     setLoading("next"); clearPanels();
-    const data = await call("NEXT_PYTHON_QUESTION", {
+    const data = await call("NEXT_JAVA_QUESTION", {
       target_difficulty: focusPlan.difficulty,
       target_concept: concept,
       covered_concepts: covered,
@@ -623,7 +623,7 @@ function PythonWorkspace() {
     if (next > TOTAL) { toast.success("Session complete!"); return; }
     setLoading("next"); clearPanels();
     const tgt = interviewMode ? interviewLevel : diffForIndex(next, planLevel);
-    const data = await call("NEXT_PYTHON_QUESTION", {
+    const data = await call("NEXT_JAVA_QUESTION", {
       target_difficulty: tgt,
       target_concept: pickConcept(next, covered),
       covered_concepts: covered,
@@ -659,8 +659,8 @@ function PythonWorkspace() {
     try {
       await supabase.from("attempts").insert({
         user_id: user!.id,
-        subject: "python",
-        topic_slug: String(question.concept || "python").slice(0, 100),
+        subject: "java",
+        topic_slug: String(question.concept || "java").slice(0, 100),
         concept: question.concept ?? null,
         difficulty: (question.difficulty as any) ?? "beginner",
         question_text: question.task,
@@ -668,14 +668,14 @@ function PythonWorkspace() {
         is_correct: !!data.is_correct,
       });
     } catch (e) {
-      console.warn("Failed to log python attempt", e);
+      console.warn("Failed to log java attempt", e);
     }
   }
 
   async function handleHint() {
     if (!question) return;
     setLoading("hint");
-    const data = await call("PYTHON_HINT", { task: question.task, user_code: code });
+    const data = await call("JAVA_HINT", { task: question.task, user_code: code });
     setLoading(null);
     if (data) setHint(data);
   }
@@ -683,7 +683,7 @@ function PythonWorkspace() {
   async function handleReveal() {
     if (!question || !sessionQid) return;
     setLoading("solution");
-    const data = await call("REVEAL_PYTHON_SOLUTION", { session_question_id: sessionQid });
+    const data = await call("REVEAL_JAVA_SOLUTION", { session_question_id: sessionQid });
     setLoading(null);
     if (data) setSolution(data);
   }
@@ -691,21 +691,21 @@ function PythonWorkspace() {
   async function handleDebug() {
     if (!question) return;
     setLoading("debug");
-    const data = await call("PYTHON_DEBUG", { task: question.task, user_code: code });
+    const data = await call("JAVA_DEBUG", { task: question.task, user_code: code });
     setLoading(null);
     if (data) setDebugInfo(data);
   }
   async function handleVisualize() {
     if (!question) return;
     setLoading("visualize");
-    const data = await call("PYTHON_VISUALIZE", { task: question.task, user_code: code });
+    const data = await call("JAVA_VISUALIZE", { task: question.task, user_code: code });
     setLoading(null);
     if (data) setVisual(data);
   }
   async function handleReview() {
     if (!question || !sessionQid) return;
     setLoading("review");
-    const data = await call("PYTHON_OPTIMIZE", { session_question_id: sessionQid, user_code: code });
+    const data = await call("JAVA_OPTIMIZE", { session_question_id: sessionQid, user_code: code });
     setLoading(null);
     if (data) setReview(data);
   }
@@ -713,7 +713,7 @@ function PythonWorkspace() {
   async function handleShowSql() {
     if (!question || !sessionQid) return;
     setLoading("to-sql");
-    const data = await call("PYTHON_TO_SQL", { session_question_id: sessionQid });
+    const data = await call("JAVA_TO_SQL", { session_question_id: sessionQid });
     setLoading(null);
     if (data) setSqlSolution(data);
   }
@@ -732,11 +732,11 @@ function PythonWorkspace() {
             <Code2 className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-base font-semibold tracking-tight">Python Interview Engine</h1>
+            <h1 className="text-base font-semibold tracking-tight">Java Interview Engine</h1>
             <p className="text-xs text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
           </div>
           <div className="ml-6 hidden sm:block">
-            <HeaderTimer storageKey="header_timer:python" />
+            <HeaderTimer storageKey="header_timer:java" />
           </div>
           <div className="ml-auto flex items-center gap-2 text-xs font-mono">
             {question && (
@@ -804,7 +804,7 @@ function PythonWorkspace() {
               <Boxes className="h-3.5 w-3.5" /> Data Engineering
             </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
+              <Building2 className="h-3.5 w-3.5" /> Interview ({JAVA_COMPANIES.length} companies)
             </button>
             <button onClick={() => setTab("solved")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "solved" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <CheckCircle2 className="h-3.5 w-3.5" /> Solved
@@ -813,11 +813,11 @@ function PythonWorkspace() {
         )}
 
         {!question && tab === "today" && plan && (
-          <PyPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
+          <JvPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
         )}
 
         {!question && tab === "solved" && (
-          <SolvedLibrary subject="python" />
+          <SolvedLibrary subject="java" />
         )}
 
         {!question && tab === "topic" && (
@@ -827,10 +827,10 @@ function PythonWorkspace() {
                 <Library className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Topic-wise Python practice for Data Engineers</h2>
+                <h2 className="text-lg font-semibold">Topic-wise Java practice for Data Engineers</h2>
                 <p className="text-sm text-muted-foreground">
                   Pick any topic or library. AI generates a focused question and grades your solution.
-                  Covers core Python, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
+                  Covers core Java, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
                 </p>
               </div>
             </div>
@@ -883,7 +883,7 @@ function PythonWorkspace() {
               <div>
                 <h2 className="text-lg font-semibold">Tell me what to test you on</h2>
                 <p className="text-sm text-muted-foreground">
-                  Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
+                  Describe your goal in plain English. AI plans a focused set of Java questions covering it end-to-end.
                 </p>
               </div>
             </div>
@@ -907,7 +907,7 @@ function PythonWorkspace() {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
-                "Test my Python basics",
+                "Test my Java basics",
                 "Drill me on decorators and generators",
                 "Make me confident with pandas groupby & joins",
                 "I want to be a pro at recursion and DP",
@@ -932,7 +932,7 @@ function PythonWorkspace() {
                 <Boxes className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Data Engineering — Python on the job</h2>
+                <h2 className="text-lg font-semibold">Data Engineering — Java on the job</h2>
                 <p className="text-sm text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
               </div>
             </div>
@@ -962,7 +962,7 @@ function PythonWorkspace() {
                   "Backfill a partitioned table for a date range with idempotent tasks",
                 ]},
                 { group: "Warehousing & Modeling", scenarios: [
-                  "Implement SCD Type 2 logic in Python over a dimension table",
+                  "Implement SCD Type 2 logic in Java over a dimension table",
                   "Generate a star schema loader with surrogate keys and referential checks",
                 ]},
                 { group: "Data Quality & Reliability", scenarios: [
@@ -996,7 +996,7 @@ function PythonWorkspace() {
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Company-style Python interview</h2>
+                <h2 className="text-lg font-semibold">Company-style Java interview</h2>
                 <p className="text-sm text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
               </div>
             </div>
@@ -1011,9 +1011,9 @@ function PythonWorkspace() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Company ({PY_COMPANIES.length})</label>
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Company ({JAVA_COMPANIES.length})</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 max-h-72 overflow-y-auto p-1">
-                {PY_COMPANIES.map((c) => (
+                {JAVA_COMPANIES.map((c) => (
                   <button key={c} onClick={() => setInterviewCompany(c)} className={`text-sm px-2.5 py-1.5 rounded border text-left truncate transition-colors ${interviewCompany === c ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
                     {c}
                   </button>
@@ -1036,7 +1036,7 @@ function PythonWorkspace() {
                   <Target className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold">Build your Python practice plan</h2>
+                  <h2 className="text-lg font-semibold">Build your Java practice plan</h2>
                   <p className="text-sm text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
                 </div>
               </div>
@@ -1118,7 +1118,7 @@ function PythonWorkspace() {
 
               {sessionQid && (
                 <div data-tour="theory">
-                  <PythonTheoryPanel
+                  <JavaTheoryPanel
                     sessionQuestionId={sessionQid}
                     concept={question.concept}
                   />
@@ -1133,7 +1133,7 @@ function PythonWorkspace() {
                   <span>solution.py</span>
                   <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
                 </div>
-                <PythonEditor value={code} onChange={setCode} minHeight={440} />
+                <JavaEditor value={code} onChange={setCode} minHeight={440} />
               </div>
               <div className="flex flex-wrap gap-2">
                 <button data-tour="run" onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
@@ -1327,10 +1327,10 @@ function PythonWorkspace() {
                         <p className="text-sm whitespace-pre-wrap leading-relaxed">{sqlSolution.walkthrough}</p>
                       </div>
                     )}
-                    {sqlSolution.python_vs_sql && (
+                    {sqlSolution.java_vs_sql && (
                       <div className="rounded border border-border bg-surface-2 p-3">
-                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Python vs SQL</div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{sqlSolution.python_vs_sql}</p>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Java vs SQL</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sqlSolution.java_vs_sql}</p>
                       </div>
                     )}
                   </div>
@@ -1413,20 +1413,20 @@ function PythonWorkspace() {
         )}
       </main>
       <AiAssistant
-        context="Python coding interview practice — data structures, algorithms, OOP & system design"
+        context="Java coding interview practice — data structures, algorithms, OOP & system design"
         suggestions={[
           "Explain time complexity of binary search",
           "Give me a sliding window example",
-          "How do Python decorators work?",
+          "How do Java decorators work?",
         ]}
       />
       <ProductTour
-        storageKey="sqlmentor:tour:python-v1"
+        storageKey="sqlmentor:tour:java-v1"
         open={tourOpen}
         onClose={() => setTourOpen(false)}
         steps={[
           {
-            title: "Welcome to the Python Interview Engine 🐍",
+            title: "Welcome to the Java Interview Engine 🐍",
             body: "Real FAANG-style questions graded by AI. Let me show you around in 20 seconds.",
           },
           {
@@ -1444,7 +1444,7 @@ function PythonWorkspace() {
           {
             target: "editor",
             title: "3. Code here",
-            body: "Full Python editor with auto-indent. Your typed code autosaves — refresh or come back on another device and Resume drops you back exactly where you left off.",
+            body: "Full Java editor with auto-indent. Your typed code autosaves — refresh or come back on another device and Resume drops you back exactly where you left off.",
             placement: "top",
           },
           {
@@ -1455,7 +1455,7 @@ function PythonWorkspace() {
           },
           {
             title: "5. Bonus — SQL version",
-            body: 'After you Reveal the Python solution, click "Show SQL version of this problem" — the same problem, re-modeled as tables and solved in MySQL 8. Great for interviews that switch between the two.',
+            body: 'After you Reveal the Java solution, click "Show SQL version of this problem" — the same problem, re-modeled as tables and solved in MySQL 8. Great for interviews that switch between the two.',
           },
         ]}
       />
@@ -1463,7 +1463,7 @@ function PythonWorkspace() {
   );
 }
 
-function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPlan; onStartToday: () => void; onReplan: () => void; loading: boolean }) {
+function JvPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: JvPlan; onStartToday: () => void; onReplan: () => void; loading: boolean }) {
   const day = dayNumberFor(plan);
   const diff = difficultyForDay(day, plan.days, plan.level);
   const concept = conceptForDay(day, plan.level);
@@ -1482,7 +1482,7 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
         </div>
         <div>
           <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
-          <h2 className="text-3xl font-bold mt-1">🐍 Python · {concept}</h2>
+          <h2 className="text-3xl font-bold mt-1">🐍 Java · {concept}</h2>
           <p className="text-base text-muted-foreground mt-1">
             50-question session ramping every 5 · starts at{" "}
             <span className="font-mono text-primary-glow">{diff}</span>

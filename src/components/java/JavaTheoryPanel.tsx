@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Sparkles, RefreshCw } from "lucide-react";
-import { runPythonEngine } from "@/lib/python-engine.functions";
+import { runJavaEngine } from "@/lib/java-engine.functions";
 import { TheoryContent } from "@/components/sql/TheoryContent";
 
 interface Props {
@@ -14,12 +14,12 @@ interface Props {
 const cache = new Map<string, string>();
 
 /**
- * In-depth Python theory panel, shown below the question card. Fetches an
+ * In-depth Java theory panel, shown below the question card. Fetches an
  * AI-generated markdown guide (with an animated mermaid flow diagram + a
  * worked mini-example) tailored to the current question.
  */
-export function PythonTheoryPanel({ sessionQuestionId, concept }: Props) {
-  const engine = useServerFn(runPythonEngine);
+export function JavaTheoryPanel({ sessionQuestionId, concept }: Props) {
+  const engine = useServerFn(runJavaEngine);
   const [content, setContent] = useState<string>(() => cache.get(sessionQuestionId) ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export function PythonTheoryPanel({ sessionQuestionId, concept }: Props) {
     try {
       const res: any = await engine({
         data: {
-          command: "PYTHON_THEORY",
+          command: "JAVA_THEORY",
           payload: { session_question_id: sessionQuestionId },
         },
       });

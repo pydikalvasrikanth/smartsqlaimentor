@@ -5,9 +5,9 @@ import { z } from "zod";
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
-const SYSTEM = `You are a Python interview coach. Given a student's free-text goal
+const SYSTEM = `You are a Java interview coach. Given a student's free-text goal
 ("test my basic commands", "make me a pro at decorators and generators", "drill me on pandas"),
-produce a focused, ordered learning plan of 4-10 Python concept slugs that an AI question
+produce a focused, ordered learning plan of 4-10 Java concept slugs that an AI question
 generator can use as target_concept values. Pick a difficulty that matches the goal.
 
 Allowed concept slugs (pick the most relevant — order matters, easiest first):
@@ -25,8 +25,8 @@ pyspark-dataframe, pyspark-transformations, pyspark-joins, pyspark-window, pyspa
 airflow-dag, requests, fastapi, pytest, pydantic.`;
 
 const TOOL = {
-  name: "plan_python_focus",
-  description: "Turn a student goal into an ordered Python concept plan.",
+  name: "plan_java_focus",
+  description: "Turn a student goal into an ordered Java concept plan.",
   parameters: {
     type: "object",
     properties: {
@@ -39,7 +39,7 @@ const TOOL = {
   },
 };
 
-export const planPythonFocus = createServerFn({ method: "POST" })
+export const planJavaFocus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ goal: z.string().min(2).max(2000) }).parse(input),
@@ -82,7 +82,7 @@ export const planPythonFocus = createServerFn({ method: "POST" })
       ? plan.difficulty : "intermediate";
     return {
       data: {
-        focus_title: String(plan.focus_title ?? "Focused Python practice"),
+        focus_title: String(plan.focus_title ?? "Focused Java practice"),
         difficulty,
         concepts,
         intro: String(plan.intro ?? "Let's drill the areas you asked about."),

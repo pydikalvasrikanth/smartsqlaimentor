@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import * as RSCE from "react-simple-code-editor";
 import Prism from "prismjs";
-import "prismjs/components/prism-python";
+import "prismjs/components/prism-java";
 import "prismjs/themes/prism-tomorrow.css";
 import { Maximize2, Minimize2 } from "lucide-react";
 
@@ -35,19 +35,19 @@ interface Props {
 }
 
 /**
- * Professional Python editor: Prism syntax highlighting + 4-space Tab/Shift+Tab
+ * Professional Java editor: Prism syntax highlighting + 4-space Tab/Shift+Tab
  * (via react-simple-code-editor) and Enter auto-indent that carries the
  * previous line's indentation, adding an extra level after `:` `(` `[` `{`.
  * Supports vertical resize and a maximize toggle so the user can grow the
  * editor against the question panel.
  */
-export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
+export function JavaEditor({ value, onChange, minHeight = 420 }: Props) {
   const [maximized, setMaximized] = useState(false);
   const effectiveMin = maximized ? Math.max(minHeight, 720) : minHeight;
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
       // react-simple-code-editor already handles Tab / Shift+Tab via tabSize.
-      // We only intercept Enter for Python-aware auto-indent.
+      // We only intercept Enter for Java-aware auto-indent.
       if (e.key !== "Enter" || e.shiftKey) return;
       const ta = e.target as HTMLTextAreaElement;
       if (!(ta instanceof HTMLTextAreaElement)) return;
@@ -88,13 +88,13 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
         <Editor
         value={value}
         onValueChange={onChange}
-        highlight={(code: string) => Prism.highlight(code, Prism.languages.python, "python")}
+        highlight={(code: string) => Prism.highlight(code, Prism.languages.java, "java")}
         padding={14}
         tabSize={4}
         insertSpaces={true}
         onKeyDown={handleKeyDown}
         textareaClassName="outline-none"
-        textareaId="python-editor"
+        textareaId="java-editor"
         className="min-h-full"
         style={{
           fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
