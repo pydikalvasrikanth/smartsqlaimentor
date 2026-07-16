@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
 
-type Subject = "sql" | "python";
+type Subject = "sql" | "python" | "java";
 
 interface Solved {
   id: string;
@@ -103,8 +103,52 @@ function highlightPython(code: string): string {
   return escaped;
 }
 
+// Java keywords + common types/APIs
+const JAVA_KEYWORDS = [
+  "abstract","assert","boolean","break","byte","case","catch","char","class","const","continue","default","do","double","else","enum","extends","final","finally","float","for","goto","if","implements","import","instanceof","int","interface","long","native","new","package","private","protected","public","return","short","static","strictfp","super","switch","synchronized","this","throw","throws","transient","try","void","volatile","while","yield","record","sealed","permits","non-sealed","var","true","false","null",
+];
+const JAVA_TYPES = [
+  "String","Integer","Long","Double","Float","Boolean","Character","Byte","Short","Object","Number","Math","System","List","ArrayList","LinkedList","Map","HashMap","LinkedHashMap","TreeMap","ConcurrentHashMap","Set","HashSet","LinkedHashSet","TreeSet","Queue","Deque","ArrayDeque","PriorityQueue","Stack","Optional","Stream","IntStream","LongStream","DoubleStream","Collectors","Collection","Collections","Arrays","Comparator","Comparable","Iterator","Iterable","Function","BiFunction","Consumer","BiConsumer","Supplier","Predicate","BiPredicate","Runnable","Callable","CompletableFuture","Executor","ExecutorService","Executors","Thread","AtomicInteger","AtomicLong","AtomicReference","ReentrantLock","LocalDate","LocalDateTime","LocalTime","ZonedDateTime","Instant","Duration","Period","DateTimeFormatter","Files","Path","Paths","Scanner","BufferedReader","InputStream","OutputStream","IOException","RuntimeException","IllegalArgumentException","IllegalStateException","NullPointerException","NumberFormatException",
+];
+const JAVA_APIS = [
+  "stream","parallelStream","map","filter","reduce","collect","toList","toSet","toMap","forEach","sorted","distinct","limit","skip","count","min","max","sum","average","findFirst","findAny","anyMatch","allMatch","noneMatch","groupingBy","partitioningBy","joining","summingInt","averagingInt","mapToInt","mapToLong","mapToObj","flatMap","peek","of","ofNullable","isPresent","isEmpty","get","orElse","orElseGet","orElseThrow","ifPresent","asList","copyOf","sort","reverseOrder","comparing","comparingInt","thenComparing","binarySearch","asMap","entrySet","keySet","values","getOrDefault","putIfAbsent","computeIfAbsent","compute","merge","forEachOrdered",
+];
+
+function extractJavaSymbols(code: string): string[] {
+  const found = new Set<string>();
+  for (const name of [...JAVA_TYPES, ...JAVA_APIS]) {
+    const re = new RegExp(`\\b${name}\\b`);
+    if (re.test(code)) found.add(name);
+  }
+  return Array.from(found).sort();
+}
+
+function highlightJava(code: string): string {
+  let escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // text blocks + strings + chars
+  escaped = escaped.replace(/("""[\s\S]*?"""|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')/g, `<span class="text-emerald-300">$1</span>`);
+  // block comments
+  escaped = escaped.replace(/(\/\*[\s\S]*?\*\/)/g, `<span class="text-slate-500 italic">$1</span>`);
+  // line comments
+  escaped = escaped.replace(/(\/\/[^\n]*)/g, `<span class="text-slate-500 italic">$1</span>`);
+  // numbers
+  escaped = escaped.replace(/\b(\d+(?:\.\d+)?[LlFfDd]?)\b/g, `<span class="text-orange-300">$1</span>`);
+  // annotations
+  escaped = escaped.replace(/(@[A-Za-z_][A-Za-z0-9_]*)/g, `<span class="text-amber-300">$1</span>`);
+  for (const kw of [...JAVA_KEYWORDS].sort((a, b) => b.length - a.length)) {
+    const re = new RegExp(`\\b(${kw})\\b`, "g");
+    escaped = escaped.replace(re, `<span class="text-sky-300 font-semibold">$1</span>`);
+  }
+  for (const t of JAVA_TYPES) {
+    const re = new RegExp(`\\b(${t})\\b`, "g");
+    escaped = escaped.replace(re, `<span class="text-fuchsia-300">$1</span>`);
+  }
+  return escaped;
+}
+
 export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
   const isPython = subject === "python";
+  const isJava = subject === "java";
   const [rows, setRows] = useState<Solved[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -129,9 +173,11 @@ export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
     };
   }, [subject]);
 
-  const codeOf = (r: Solved) => (isPython ? r.user_answer : r.user_sql) ?? "";
-  const extractFns = (code: string) => (isPython ? extractPythonSymbols(code) : extractFunctions(code));
-  const highlight = (code: string) => (isPython ? highlightPython(code) : highlightSql(code));
+  const codeOf = (r: Solved) => (isPython || isJava ? r.user_answer : r.user_sql) ?? "";
+  const extractFns = (code: string) =>
+    isJava ? extractJavaSymbols(code) : isPython ? extractPythonSymbols(code) : extractFunctions(code);
+  const highlight = (code: string) =>
+    isJava ? highlightJava(code) : isPython ? highlightPython(code) : highlightSql(code);
 
   // Dedup: keep latest correct submission per question text
   const unique = useMemo(() => {
@@ -153,8 +199,8 @@ export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
     return unique.filter(
       (r) =>
         r.question_text?.toLowerCase().includes(q) ||
-        codeOf(r).toLowerCase().includes(q) ||
-        r.topic_slug.toLowerCase().includes(q),
+        (codeOf(r) ?? "").toLowerCase().includes(q) ||
+        (r.topic_slug ?? "").toLowerCase().includes(q),
     );
   }, [unique, filter]);
 

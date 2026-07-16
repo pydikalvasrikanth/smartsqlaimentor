@@ -1,0 +1,1474 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, useCallback } from "react";
+import { useResumableState } from "@/lib/resume";
+import { ResumePrompt } from "@/components/ResumePrompt";
+import { useAuth } from "@/hooks/use-auth";
+import { useServerFn } from "@tanstack/react-start";
+import { toast, Toaster } from "sonner";
+import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle } from "lucide-react";
+import { runJavaEngine } from "@/lib/java-engine.functions";
+import { planJavaFocus } from "@/lib/java-plan.functions";
+import { AnimatedTrace } from "@/components/java/AnimatedTrace";
+import { JavaEditor } from "@/components/java/JavaEditor";
+import { JavaTheoryPanel } from "@/components/java/JavaTheoryPanel";
+import { ResizableSplit } from "@/components/sql/ResizableSplit";
+import { AiAssistant } from "@/components/AiAssistant";
+import { ProductTour } from "@/components/ProductTour";
+import { ThemeToggle } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
+import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+import { supabase } from "@/integrations/supabase/client";
+export const Route = createFileRoute("/java")({
+  head: () => ({
+    meta: [
+      { title: "Java Interview Engine — AI mentor practice" },
+      { name: "description", content: "Java coding interview practice with AI-graded feedback, hints, and complexity analysis." },
+      { property: "og:title", content: "Java Interview Engine" },
+      { property: "og:description", content: "AI-graded Java coding practice: hints, complexity analysis, and progressive 50-question sessions." },
+      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/java" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/java" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LearningResource",
+          name: "Java Interview Engine",
+          description: "AI-graded Java coding interview practice with hints, complexity analysis, and difficulty ramping.",
+          url: "https://smartsqlaimentor.lovable.app/java",
+          learningResourceType: "Interactive practice",
+          educationalLevel: "Beginner to Advanced",
+          teaches: "Java, data structures, algorithms, OOP, system design",
+        }),
+      },
+    ],
+  }),
+  component: JavaWorkspace,
+});
+
+const JAVA_CONCEPTS: Record<string, string[]> = {
+  beginner: ["arrays", "strings", "arraylist", "hashmap", "hashset", "loops", "primitives", "autoboxing", "control-flow", "varargs", "sorting", "two-pointers", "hashing", "recursion", "math"],
+  intermediate: ["sliding-window", "binary-search", "stack", "queue", "deque", "priorityqueue", "linked-list", "tree-traversal", "bst", "regex", "generics", "stream-api", "lambdas", "optional", "records", "switch-expressions", "pattern-matching", "exceptions", "collectors"],
+  advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "topological-sort", "bit-manipulation", "system-design-mini", "concurrency", "completablefuture", "virtual-threads", "concurrent-collections", "spring-boot", "spring-data-jpa"],
+};
+
+const TOTAL = 50;
+type Level = "beginner" | "intermediate" | "advanced";
+const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
+
+// Companies list intentionally left empty for now — will be populated later.
+const JAVA_COMPANIES: string[] = [];
+
+// Topic-wise practice catalog focused on what a Data Engineer must know.
+// Each topic = a target_concept passed to the AI engine.
+const DE_TOPIC_GROUPS: Array<{
+  group: string;
+  blurb: string;
+  topics: Array<{ slug: string; label: string; level: Level }>;
+}> = [
+  {
+    group: "Core Java",
+    blurb: "Language fundamentals every DE writes daily.",
+    topics: [
+      { slug: "arrays", label: "Arrays & iteration", level: "beginner" },
+      { slug: "strings", label: "String / StringBuilder", level: "beginner" },
+      { slug: "primitives", label: "Primitives & autoboxing", level: "beginner" },
+      { slug: "control-flow", label: "Control flow & switch", level: "beginner" },
+      { slug: "loops", label: "Loops & enhanced for", level: "beginner" },
+      { slug: "varargs", label: "Varargs & overloading", level: "beginner" },
+      { slug: "exceptions", label: "Checked vs unchecked exceptions", level: "intermediate" },
+      { slug: "try-with-resources", label: "try-with-resources", level: "intermediate" },
+      { slug: "generics", label: "Generics & wildcards", level: "intermediate" },
+      { slug: "enums", label: "Enums (with methods)", level: "intermediate" },
+      { slug: "equals-hashcode", label: "equals / hashCode / Comparable", level: "intermediate" },
+      { slug: "immutability", label: "Immutability & defensive copies", level: "intermediate" },
+      { slug: "nested-classes", label: "Nested & inner classes", level: "intermediate" },
+    ],
+  },
+  {
+    group: "Modern Java (17/21)",
+    blurb: "Records, sealed types, pattern matching, text blocks, var.",
+    topics: [
+      { slug: "records", label: "Records", level: "intermediate" },
+      { slug: "sealed-classes", label: "Sealed classes & interfaces", level: "advanced" },
+      { slug: "pattern-matching", label: "Pattern matching (switch / instanceof)", level: "intermediate" },
+      { slug: "switch-expressions", label: "Switch expressions", level: "intermediate" },
+      { slug: "text-blocks", label: "Text blocks", level: "beginner" },
+      { slug: "var", label: "Local variable var", level: "beginner" },
+    ],
+  },
+  {
+    group: "Collections Framework",
+    blurb: "Lists, maps, sets, queues, and picking the right one.",
+    topics: [
+      { slug: "arraylist", label: "ArrayList", level: "beginner" },
+      { slug: "linked-list", label: "LinkedList", level: "beginner" },
+      { slug: "hashmap", label: "HashMap", level: "beginner" },
+      { slug: "linkedhashmap", label: "LinkedHashMap (LRU-ish)", level: "intermediate" },
+      { slug: "treemap", label: "TreeMap / NavigableMap", level: "intermediate" },
+      { slug: "hashset", label: "HashSet", level: "beginner" },
+      { slug: "treeset", label: "TreeSet", level: "intermediate" },
+      { slug: "deque", label: "ArrayDeque as stack/queue", level: "intermediate" },
+      { slug: "priorityqueue", label: "PriorityQueue / heap", level: "intermediate" },
+      { slug: "iterators-comparators", label: "Iterator & Comparator", level: "intermediate" },
+    ],
+  },
+  {
+    group: "Streams & Functional",
+    blurb: "Streams API, lambdas, and Optional — read cleanly.",
+    topics: [
+      { slug: "stream-api", label: "Stream API basics", level: "intermediate" },
+      { slug: "collectors", label: "Collectors (groupingBy, joining)", level: "intermediate" },
+      { slug: "lambdas", label: "Lambdas & method references", level: "intermediate" },
+      { slug: "functional-interfaces", label: "Function / Predicate / Consumer / Supplier", level: "intermediate" },
+      { slug: "optional", label: "Optional (right ways)", level: "intermediate" },
+      { slug: "primitive-streams", label: "IntStream / LongStream", level: "intermediate" },
+      { slug: "parallel-streams", label: "Parallel streams (when NOT to)", level: "advanced" },
+    ],
+  },
+  {
+    group: "Concurrency",
+    blurb: "Threads, executors, and the java.util.concurrent toolkit.",
+    topics: [
+      { slug: "threads", label: "Thread & Runnable", level: "intermediate" },
+      { slug: "executors", label: "ExecutorService & thread pools", level: "intermediate" },
+      { slug: "completablefuture", label: "CompletableFuture pipelines", level: "advanced" },
+      { slug: "virtual-threads", label: "Virtual threads (Loom)", level: "advanced" },
+      { slug: "synchronized", label: "synchronized & volatile", level: "intermediate" },
+      { slug: "locks", label: "ReentrantLock / ReadWriteLock", level: "advanced" },
+      { slug: "atomic", label: "Atomic types & CAS", level: "advanced" },
+      { slug: "concurrent-collections", label: "ConcurrentHashMap / BlockingQueue", level: "advanced" },
+    ],
+  },
+  {
+    group: "OOP & Design",
+    blurb: "Object-oriented modeling and common patterns.",
+    topics: [
+      { slug: "oop-design", label: "Classes, inheritance, polymorphism", level: "intermediate" },
+      { slug: "interfaces", label: "Interfaces & default methods", level: "intermediate" },
+      { slug: "abstract-class", label: "Abstract classes", level: "intermediate" },
+      { slug: "builder-pattern", label: "Builder pattern", level: "intermediate" },
+      { slug: "factory-pattern", label: "Factory pattern", level: "intermediate" },
+      { slug: "singleton", label: "Singleton (thread-safe)", level: "intermediate" },
+      { slug: "observer", label: "Observer / listeners", level: "intermediate" },
+      { slug: "strategy", label: "Strategy pattern", level: "intermediate" },
+    ],
+  },
+  {
+    group: "Data Structures & Algorithms",
+    blurb: "Interview classics in idiomatic Java.",
+    topics: [
+      { slug: "two-pointers", label: "Two pointers", level: "intermediate" },
+      { slug: "sliding-window", label: "Sliding window", level: "intermediate" },
+      { slug: "binary-search", label: "Binary search", level: "intermediate" },
+      { slug: "hashing", label: "HashMap counting", level: "intermediate" },
+      { slug: "recursion", label: "Recursion", level: "intermediate" },
+      { slug: "backtracking", label: "Backtracking", level: "advanced" },
+      { slug: "tree-traversal", label: "Tree traversal", level: "intermediate" },
+      { slug: "bst", label: "Binary search trees", level: "advanced" },
+      { slug: "trie", label: "Trie", level: "advanced" },
+      { slug: "graph-bfs", label: "Graph BFS", level: "advanced" },
+      { slug: "graph-dfs", label: "Graph DFS", level: "advanced" },
+      { slug: "dijkstra", label: "Dijkstra shortest path", level: "advanced" },
+      { slug: "union-find", label: "Union-Find", level: "advanced" },
+      { slug: "topological-sort", label: "Topological sort", level: "advanced" },
+      { slug: "dp-1d", label: "DP (1D)", level: "advanced" },
+      { slug: "dp-2d", label: "DP (2D)", level: "advanced" },
+      { slug: "bit-manipulation", label: "Bit manipulation", level: "advanced" },
+    ],
+  },
+  {
+    group: "I/O, Regex & Time",
+    blurb: "The JDK toolbox for real-world Java.",
+    topics: [
+      { slug: "nio-files", label: "NIO.2 Files / Path", level: "intermediate" },
+      { slug: "regex", label: "Regex (java.util.regex)", level: "intermediate" },
+      { slug: "date-time", label: "java.time (LocalDate, Instant)", level: "intermediate" },
+      { slug: "json-jackson", label: "JSON with Jackson", level: "intermediate" },
+      { slug: "logging-slf4j", label: "SLF4J logging", level: "intermediate" },
+    ],
+  },
+  {
+    group: "Spring Boot & Persistence",
+    blurb: "The backend-Java default stack.",
+    topics: [
+      { slug: "spring-boot", label: "Spring Boot basics", level: "intermediate" },
+      { slug: "spring-di", label: "DI & @Component / @Bean", level: "intermediate" },
+      { slug: "spring-rest", label: "REST controllers", level: "intermediate" },
+      { slug: "spring-data-jpa", label: "Spring Data JPA", level: "advanced" },
+      { slug: "hibernate", label: "Hibernate mappings", level: "advanced" },
+      { slug: "jdbc", label: "JDBC / PreparedStatement", level: "intermediate" },
+      { slug: "validation", label: "Bean Validation (JSR-380)", level: "intermediate" },
+    ],
+  },
+  {
+    group: "Testing & Build",
+    blurb: "Ship it with confidence.",
+    topics: [
+      { slug: "junit5", label: "JUnit 5", level: "intermediate" },
+      { slug: "mockito", label: "Mockito", level: "intermediate" },
+      { slug: "assertj", label: "AssertJ", level: "intermediate" },
+      { slug: "maven", label: "Maven basics", level: "beginner" },
+      { slug: "gradle", label: "Gradle basics", level: "beginner" },
+    ],
+  },
+];
+
+interface JvPlan {
+  days: number;
+  level: Level;
+  startedAt: number;
+  completedDays: number[];
+}
+const PLAN_KEY = "java_plan_v1";
+function loadPlan(): JvPlan | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(PLAN_KEY);
+    return raw ? (JSON.parse(raw) as JvPlan) : null;
+  } catch {
+    return null;
+  }
+}
+function savePlan(p: JvPlan | null) {
+  if (typeof window === "undefined") return;
+  if (p) localStorage.setItem(PLAN_KEY, JSON.stringify(p));
+  else localStorage.removeItem(PLAN_KEY);
+}
+function dayNumberFor(p: JvPlan) {
+  const elapsed = Date.now() - p.startedAt;
+  return Math.min(p.days, Math.floor(elapsed / 86_400_000) + 1);
+}
+function difficultyForDay(day: number, totalDays: number, target: Level): string {
+  // Ramp difficulty proportional to plan progress, capped by target.
+  const cap = LEVEL_ORDER.indexOf(target);
+  const pct = day / Math.max(1, totalDays);
+  let tier = 0;
+  if (pct > 0.66) tier = 2;
+  else if (pct > 0.33) tier = 1;
+  return LEVEL_ORDER[Math.min(tier, cap)];
+}
+function conceptForDay(day: number, target: Level): string {
+  const tier = difficultyForDay(day, day, target) as Level;
+  const pool = JAVA_CONCEPTS[tier];
+  return pool[(day - 1) % pool.length];
+}
+
+function diffForIndex(i: number, target: Level = "advanced"): string {
+  const cap = LEVEL_ORDER.indexOf(target);
+  const stage = Math.floor((i - 1) / 5);
+  let tier: number;
+  if (stage <= 1) tier = 0;
+  else if (stage <= 5) tier = 1;
+  else tier = 2;
+  return LEVEL_ORDER[Math.min(tier, cap)];
+}
+function pickConcept(i: number, covered: string[]): string {
+  const tier = diffForIndex(i) as Level;
+  const pool = JAVA_CONCEPTS[tier];
+  const fresh = pool.filter((c) => !covered.includes(c));
+  if (fresh.length) return fresh[(i * 7) % fresh.length];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+interface JvQuestion {
+  question_id: number;
+  difficulty: string;
+  concept?: string;
+  business_context?: string;
+  task: string;
+  function_signature: string;
+  starter_code: string;
+  test_cases: Array<{ input_repr: string; expected_repr: string; explanation?: string }>;
+  expected_solution?: string;
+  time_complexity?: string;
+  space_complexity?: string;
+}
+
+function JavaWorkspace() {
+  const engine = useServerFn(runJavaEngine);
+  const planFocusFn = useServerFn(planJavaFocus);
+  const { user, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const [planDays, setPlanDays] = useState(30);
+  const [planLevel, setPlanLevel] = useState<Level>("intermediate");
+  const [plan, setPlan] = useState<JvPlan | null>(null);
+  const [tab, setTab] = useState<"today" | "topic" | "targeted" | "data-eng" | "interview" | "solved">("today");
+  const [topicLevel, setTopicLevel] = useState<Level>("intermediate");
+  const [deLevel, setDeLevel] = useState<Level>("intermediate");
+  const [interviewCompany, setInterviewCompany] = useState<string>("Google");
+  const [interviewLevel, setInterviewLevel] = useState<Level>("intermediate");
+  const [interviewMode, setInterviewMode] = useState(false);
+
+  // Targeted (goal-driven) practice state
+  type FocusPlan = { focus_title: string; difficulty: Level; concepts: string[]; intro: string };
+  const [focusGoal, setFocusGoal] = useState("");
+  const [focusPlan, setFocusPlan] = useState<FocusPlan | null>(null);
+  const [focusIdx, setFocusIdx] = useState(0);
+  const [focusCount, setFocusCount] = useState(0);
+
+  const [question, setQuestion] = useState<JvQuestion | null>(null);
+  const [sessionQid, setSessionQid] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [pastIds, setPastIds] = useState<number[]>([]);
+  const [covered, setCovered] = useState<string[]>([]);
+  const [qIndex, setQIndex] = useState(0);
+  const [feedback, setFeedback] = useState<any>(null);
+  const [hint, setHint] = useState<any>(null);
+  const [solution, setSolution] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [visual, setVisual] = useState<any>(null);
+  const [review, setReview] = useState<any>(null);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [sqlSolution, setSqlSolution] = useState<any>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  // Cross-device resume for tab / filters / typed code. In-session question is
+  // rebuilt from the engine when the user picks Next.
+  type JvResume = {
+    tab: "today" | "topic" | "targeted" | "data-eng" | "interview" | "solved";
+    topicLevel: Level;
+    deLevel: Level;
+    interviewCompany: string;
+    interviewLevel: Level;
+    focusGoal: string;
+    code: string;
+    question: JvQuestion | null;
+    sessionQid: string | null;
+    qIndex: number;
+    pastIds: number[];
+    covered: string[];
+    interviewMode: boolean;
+  };
+  const resume = useResumableState<JvResume>(
+    "java",
+    {
+      tab: "today",
+      topicLevel: "intermediate",
+      deLevel: "intermediate",
+      interviewCompany: "Google",
+      interviewLevel: "intermediate",
+      focusGoal: "",
+      code: "",
+      question: null,
+      sessionQid: null,
+      qIndex: 0,
+      pastIds: [],
+      covered: [],
+      interviewMode: false,
+    },
+    {
+      isEmpty: (s: any) =>
+        !s ||
+        (s.tab === "today" &&
+          s.topicLevel === "intermediate" &&
+          s.deLevel === "intermediate" &&
+          s.interviewCompany === "Google" &&
+          s.interviewLevel === "intermediate" &&
+          !s.focusGoal &&
+          (!s.code || !s.code.trim()) &&
+          !s.question),
+    },
+  );
+  useEffect(() => {
+    if (!resume.ready) return;
+    resume.setState({
+      tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code,
+      question, sessionQid, qIndex, pastIds, covered, interviewMode,
+    });
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/auth" });
+  }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    const p = loadPlan();
+    if (p) { setPlan(p); setPlanDays(p.days); setPlanLevel(p.level); }
+  }, []);
+
+  const call = useCallback(async (command: string, payload: any) => {
+    try {
+      const res: any = await engine({ data: { command, payload } });
+      if (res?.error) { toast.error(res.error); return null; }
+      return res?.data;
+    } catch (e: any) {
+      console.error("Java engine call failed", e);
+      toast.error(e?.message ?? "Network error — please try again.");
+      return null;
+    }
+  }, [engine]);
+
+  function clearPanels() {
+    setFeedback(null); setHint(null); setSolution(null);
+    setDebugInfo(null); setVisual(null); setReview(null); setSqlSolution(null);
+  }
+
+  function handleCreatePlan() {
+    const p: JvPlan = { days: planDays, level: planLevel, startedAt: Date.now(), completedDays: [] };
+    savePlan(p);
+    setPlan(p);
+    setTab("today");
+    toast.success(`Plan ready — ${planDays} days of ${planLevel} practice`);
+  }
+
+  function handleReplan() {
+    savePlan(null);
+    setPlan(null);
+    setQuestion(null);
+    clearPanels();
+    setQIndex(0);
+    setPastIds([]);
+    setCovered([]);
+  }
+
+  async function handleStart(opts?: { difficulty?: string; concept?: string }) {
+    setLoading("init");
+    clearPanels();
+    setInterviewMode(false);
+    const startDiff = opts?.difficulty ?? diffForIndex(1, planLevel);
+    const concept = opts?.concept ?? pickConcept(1, []);
+    const data = await call("INIT_JAVA_ENVIRONMENT", { difficulty: startDiff, target_concept: concept });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(`Q 1 / ${TOTAL} · ${startDiff}`);
+  }
+
+  async function handleStartInterview() {
+    setLoading("init");
+    clearPanels();
+    const concept = pickConcept(1, []);
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
+      difficulty: interviewLevel,
+      target_concept: concept,
+      company: interviewCompany,
+    });
+    setLoading(null);
+    if (!data) return;
+    setInterviewMode(true);
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(`${interviewCompany} · ${interviewLevel} interview question`);
+  }
+
+  async function handleStartTopic(topicSlug: string, topicLabel: string, difficulty: Level) {
+    setLoading("init");
+    clearPanels();
+    setInterviewMode(false);
+    setFocusPlan(null);
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
+      difficulty,
+      target_concept: topicSlug,
+      topic: topicLabel,
+    });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(`${topicLabel} · ${difficulty}`);
+  }
+
+  async function handleStartFocus() {
+    const goal = focusGoal.trim();
+    if (goal.length < 2) {
+      toast.error('Tell me what you\'d like to practice, e.g. "drill me on Streams".');
+      return;
+    }
+    await runFocus(goal);
+  }
+
+  async function runFocus(goal: string, overrideLevel?: Level) {
+    setLoading("init");
+    clearPanels();
+    setInterviewMode(false);
+    let planRes: any;
+    try {
+      planRes = await planFocusFn({ data: { goal } });
+    } catch (e: any) {
+      setLoading(null);
+      toast.error(e?.message ?? "Could not build a plan.");
+      return;
+    }
+    if (planRes?.error) { setLoading(null); toast.error(planRes.error); return; }
+    let fp = planRes?.data as FocusPlan | undefined;
+    if (!fp?.concepts?.length) { setLoading(null); toast.error("Couldn't build a plan from that goal."); return; }
+    if (overrideLevel) fp = { ...fp, difficulty: overrideLevel };
+    const data = await call("INIT_JAVA_ENVIRONMENT", {
+      difficulty: fp.difficulty,
+      target_concept: fp.concepts[0],
+      topic: fp.focus_title,
+    });
+    setLoading(null);
+    if (!data) return;
+    setFocusPlan(fp);
+    setFocusIdx(0);
+    setFocusCount(1);
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(1);
+    setPastIds([data.question.question_id]);
+    if (data.question.concept) setCovered([data.question.concept]);
+    toast.success(fp.intro || `${fp.focus_title} — let's go!`);
+  }
+
+  async function handleFocusNext() {
+    if (!focusPlan) return;
+    const nextIdx = (focusIdx + 1) % focusPlan.concepts.length;
+    const concept = focusPlan.concepts[nextIdx];
+    setLoading("next"); clearPanels();
+    const data = await call("NEXT_JAVA_QUESTION", {
+      target_difficulty: focusPlan.difficulty,
+      target_concept: concept,
+      covered_concepts: covered,
+      previous_question_ids: pastIds,
+    });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex((i) => i + 1);
+    setFocusIdx(nextIdx);
+    setFocusCount((c) => c + 1);
+    setPastIds((ids) => [...ids, data.question.question_id]);
+    if (data.question.concept) setCovered((cs) => cs.includes(data.question.concept) ? cs : [...cs, data.question.concept]);
+    toast.success(`Focus: ${concept}`);
+  }
+
+  function handleFocusReset() {
+    setFocusPlan(null);
+    setFocusIdx(0);
+    setFocusCount(0);
+    setQuestion(null);
+    setSessionQid(null);
+    setPastIds([]);
+    setCovered([]);
+    setQIndex(0);
+    clearPanels();
+  }
+
+  function handleStartToday() {
+    if (!plan) return;
+    const day = dayNumberFor(plan);
+    handleStart({
+      difficulty: difficultyForDay(day, plan.days, plan.level),
+      concept: conceptForDay(day, plan.level),
+    });
+  }
+
+  async function handleNext() {
+    const next = qIndex + 1;
+    if (next > TOTAL) { toast.success("Session complete!"); return; }
+    setLoading("next"); clearPanels();
+    const tgt = interviewMode ? interviewLevel : diffForIndex(next, planLevel);
+    const data = await call("NEXT_JAVA_QUESTION", {
+      target_difficulty: tgt,
+      target_concept: pickConcept(next, covered),
+      covered_concepts: covered,
+      previous_question_ids: pastIds,
+      ...(interviewMode ? { company: interviewCompany } : {}),
+    });
+    setLoading(null);
+    if (!data) return;
+    setQuestion(data.question);
+    setSessionQid(data.session_question_id ?? null);
+    setCode(data.question.starter_code);
+    setQIndex(next);
+    setPastIds((ids) => [...ids, data.question.question_id]);
+    if (data.question.concept) setCovered((cs) => cs.includes(data.question.concept) ? cs : [...cs, data.question.concept]);
+    if (interviewMode) toast.success(`${interviewCompany} · Q ${next}/${TOTAL}`);
+    else if (next % 5 === 1) toast.success(`Difficulty up → ${tgt} (Q ${next}/${TOTAL})`);
+    else toast.success(`Question ${next} / ${TOTAL}`);
+  }
+
+  async function handleRun() {
+    if (!question || !sessionQid) return;
+    setLoading("eval");
+    const data = await call("EVALUATE_JAVA", {
+      session_question_id: sessionQid,
+      user_code: code,
+    });
+    setLoading(null);
+    if (!data) return;
+    setFeedback(data);
+    if (data.is_correct) toast.success("All tests pass");
+    else toast.error(`${data.passed}/${data.total} tests passed`);
+    // Log to attempts table so the Solved tab can show this question.
+    try {
+      await supabase.from("attempts").insert({
+        user_id: user!.id,
+        subject: "java",
+        topic_slug: String(question.concept || "java").slice(0, 100),
+        concept: question.concept ?? null,
+        difficulty: (question.difficulty as any) ?? "beginner",
+        question_text: question.task,
+        user_answer: code,
+        is_correct: !!data.is_correct,
+      });
+    } catch (e) {
+      console.warn("Failed to log java attempt", e);
+    }
+  }
+
+  async function handleHint() {
+    if (!question) return;
+    setLoading("hint");
+    const data = await call("JAVA_HINT", { task: question.task, user_code: code });
+    setLoading(null);
+    if (data) setHint(data);
+  }
+
+  async function handleReveal() {
+    if (!question || !sessionQid) return;
+    setLoading("solution");
+    const data = await call("REVEAL_JAVA_SOLUTION", { session_question_id: sessionQid });
+    setLoading(null);
+    if (data) setSolution(data);
+  }
+
+  async function handleDebug() {
+    if (!question) return;
+    setLoading("debug");
+    const data = await call("JAVA_DEBUG", { task: question.task, user_code: code });
+    setLoading(null);
+    if (data) setDebugInfo(data);
+  }
+  async function handleVisualize() {
+    if (!question) return;
+    setLoading("visualize");
+    const data = await call("JAVA_VISUALIZE", { task: question.task, user_code: code });
+    setLoading(null);
+    if (data) setVisual(data);
+  }
+  async function handleReview() {
+    if (!question || !sessionQid) return;
+    setLoading("review");
+    const data = await call("JAVA_OPTIMIZE", { session_question_id: sessionQid, user_code: code });
+    setLoading(null);
+    if (data) setReview(data);
+  }
+
+  async function handleShowSql() {
+    if (!question || !sessionQid) return;
+    setLoading("to-sql");
+    const data = await call("JAVA_TO_SQL", { session_question_id: sessionQid });
+    setLoading(null);
+    if (data) setSqlSolution(data);
+  }
+
+  if (authLoading || !user) {
+    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Toaster theme="dark" position="top-right" richColors />
+      <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
+        <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
+          <Link to="/" aria-label="Back to subjects" className="text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /></Link>
+          <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+            <Code2 className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <div className="leading-tight">
+            <h1 className="text-base font-semibold tracking-tight">Java Interview Engine</h1>
+            <p className="text-xs text-muted-foreground font-mono">AI-graded · MNC-style questions</p>
+          </div>
+          <div className="ml-6 hidden sm:block">
+            <HeaderTimer storageKey="header_timer:java" />
+          </div>
+          <div className="ml-auto flex items-center gap-2 text-xs font-mono">
+            {question && (
+              <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
+                Day {Math.max(1, Math.ceil((qIndex / TOTAL) * planDays))}/{planDays} · Q {qIndex}/{TOTAL}
+              </span>
+            )}
+            {question && <span className="px-2 py-0.5 rounded border border-border">{question.difficulty}</span>}
+            {question?.concept && <span className="px-2 py-0.5 rounded border border-border text-primary-glow">{question.concept}</span>}
+            <button
+              onClick={() => setTourOpen(true)}
+              title="Take the tour"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent"
+            >
+              <HelpCircle className="h-3 w-3" />
+              <span className="hidden sm:inline">Tour</span>
+            </button>
+            <ThemeToggle />
+            <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
+              <LogOut className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1400px] mx-auto p-4 space-y-4">
+        {resume.hasResumable && resume.savedSnapshot && (
+          <ResumePrompt
+            updatedAt={resume.savedSnapshot.updatedAt}
+            meta={`${resume.savedSnapshot.state.tab} tab`}
+            onResume={() => {
+              const s = resume.savedSnapshot!.state;
+              setTab(s.tab);
+              setTopicLevel(s.topicLevel);
+              setDeLevel(s.deLevel);
+              setInterviewCompany(s.interviewCompany);
+              setInterviewLevel(s.interviewLevel);
+              setFocusGoal(s.focusGoal);
+              if (s.question) {
+                setQuestion(s.question);
+                setSessionQid(s.sessionQid);
+                setQIndex(s.qIndex || 0);
+                setPastIds(s.pastIds || []);
+                setCovered(s.covered || []);
+                setInterviewMode(!!s.interviewMode);
+              }
+              if (s.code) setCode(s.code);
+              resume.hydrate(resume.savedSnapshot);
+            }}
+            onDismiss={resume.dismiss}
+          />
+        )}
+        {!question && (
+          <div className="flex items-center gap-1 border-b border-border">
+            <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Calendar className="h-3.5 w-3.5" /> Today
+            </button>
+            <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
+            </button>
+            <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Target className="h-3.5 w-3.5" /> Targeted
+            </button>
+            <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Boxes className="h-3.5 w-3.5" /> Data Engineering
+            </button>
+            <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <Building2 className="h-3.5 w-3.5" /> Interview
+            </button>
+            <button onClick={() => setTab("solved")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "solved" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              <CheckCircle2 className="h-3.5 w-3.5" /> Solved
+            </button>
+          </div>
+        )}
+
+        {!question && tab === "today" && plan && (
+          <JvPlanDashboard plan={plan} onStartToday={handleStartToday} onReplan={handleReplan} loading={loading === "init"} />
+        )}
+
+        {!question && tab === "solved" && (
+          <SolvedLibrary subject="java" />
+        )}
+
+        {!question && tab === "topic" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Library className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Topic-wise Java practice</h2>
+                <p className="text-sm text-muted-foreground">
+                  Pick any topic. AI generates a focused Java 17/21 question and grades your solution.
+                  Covers core Java, collections, streams, concurrency, modern language features, DSA, Spring Boot & testing.
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <div className="grid grid-cols-3 gap-2">
+                {LEVEL_ORDER.map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setTopicLevel(l)}
+                    className={`text-left p-2.5 rounded-md border transition-colors ${topicLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}
+                  >
+                    <div className="text-base font-semibold capitalize">{l}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-5">
+              {DE_TOPIC_GROUPS.map((g) => (
+                <div key={g.group} className="space-y-2">
+                  <div>
+                    <div className="text-sm font-semibold text-primary-glow">{g.group}</div>
+                    <div className="text-xs text-muted-foreground">{g.blurb}</div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                    {g.topics.map((t) => (
+                      <button
+                        key={t.slug}
+                        onClick={() => handleStartTopic(t.slug, t.label, topicLevel)}
+                        disabled={loading === "init"}
+                        className="text-left text-sm px-2.5 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50 flex items-start justify-between gap-2"
+                      >
+                        <span className="truncate">{t.label}</span>
+                        <span className="text-[9px] uppercase tracking-wider text-muted-foreground shrink-0">{t.level[0]}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!question && tab === "targeted" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Target className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Tell me what to test you on</h2>
+                <p className="text-sm text-muted-foreground">
+                  Describe your goal in plain English. AI plans a focused set of Java questions covering it end-to-end.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                value={focusGoal}
+                onChange={(e) => setFocusGoal(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
+                placeholder='e.g. "Drill me on Streams and Collectors" or "Make me a concurrency pro"'
+                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
+                disabled={loading === "init"}
+              />
+              <button
+                onClick={handleStartFocus}
+                disabled={loading === "init"}
+                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50"
+              >
+                {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Start
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                "Test my Java basics",
+                "Drill me on Streams, Collectors and Optional",
+                "Make me confident with concurrency and CompletableFuture",
+                "I want to be a pro at recursion and DP in Java",
+                "Practice Spring Boot REST + JPA",
+                "Master records, sealed classes and pattern matching",
+              ].map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => setFocusGoal(ex)}
+                  disabled={loading === "init"}
+                  className="text-xs px-2 py-1 rounded-full border border-border bg-surface hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {!question && tab === "data-eng" && (
+          <div className="rounded-xl border border-border bg-surface-1 p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                <Boxes className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Backend Java — on the job</h2>
+                <p className="text-sm text-muted-foreground">Production-style backend scenarios: services, persistence, streaming, concurrency & reliability. Pick a level, then a scenario.</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Difficulty</label>
+              <div className="grid grid-cols-3 gap-2">
+                {LEVEL_ORDER.map((l) => (
+                  <button key={l} onClick={() => setDeLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${deLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                    <div className="text-base font-semibold capitalize">{l}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              {[
+                { group: "REST Services (Spring Boot)", scenarios: [
+                  "Design a Spring Boot REST controller with validation, DTO mapping and error handling",
+                  "Add pagination, sorting and filtering to a Spring Data JPA repository endpoint",
+                  "Implement idempotent POST /orders using request keys",
+                ]},
+                { group: "Persistence & JPA", scenarios: [
+                  "Model a one-to-many Order → OrderItem in JPA with cascade and lazy loading",
+                  "Write a JPQL query with join fetch to avoid N+1",
+                  "Implement optimistic locking with @Version",
+                ]},
+                { group: "Concurrency & Async", scenarios: [
+                  "Fan out N remote calls with CompletableFuture and combine with timeout",
+                  "Rate-limit a worker pool using Semaphore + ExecutorService",
+                  "Refactor blocking I/O to virtual threads (Loom) and measure",
+                ]},
+                { group: "Streaming & Messaging", scenarios: [
+                  "Consume Kafka events with a Spring Kafka listener, dedupe, and persist",
+                  "Implement a retry + DLQ policy for failed messages",
+                ]},
+                { group: "Reliability & Observability", scenarios: [
+                  "Add circuit breaker + retry to a downstream call with Resilience4j",
+                  "Instrument a service with Micrometer metrics and structured logs",
+                ]},
+              ].map((g) => (
+                <div key={g.group} className="space-y-1.5">
+                  <div className="text-sm font-semibold text-primary-glow">{g.group}</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                    {g.scenarios.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => runFocus(s, deLevel)}
+                        disabled={loading === "init"}
+                        className="text-left text-sm px-3 py-2 rounded border border-border hover:bg-accent hover:border-primary/50 transition-colors disabled:opacity-50"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {!question && tab === "interview" && (
+          <div className="rounded-xl border border-dashed border-border bg-surface-1 p-8 text-center space-y-3">
+            <div className="h-10 w-10 mx-auto rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+              <Building2 className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <h2 className="text-lg font-semibold">Company-style Java interview — coming soon</h2>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              The company list is being curated. In the meantime, use the <span className="font-mono text-primary-glow">Today</span>,
+              {" "}<span className="font-mono text-primary-glow">Topic-wise</span>, <span className="font-mono text-primary-glow">Targeted</span>,
+              or <span className="font-mono text-primary-glow">Data Engineering</span> tabs to drill Java questions with AI grading.
+            </p>
+          </div>
+        )}
+
+        {!question && tab === "today" && !plan && (
+          <div className="grid place-items-center min-h-[50vh]">
+            <div className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 space-y-5">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+                  <Target className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold">Build your Java practice plan</h2>
+                  <p className="text-sm text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] uppercase tracking-widest text-muted-foreground">{plan ? "Plan timeframe (saved)" : "Timeframe"}</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[14, 30, 60, 90].map((d) => (
+                    <button key={d} onClick={() => setPlanDays(d)} className={`px-3 py-2 rounded-md text-base font-mono border transition-colors ${planDays === d ? "border-primary bg-primary/10 text-primary-glow" : "border-border hover:bg-accent"}`}>
+                      {d} days
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] uppercase tracking-widest text-muted-foreground">Target level</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {LEVEL_ORDER.map((l) => (
+                    <button key={l} onClick={() => setPlanLevel(l)} className={`text-left p-3 rounded-md border transition-colors ${planLevel === l ? "border-primary bg-primary/10" : "border-border hover:bg-accent"}`}>
+                      <div className="text-base font-semibold capitalize">{l}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {l === "beginner" && "Syntax, lists, dicts, loops."}
+                        {l === "intermediate" && "Sliding window, recursion, trees."}
+                        {l === "advanced" && "DP, graphs, system design."}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {plan ? (
+                <button onClick={() => handleStart()} disabled={loading === "init"} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold disabled:opacity-50">
+                  {loading === "init" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                  Start free session
+                </button>
+              ) : (
+                <button onClick={handleCreatePlan} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2.5 rounded-md text-base font-semibold">
+                  <Play className="h-4 w-4" /> Create {planDays}-day plan
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {question && (
+          <>
+          {focusPlan && (
+            <div className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 mb-3 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold">🎯 {focusPlan.focus_title}</span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-accent text-accent-foreground capitalize">{focusPlan.difficulty}</span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border">{focusCount} answered</span>
+              <div className="flex flex-wrap gap-1 ml-2">
+                {focusPlan.concepts.map((c, i) => (
+                  <span key={c} className={`text-[11px] font-mono px-2 py-0.5 rounded border ${i === focusIdx ? "border-primary bg-primary/10 text-foreground" : i < focusIdx ? "border-border bg-surface text-muted-foreground" : "border-dashed border-border text-muted-foreground/60"}`}>{c}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          <ResizableSplit
+            left={
+              <div className="space-y-3">
+              <div data-tour="question" className="rounded-lg border border-border bg-surface-1 p-4 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">{question.difficulty}</span>
+                  {question.concept && <span className="text-muted-foreground">{question.concept}</span>}
+                </div>
+                <h2 className="text-lg font-semibold">Question {qIndex}</h2>
+                {question.business_context && <p className="text-base text-muted-foreground">{question.business_context}</p>}
+                <p className="text-base whitespace-pre-wrap">{question.task}</p>
+                <pre className="text-sm bg-surface-2 p-2 rounded font-mono">{question.function_signature}</pre>
+                <div className="text-xs font-mono text-muted-foreground space-y-1">
+                  <div className="font-semibold">Examples:</div>
+                  {question.test_cases.slice(0, 3).map((tc, i) => (
+                    <div key={i} className="pl-2 border-l border-border">
+                      <div>input: <code>{tc.input_repr}</code></div>
+                      <div>output: <code>{tc.expected_repr}</code></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {sessionQid && (
+                <div data-tour="theory">
+                  <JavaTheoryPanel
+                    sessionQuestionId={sessionQid}
+                    concept={question.concept}
+                  />
+                </div>
+              )}
+              </div>
+            }
+            right={
+              <>
+              <div data-tour="editor" className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
+                  <span>Solution.java</span>
+                  <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
+                </div>
+                <JavaEditor value={code} onChange={setCode} minHeight={440} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button data-tour="run" onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
+                  {loading === "eval" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />} Run
+                </button>
+                <button onClick={handleVisualize} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "visualize" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Workflow className="h-3.5 w-3.5" />} Visualize
+                </button>
+                <button onClick={handleHint} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "hint" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="h-3.5 w-3.5" />} Hint
+                </button>
+                <button onClick={handleDebug} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "debug" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bug className="h-3.5 w-3.5" />} Debug
+                </button>
+                <button onClick={handleReveal} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "solution" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />} Reveal
+                </button>
+                <button onClick={handleReview} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "review" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />} AI Review
+                </button>
+                {focusPlan && (
+                  <button onClick={handleFocusReset} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                    <Square className="h-3.5 w-3.5" /> End focus
+                  </button>
+                )}
+                <button onClick={focusPlan ? handleFocusNext : handleNext} disabled={!!loading} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded border border-border text-base hover:bg-accent disabled:opacity-50">
+                  {loading === "next" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />} Next
+                </button>
+              </div>
+
+              {feedback && (
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className={`px-4 py-2.5 flex items-center justify-between border-b border-border ${feedback.is_correct ? "bg-green-500/10" : "bg-yellow-500/10"}`}>
+                    <div className="flex items-center gap-2">
+                      {feedback.is_correct ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-yellow-500" />}
+                      <span className="text-base font-semibold">Run Results</span>
+                    </div>
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${feedback.is_correct ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                      {feedback.passed}/{feedback.total} passed
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Summary</div>
+                      <p className="text-sm leading-relaxed">{feedback.explanation}</p>
+                    </div>
+                    {feedback.per_test && feedback.per_test.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1.5">Test cases</div>
+                        <div className="space-y-1.5">
+                          {feedback.per_test.map((t: any, i: number) => (
+                            <div key={i} className={`rounded border ${t.passed ? "border-green-500/30 bg-green-500/5" : "border-yellow-500/30 bg-yellow-500/5"} overflow-hidden`}>
+                              <div className="flex items-center justify-between px-2.5 py-1 border-b border-border/50">
+                                <span className="text-[11px] font-mono">Test #{i + 1}</span>
+                                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${t.passed ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                                  {t.passed ? "PASS" : "FAIL"}
+                                </span>
+                              </div>
+                              <div className="px-2.5 py-1.5 text-xs font-mono space-y-0.5">
+                                <div><span className="text-muted-foreground">input:</span> <code>{t.input_repr}</code></div>
+                                <div><span className="text-muted-foreground">expected:</span> <code>{t.expected_repr}</code></div>
+                                <div><span className="text-muted-foreground">got:</span> <code>{t.actual_repr}</code></div>
+                                {t.note && <div className="text-muted-foreground italic pt-0.5">{t.note}</div>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {feedback.improvements?.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Improvements</div>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {feedback.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {feedback && !sqlSolution && (
+                <div className="rounded-lg border border-primary/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Database className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">Want the SQL version?</span>
+                  </div>
+                  <div className="p-4 flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-sm text-muted-foreground">
+                      See the same problem re-modeled as tables and solved in MySQL 8 — with a walkthrough.
+                    </p>
+                    <button
+                      onClick={handleShowSql}
+                      disabled={!!loading}
+                      data-tour="to-sql"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 text-primary-glow text-sm hover:bg-primary/20 disabled:opacity-50"
+                    >
+                      {loading === "to-sql" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                      Show SQL version
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {hint && (
+                <div className="rounded-lg border border-amber-500/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-400" />
+                    <span className="text-base font-semibold text-amber-400">Hint</span>
+                  </div>
+                  <div className="p-4 space-y-2 text-sm leading-relaxed">
+                    <p>{hint.hint}</p>
+                    {hint.leading_question && (
+                      <p className="text-muted-foreground italic border-l-2 border-amber-500/40 pl-3">
+                        {hint.leading_question}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {solution && (
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">Reference Solution</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Code</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{solution.solution}</pre>
+                    </div>
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Walkthrough</div>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{solution.walkthrough}</p>
+                    </div>
+                    {(solution.time_complexity || solution.space_complexity) && (
+                      <div className="flex gap-2 pt-1">
+                        <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Time: {solution.time_complexity}</span>
+                        <span className="text-xs font-mono px-2 py-1 rounded bg-surface-2 border border-border">Space: {solution.space_complexity}</span>
+                      </div>
+                    )}
+                    <div className="pt-2 border-t border-border">
+                      {!sqlSolution ? (
+                        <button
+                          onClick={handleShowSql}
+                          disabled={!!loading}
+                          data-tour="to-sql"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 text-primary-glow text-sm hover:bg-primary/20 disabled:opacity-50"
+                        >
+                          {loading === "to-sql" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                          Show SQL version of this problem
+                        </button>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          SQL solution generated below — scroll down.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {sqlSolution && (
+                <div className="rounded-lg border border-primary/40 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-primary/15 to-primary-glow/10 border-b border-border flex items-center gap-2">
+                    <Database className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">SQL Solution (MySQL 8)</span>
+                    <span className="ml-auto text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Same problem · SQL edition</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {sqlSolution.schema_ddl && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Schema</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.schema_ddl}</pre>
+                      </div>
+                    )}
+                    {sqlSolution.sample_seed && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Sample data</div>
+                        <pre className="text-xs bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sample_seed}</pre>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Query</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{sqlSolution.sql_solution}</pre>
+                    </div>
+                    {sqlSolution.walkthrough && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Walkthrough</div>
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{sqlSolution.walkthrough}</p>
+                      </div>
+                    )}
+                    {sqlSolution.java_vs_sql && (
+                      <div className="rounded border border-border bg-surface-2 p-3">
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Java vs SQL</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sqlSolution.java_vs_sql}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {debugInfo && (
+                <div className="rounded-lg border border-orange-500/30 bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-orange-500/10 border-b border-orange-500/20 flex items-center gap-2">
+                    <Bug className="h-4 w-4 text-orange-400" />
+                    <span className="text-base font-semibold text-orange-400">Debugger</span>
+                  </div>
+                  <div className="p-4 space-y-3 text-sm">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">What's wrong</div>
+                      <p className="leading-relaxed">{debugInfo.error_analysis}</p>
+                    </div>
+                    {debugInfo.suspected_line && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Suspected line</div>
+                        <pre className="text-xs bg-[#1e1e1e] p-2 rounded font-mono overflow-auto">{debugInfo.suspected_line}</pre>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Concept to apply</div>
+                      <p className="leading-relaxed text-muted-foreground">{debugInfo.educational_fix}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {visual && (
+                <AnimatedTrace
+                  sample_input={visual.sample_input}
+                  steps={visual.steps || []}
+                  final_output={visual.final_output}
+                  summary={visual.summary}
+                />
+              )}
+
+              {review && (
+                <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
+                  <div className="px-4 py-2.5 bg-primary/10 border-b border-border flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-primary-glow" />
+                    <span className="text-base font-semibold">AI Senior Review</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Optimized code</div>
+                      <pre className="text-sm bg-[#1e1e1e] text-foreground p-3 rounded font-mono overflow-auto leading-relaxed">{review.optimized_code}</pre>
+                    </div>
+                    {review.improvements?.length > 0 && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Improvements</div>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {review.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {(review.time_complexity_before || review.time_complexity_after) && (
+                      <div className="flex gap-2 items-center text-xs font-mono">
+                        <span className="px-2 py-1 rounded bg-surface-2 border border-border">Before: {review.time_complexity_before}</span>
+                        <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                        <span className="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-primary-glow">After: {review.time_complexity_after}</span>
+                      </div>
+                    )}
+                    {review.idiomatic_notes && (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Notes</div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{review.idiomatic_notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              </>
+            }
+          />
+          </>
+        )}
+      </main>
+      <AiAssistant
+        context="Java coding interview practice — data structures, algorithms, OOP & system design"
+        suggestions={[
+          "Explain time complexity of binary search",
+          "Give me a sliding window example",
+          "What are Java records and sealed classes?",
+        ]}
+      />
+      <ProductTour
+        storageKey="sqlmentor:tour:java-v1"
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        steps={[
+          {
+            title: "Welcome to the Java Interview Engine 🐍",
+            body: "Real FAANG-style questions graded by AI. Let me show you around in 20 seconds.",
+          },
+          {
+            target: "question",
+            title: "1. The question",
+            body: "Each session gives you 50 questions, difficulty ramping every 5. Read the task, function signature, and sample cases here.",
+            placement: "bottom",
+          },
+          {
+            target: "theory",
+            title: "2. Theory + animated flow",
+            body: "Not sure of the concept? Open the Theory tab for an in-depth explanation with an animated flow and a mini worked example — tailored to this exact question.",
+            placement: "bottom",
+          },
+          {
+            target: "editor",
+            title: "3. Code here",
+            body: "Full Java editor with auto-indent. Your typed code autosaves — refresh or come back on another device and Resume drops you back exactly where you left off.",
+            placement: "top",
+          },
+          {
+            target: "run",
+            title: "4. Run & get graded",
+            body: "Hit Run to have the AI mentally execute your code against every test case, grade it, and explain each failure. Use Hint for a Socratic nudge, Debug for what's wrong, Reveal for the answer, and AI Review for an idiomatic rewrite.",
+            placement: "bottom",
+          },
+          {
+            title: "5. Bonus — SQL version",
+            body: 'After you Reveal the Java solution, click "Show SQL version of this problem" — the same problem, re-modeled as tables and solved in MySQL 8. Great for interviews that switch between the two.',
+          },
+        ]}
+      />
+    </div>
+  );
+}
+
+function JvPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: JvPlan; onStartToday: () => void; onReplan: () => void; loading: boolean }) {
+  const day = dayNumberFor(plan);
+  const diff = difficultyForDay(day, plan.days, plan.level);
+  const concept = conceptForDay(day, plan.level);
+  const days = Array.from({ length: plan.days }, (_, i) => i + 1);
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
+      <div className="rounded-xl border border-border bg-gradient-to-br from-card to-surface-2 p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-mono text-muted-foreground">
+            <Flame className="h-3.5 w-3.5 text-primary-glow" />
+            Day {day} of {plan.days} · {plan.level} track
+          </div>
+          <button onClick={onReplan} className="text-xs font-mono text-muted-foreground hover:text-foreground">
+            Replan
+          </button>
+        </div>
+        <div>
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
+          <h2 className="text-3xl font-bold mt-1">🐍 Java · {concept}</h2>
+          <p className="text-base text-muted-foreground mt-1">
+            50-question session ramping every 5 · starts at{" "}
+            <span className="font-mono text-primary-glow">{diff}</span>
+          </p>
+        </div>
+        <button
+          onClick={onStartToday}
+          disabled={loading}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+          Start today's session
+        </button>
+        <div className="pt-3 border-t border-border">
+          <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
+            <Calendar className="h-3 w-3" /> Schedule
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {days.map((d) => {
+              const isToday = d === day;
+              const isPast = d < day;
+              const done = plan.completedDays.includes(d);
+              return (
+                <div
+                  key={d}
+                  title={`Day ${d}: ${conceptForDay(d, plan.level)} (${difficultyForDay(d, plan.days, plan.level)})`}
+                  className={`h-6 w-6 rounded text-[11px] grid place-items-center font-mono border ${
+                    done
+                      ? "bg-primary/30 border-primary text-primary-glow"
+                      : isToday
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : isPast
+                      ? "border-border bg-surface text-muted-foreground"
+                      : "border-border/40 text-muted-foreground/60"
+                  }`}
+                >
+                  {d}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+        <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+          <AlertTriangle className="h-3 w-3 text-orange-400" /> Weak spots
+        </div>
+        <p className="text-sm text-muted-foreground">
+          No weak concepts yet — answer a few questions to build a learning state.
+        </p>
+      </div>
+    </div>
+  );
+}

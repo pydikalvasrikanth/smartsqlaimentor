@@ -13,6 +13,7 @@ import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
@@ -40,6 +41,11 @@ const PythonRoute = PythonRouteImport.update({
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JavaRoute = JavaRouteImport.update({
+  id: '/java',
+  path: '/java',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewRoute = InterviewRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/interview': typeof InterviewRoute
+  '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/interview': typeof InterviewRoute
+  '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/interview': typeof InterviewRoute
+  '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/gcp'
     | '/interview'
+    | '/java'
     | '/practice'
     | '/python'
     | '/reset-password'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/gcp'
     | '/interview'
+    | '/java'
     | '/practice'
     | '/python'
     | '/reset-password'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/gcp'
     | '/interview'
+    | '/java'
     | '/practice'
     | '/python'
     | '/reset-password'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
   InterviewRoute: typeof InterviewRoute
+  JavaRoute: typeof JavaRoute
   PracticeRoute: typeof PracticeRoute
   PythonRoute: typeof PythonRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/practice'
       fullPath: '/practice'
       preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/java': {
+      id: '/java'
+      path: '/java'
+      fullPath: '/java'
+      preLoaderRoute: typeof JavaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/interview': {
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
   InterviewRoute: InterviewRoute,
+  JavaRoute: JavaRoute,
   PracticeRoute: PracticeRoute,
   PythonRoute: PythonRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -292,13 +313,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
