@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, MessageSquare } from "lucide-react";
+import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/")({
@@ -207,22 +207,8 @@ function SubjectPicker() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.42 }}
-          className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4"
+          className="mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4"
         >
-          <Link
-            to="/chat"
-            preload="intent"
-            className="group flex items-center gap-3 rounded-xl border border-border bg-surface-1/70 backdrop-blur px-5 py-4 hover:border-primary/60 hover:bg-surface-1 transition-all"
-          >
-            <div className="h-10 w-10 rounded-lg bg-primary/10 grid place-items-center shrink-0">
-              <MessageSquare className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium">AI Chat</div>
-              <div className="text-[11px] text-muted-foreground">Attach images, files & videos</div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-          </Link>
           <Link
             to="/interview"
             preload="intent"
