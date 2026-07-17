@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, MessageSquare } from "lucide-react";
+import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/")({
