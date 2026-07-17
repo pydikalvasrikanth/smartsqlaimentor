@@ -126,6 +126,7 @@ function SubjectPicker() {
           </div>
           <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
             <span className="text-muted-foreground hidden sm:inline">{user.email}</span>
+            <HeaderTimer storageKey="subject_timer" />
             <ThemeToggle />
             <button onClick={() => signOut()} className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border hover:bg-accent">
               <LogOut className="h-3 w-3" /> Sign out
