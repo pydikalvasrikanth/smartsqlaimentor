@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
+import { HeaderTimer } from "@/components/HeaderTimer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
