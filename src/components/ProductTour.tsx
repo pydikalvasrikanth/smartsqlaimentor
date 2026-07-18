@@ -48,15 +48,28 @@ export function ProductTour({ storageKey, steps, open, onClose }: Props) {
       return;
     }
     if (!hasSeen(storageKey)) {
-      // Defer to avoid overlapping the Resume prompt / initial content shift.
-      const t = setTimeout(() => {
-        if (typeof document !== "undefined" && document.querySelector("[data-resume-prompt]")) {
+      // Poll for up to 6s: only auto-open once no Resume prompt is present.
+      let elapsed = 0;
+      const interval = 400;
+      const maxWait = 6000;
+      const id = window.setInterval(() => {
+        elapsed += interval;
+        const hasResume =
+          typeof document !== "undefined" &&
+          !!document.querySelector("[data-resume-prompt]");
+        if (hasResume) {
+          // Resume banner is visible — skip auto-tour entirely this visit.
+          window.clearInterval(id);
           return;
         }
-        setActive(true);
-        setIdx(0);
-      }, 1400);
-      return () => clearTimeout(t);
+        if (elapsed >= 1200) {
+          window.clearInterval(id);
+          setActive(true);
+          setIdx(0);
+        }
+        if (elapsed >= maxWait) window.clearInterval(id);
+      }, interval);
+      return () => window.clearInterval(id);
     }
   }, [open, storageKey]);
 
