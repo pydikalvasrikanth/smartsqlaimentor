@@ -10,7 +10,7 @@ interface ResumePromptProps {
 
 export function ResumePrompt({ updatedAt, meta, onResume, onDismiss }: ResumePromptProps) {
   return (
-    <div className="mb-3 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2.5 flex items-center gap-3 shadow-sm">
+    <div data-resume-prompt className="mb-3 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2.5 flex flex-wrap items-center gap-2 shadow-sm">
       <History className="h-4 w-4 text-primary shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-foreground truncate">
