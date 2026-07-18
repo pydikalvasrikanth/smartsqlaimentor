@@ -1068,38 +1068,38 @@ function Workspace() {
       <Toaster theme={theme} position="top-right" richColors />
 
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-[1400px] mx-auto px-4 py-3 flex flex-wrap items-center gap-2 sm:gap-3">
           <Link to="/" className="text-muted-foreground hover:text-foreground" aria-label="Back to subjects">
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
+          <div className="h-8 w-8 shrink-0 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Terminal className="h-4 w-4 text-primary-foreground" />
           </div>
-          <div className="leading-tight">
-            <h1 className="text-base font-semibold tracking-tight">SQL Intelligence Engine</h1>
-            <p className="text-xs text-muted-foreground font-mono">
+          <div className="leading-tight min-w-0">
+            <h1 className="text-sm sm:text-base font-semibold tracking-tight truncate">SQL Intelligence Engine</h1>
+            <p className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">
               senior data engineer · in your browser
             </p>
           </div>
-          <div className="ml-4 hidden sm:block">
+          <div className="ml-2 sm:ml-4">
             <HeaderTimer storageKey="header_timer:sql" />
           </div>
           {session ? (
-            <div className="ml-auto flex items-center gap-2 text-xs font-mono">
-              <span className="text-muted-foreground">{difficulty} coverage</span>
+            <div className="ml-auto flex flex-wrap items-center gap-2 text-xs font-mono">
+              <span className="text-muted-foreground hidden md:inline">{difficulty} coverage</span>
               <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
                 {coverageInLevel}/{pool.length}
               </span>
               {question?.concept && (
-                <span className="px-2 py-0.5 rounded border border-border text-primary-glow">
+                <span className="hidden md:inline px-2 py-0.5 rounded border border-border text-primary-glow">
                   {question.concept}
                 </span>
               )}
-              <Link to="/tutorial" className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
-                <BookOpen className="h-3 w-3" /> Tutorial
+              <Link to="/tutorial" aria-label="Tutorial" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
+                <BookOpen className="h-3 w-3" /> <span className="hidden sm:inline">Tutorial</span>
               </Link>
-              <Link to="/engine" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
-                <Database className="h-3 w-3" /> Intelligence Engine
+              <Link to="/engine" aria-label="Intelligence Engine" className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-accent">
+                <Database className="h-3 w-3" /> <span className="hidden md:inline">Intelligence Engine</span>
               </Link>
               <button
                 onClick={() => setTourOpen(true)}
