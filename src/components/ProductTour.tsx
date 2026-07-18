@@ -47,13 +47,9 @@ export function ProductTour({ storageKey, steps, open, onClose }: Props) {
       setIdx(0);
       return;
     }
-    if (!hasSeen(storageKey)) {
-      const t = setTimeout(() => {
-        setActive(true);
-        setIdx(0);
-      }, 600);
-      return () => clearTimeout(t);
-    }
+    // Tour no longer auto-opens on first visit — users start it via the
+    // Tour button. This prevents overlap with the Resume prompt on returning
+    // sessions and keeps mobile viewports uncluttered.
   }, [open, storageKey]);
 
   const step = active ? steps[idx] : null;
