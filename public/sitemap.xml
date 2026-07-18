@@ -26,6 +26,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://smartsqlaimentor.lovable.app/java</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://smartsqlaimentor.lovable.app/gcp</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

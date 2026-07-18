@@ -121,7 +121,7 @@ function SubjectPicker() {
             <Sparkles className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-semibold tracking-tight">Interview Intelligence Engine</h1>
+            <h1 className="text-sm font-semibold tracking-tight">Interview Intelligence Engine — AI practice for SQL, Python, and GCP</h1>
             <p className="text-[11px] text-muted-foreground font-mono">pick a subject · practice with AI</p>
           </div>
           <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">

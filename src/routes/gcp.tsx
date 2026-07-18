@@ -149,12 +149,12 @@ function GcpWorkspace() {
         )}
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <Filter className="h-3.5 w-3.5 text-muted-foreground" />
-          <label className="text-muted-foreground">Topic</label>
-          <select value={topic} onChange={(e) => setTopic(e.target.value)} className="bg-surface-2 border border-border rounded px-2 py-1">
+          <label htmlFor="gcp-topic" className="text-muted-foreground">Topic</label>
+          <select id="gcp-topic" value={topic} onChange={(e) => setTopic(e.target.value)} className="bg-surface-2 border border-border rounded px-2 py-1">
             {TOPICS.map((t) => <option key={t}>{t}</option>)}
           </select>
-          <label className="text-muted-foreground ml-2">Level</label>
-          <select value={diff} onChange={(e) => setDiff(e.target.value as any)} className="bg-surface-2 border border-border rounded px-2 py-1">
+          <label htmlFor="gcp-level" className="text-muted-foreground ml-2">Level</label>
+          <select id="gcp-level" value={diff} onChange={(e) => setDiff(e.target.value as any)} className="bg-surface-2 border border-border rounded px-2 py-1">
             {DIFFS.map((d) => <option key={d}>{d}</option>)}
           </select>
           <span className="ml-auto text-muted-foreground">{total ? `${index + 1} / ${total}` : "no questions"}</span>
