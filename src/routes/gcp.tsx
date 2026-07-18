@@ -112,8 +112,11 @@ function GcpWorkspace() {
           <div className="h-8 w-8 shrink-0 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Cloud className="h-4 w-4 text-primary-foreground" />
           </div>
-          <div className="leading-tight min-w-0">
-            <h1 className="text-sm font-semibold tracking-tight truncate">GCP Data Engineer Bank</h1>
+          <div className="leading-tight min-w-0 max-w-[45vw] sm:max-w-none">
+            <h1 className="text-sm font-semibold tracking-tight truncate">
+              <span className="sm:hidden">GCP Bank</span>
+              <span className="hidden sm:inline">GCP Data Engineer Bank</span>
+            </h1>
             <p className="text-[10px] sm:text-[11px] text-muted-foreground font-mono truncate">{GCP_BANK.length} questions · top MNCs</p>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2 text-[11px] font-mono">
