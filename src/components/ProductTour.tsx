@@ -47,30 +47,9 @@ export function ProductTour({ storageKey, steps, open, onClose }: Props) {
       setIdx(0);
       return;
     }
-    if (!hasSeen(storageKey)) {
-      // Poll for up to 6s: only auto-open once no Resume prompt is present.
-      let elapsed = 0;
-      const interval = 400;
-      const maxWait = 6000;
-      const id = window.setInterval(() => {
-        elapsed += interval;
-        const hasResume =
-          typeof document !== "undefined" &&
-          !!document.querySelector("[data-resume-prompt]");
-        if (hasResume) {
-          // Resume banner is visible — skip auto-tour entirely this visit.
-          window.clearInterval(id);
-          return;
-        }
-        if (elapsed >= 1200) {
-          window.clearInterval(id);
-          setActive(true);
-          setIdx(0);
-        }
-        if (elapsed >= maxWait) window.clearInterval(id);
-      }, interval);
-      return () => window.clearInterval(id);
-    }
+    // Tour no longer auto-opens on first visit — users start it via the
+    // Tour button. This prevents overlap with the Resume prompt on returning
+    // sessions and keeps mobile viewports uncluttered.
   }, [open, storageKey]);
 
   const step = active ? steps[idx] : null;
