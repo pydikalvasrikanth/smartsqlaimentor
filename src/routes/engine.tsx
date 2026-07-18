@@ -93,7 +93,7 @@ function EnginePage() {
             </Link>
           </div>
         </div>
-        <nav className="max-w-[1400px] mx-auto px-4 flex gap-1 text-sm font-mono">
+        <nav className="max-w-[1400px] mx-auto px-4 flex gap-1 text-sm font-mono overflow-x-auto whitespace-nowrap scrollbar-thin">
           <TabBtn active={tab === "preview"} onClick={() => setTab("preview")} icon={<Database className="h-3.5 w-3.5" />}>Data Preview</TabBtn>
           <TabBtn active={tab === "ai"} onClick={() => setTab("ai")} icon={<Sparkles className="h-3.5 w-3.5" />}>AI SQL Compiler</TabBtn>
           <TabBtn active={tab === "quality"} onClick={() => setTab("quality")} icon={<ShieldCheck className="h-3.5 w-3.5" />}>Data Quality</TabBtn>

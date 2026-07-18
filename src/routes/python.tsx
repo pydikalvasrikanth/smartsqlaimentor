@@ -794,7 +794,7 @@ function PythonWorkspace() {
           />
         )}
         {!question && (
-          <div className="flex items-center gap-1 border-b border-border">
+          <div className="flex items-center gap-1 border-b border-border overflow-x-auto whitespace-nowrap scrollbar-thin">
             <button onClick={() => setTab("today")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "today" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Calendar className="h-3.5 w-3.5" /> Today
             </button>

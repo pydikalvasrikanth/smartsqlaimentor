@@ -1198,7 +1198,7 @@ function Workspace() {
           />
         )}
         {/* Tabs */}
-        <div className="flex items-center gap-1 border-b border-border">
+        <div className="flex items-center gap-1 border-b border-border overflow-x-auto whitespace-nowrap scrollbar-thin">
           <TabBtn active={tab === "today"} onClick={() => setTab("today")} icon={<Calendar className="h-3.5 w-3.5" />}>
             Today
           </TabBtn>
