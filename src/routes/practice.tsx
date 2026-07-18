@@ -1075,10 +1075,14 @@ function Workspace() {
           <div className="h-8 w-8 shrink-0 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Terminal className="h-4 w-4 text-primary-foreground" />
           </div>
-          <div className="leading-tight min-w-0">
-            <h1 className="text-sm sm:text-base font-semibold tracking-tight truncate">SQL Intelligence Engine</h1>
+          <div className="leading-tight min-w-0 max-w-[40vw] sm:max-w-none">
+            <h1 className="text-sm sm:text-base font-semibold tracking-tight truncate">
+              <span className="sm:hidden">SQL Engine</span>
+              <span className="hidden sm:inline">SQL Intelligence Engine</span>
+            </h1>
             <p className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">
-              senior data engineer · in your browser
+              <span className="sm:hidden">in your browser</span>
+              <span className="hidden sm:inline">senior data engineer · in your browser</span>
             </p>
           </div>
           <div className="ml-2 sm:ml-4">
