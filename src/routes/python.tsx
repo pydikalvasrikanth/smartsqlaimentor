@@ -731,8 +731,11 @@ function PythonWorkspace() {
           <div className="h-8 w-8 shrink-0 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Code2 className="h-4 w-4 text-primary-foreground" />
           </div>
-          <div className="leading-tight min-w-0">
-            <h1 className="text-sm sm:text-base font-semibold tracking-tight truncate">Python Interview Engine</h1>
+          <div className="leading-tight min-w-0 max-w-[40vw] sm:max-w-none">
+            <h1 className="text-sm sm:text-base font-semibold tracking-tight truncate">
+              <span className="sm:hidden">Python</span>
+              <span className="hidden sm:inline">Python Interview Engine</span>
+            </h1>
             <p className="text-[10px] sm:text-xs text-muted-foreground font-mono truncate">AI-graded · MNC-style</p>
           </div>
           <div className="ml-2 sm:ml-6">
