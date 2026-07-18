@@ -48,10 +48,14 @@ export function ProductTour({ storageKey, steps, open, onClose }: Props) {
       return;
     }
     if (!hasSeen(storageKey)) {
+      // Defer to avoid overlapping the Resume prompt / initial content shift.
       const t = setTimeout(() => {
+        if (typeof document !== "undefined" && document.querySelector("[data-resume-prompt]")) {
+          return;
+        }
         setActive(true);
         setIdx(0);
-      }, 600);
+      }, 1400);
       return () => clearTimeout(t);
     }
   }, [open, storageKey]);
