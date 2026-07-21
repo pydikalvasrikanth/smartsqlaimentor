@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import * as RSCE from "react-simple-code-editor";
-import Prism from "prismjs";
+import { Prism } from "@/lib/prism-setup";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
