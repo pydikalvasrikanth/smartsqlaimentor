@@ -2,18 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
+import { languageSpec, type CodeLang } from "@/lib/languages";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
-const SYSTEM_PROMPT = `You are a Senior Python Engineer + interview mentor.
-You generate realistic Python coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
+function systemPromptFor(lang: CodeLang): string {
+  return `You are a Senior Software Engineer + interview mentor.
+You generate realistic coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
 
-Cover the full Python landscape across a session: data structures (list, dict, set, tuple, deque, heap), strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, OOP/dataclasses, decorators, generators/iterators, comprehensions, itertools/collections, file I/O, regex, exception handling, type hints, pandas basics, numpy basics, async/await.
+${languageSpec(lang)}
+
+Cover the appropriate landscape for the chosen language: data structures, strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, OOP, standard-library idioms.
 
 Difficulty rules — beginner: single concept, ~5-10 lines; intermediate: multi-concept, 10-25 lines, edge cases; advanced: optimized algo, 20+ lines, time/space analysis required.
 
 When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
+}
 
 const TOOLS_BY_COMMAND: Record<string, any> = {
   INIT_PYTHON_ENVIRONMENT: {
@@ -224,21 +229,21 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
 function buildUserPrompt(command: string, payload: any): string {
   switch (command) {
     case "INIT_PYTHON_ENVIRONMENT":
-      return `Generate a Python interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
+      return `Generate a ${payload.lang || "python"} interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
     case "NEXT_PYTHON_QUESTION":
-      return `Generate the next Python question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
+      return `Generate the next ${payload.lang || "python"} question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_PYTHON":
-      return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code against each test case. Compare actual vs expected. Grade fairly.`;
+      return `Language: ${payload.lang || "python"}.\nQuestion task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code (in the stated language) against each test case. Compare actual vs expected. Grade fairly.`;
     case "PYTHON_HINT":
-      return `Task:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint.`;
+      return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint appropriate for the language.`;
     case "REVEAL_PYTHON_SOLUTION":
-      return `Task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nProvide the solution with a clear line-by-line walkthrough.`;
+      return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nProvide the solution in ${payload.lang || "python"} with a clear line-by-line walkthrough.`;
     case "PYTHON_DEBUG":
-      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nIdentify the bug. Do NOT give the full solution — just explain what's wrong and the concept to apply.`;
+      return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nIdentify the bug. Do NOT give the full solution — just explain what's wrong and the concept to apply.`;
     case "PYTHON_VISUALIZE":
-      return `Task:\n${payload.task}\n\nCode to trace:\n${payload.user_code}\n\nMentally execute the code on a representative sample input. Return concise step-by-step trace (max 12 steps) showing line, action, and the state of key variables.`;
+      return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nCode to trace:\n${payload.user_code}\n\nMentally execute the code on a representative sample input. Return concise step-by-step trace (max 12 steps) showing line, action, and the state of key variables.`;
     case "PYTHON_OPTIMIZE":
-      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior Python engineer reviewing this code. Provide a cleaner / more idiomatic / faster version with improvements list and complexity comparison.`;
+      return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior ${payload.lang || "python"} engineer reviewing this code. Provide a cleaner / more idiomatic / faster version in the SAME language, with improvements list and complexity comparison.`;
     case "PYTHON_THEORY":
       return `Practice question task: ${payload.task}
 Primary concept: ${payload.concept || "auto — infer the dominant Python concept from the task"}
@@ -287,25 +292,25 @@ Rules:
 - Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
 - Never reveal the full solution code.`;
     case "PYTHON_TO_SQL":
-      return `The user just finished a Python problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
+      return `The user just finished a ${payload.lang || "python"} problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
 
-Python task:
+Source task:
 ${payload.task}
 
-Python function signature: ${payload.function_signature || "(n/a)"}
+Source function signature (${payload.lang || "python"}): ${payload.function_signature || "(n/a)"}
 
-Test cases (Python literals):
+Test cases:
 ${JSON.stringify(payload.test_cases || [])}
 
-Reference Python solution (for context only — do not restate it):
+Reference solution (for context only — do not restate it):
 ${payload.expected_solution || "(n/a)"}
 
 Deliver:
 1. **schema_ddl** — minimal CREATE TABLE statements that model the inputs of this problem as one or more relational tables (pick sensible column names + types).
-2. **sample_seed** — INSERT statements that mirror the Python test-case inputs so the SQL is directly verifiable.
-3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the Python function returns. If the Python function returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
-4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each Python step maps to a SQL clause.
-5. **python_vs_sql** — 2–3 sentences on when each approach is more idiomatic for this shape of problem.
+2. **sample_seed** — INSERT statements that mirror the source test-case inputs so the SQL is directly verifiable.
+3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the source function returns. If the source returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
+4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each step of the source maps to a SQL clause.
+5. **python_vs_sql** — 2–3 sentences comparing the imperative solution vs the SQL one for this shape of problem.
 
 Rules: MySQL 8 dialect only. Use CTEs (\`WITH\`) when it improves clarity. Never use vendor-specific extensions from other engines.`;
     default:
@@ -319,6 +324,7 @@ const PayloadSchemas = {
     target_concept: z.string().max(200),
     topic: z.string().max(500).optional(),
     company: z.string().max(100).optional(),
+    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
   }),
   NEXT_PYTHON_QUESTION: z.object({
     target_difficulty: z.string().max(50),
@@ -326,6 +332,7 @@ const PayloadSchemas = {
     covered_concepts: z.array(z.string().max(100)).max(200).optional(),
     previous_question_ids: z.array(z.number()).max(500).optional(),
     company: z.string().max(100).optional(),
+    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
   }),
   EVALUATE_PYTHON: z.object({
     session_question_id: z.string().uuid(),
@@ -334,6 +341,7 @@ const PayloadSchemas = {
   PYTHON_HINT: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
+    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
   }),
   REVEAL_PYTHON_SOLUTION: z.object({
     session_question_id: z.string().uuid(),
@@ -341,10 +349,12 @@ const PayloadSchemas = {
   PYTHON_DEBUG: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
+    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
   }),
   PYTHON_VISUALIZE: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
+    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
   }),
   PYTHON_OPTIMIZE: z.object({
     session_question_id: z.string().uuid(),
@@ -379,10 +389,11 @@ async function callPythonEngine(
   if (!apiKey) return { error: "LOVABLE_API_KEY is not configured." };
 
   const tool = TOOLS_BY_COMMAND[command];
+  const lang: CodeLang = (payload?.lang as CodeLang) || "python";
   const body = {
     model: MODEL,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPromptFor(lang) },
       { role: "user", content: buildUserPrompt(command, payload) },
     ],
     tools: [{ type: "function", function: tool }],
@@ -457,6 +468,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
             expected_solution: q.expected_solution ?? "",
             test_cases: q.test_cases ?? [],
             function_signature: q.function_signature ?? "",
+            lang: payload.lang ?? "python",
           },
         })
         .select("id")
@@ -485,7 +497,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         .eq("user_id", userId)
         .maybeSingle();
       if (error || !row) return { error: "Question session not found." };
-      const stored = (row.payload ?? {}) as { expected_solution?: string; test_cases?: any[]; function_signature?: string };
+      const stored = (row.payload ?? {}) as { expected_solution?: string; test_cases?: any[]; function_signature?: string; lang?: CodeLang };
       const enriched = {
         ...payload,
         task: row.task,
@@ -494,6 +506,7 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         expected_solution: stored.expected_solution ?? "",
         test_cases: stored.test_cases ?? [],
         function_signature: stored.function_signature ?? "",
+        lang: stored.lang ?? "python",
       };
       return callPythonEngine(command, enriched);
     }
