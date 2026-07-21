@@ -1,7 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as RSCE from "react-simple-code-editor";
-import Prism from "prismjs";
-import "prismjs/components/prism-java";
+import { highlightWithPrism, loadPrismLanguage } from "@/lib/prism-setup";
 import "prismjs/themes/prism-tomorrow.css";
 import { Maximize2, Minimize2 } from "lucide-react";
 
@@ -43,7 +42,19 @@ interface Props {
  */
 export function JavaEditor({ value, onChange, minHeight = 420 }: Props) {
   const [maximized, setMaximized] = useState(false);
+  const [, setGrammarVersion] = useState(0);
   const effectiveMin = maximized ? Math.max(minHeight, 720) : minHeight;
+
+  useEffect(() => {
+    let cancelled = false;
+    loadPrismLanguage("java").then(() => {
+      if (!cancelled) setGrammarVersion((version) => version + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
       // react-simple-code-editor already handles Tab / Shift+Tab via tabSize.
@@ -88,7 +99,7 @@ export function JavaEditor({ value, onChange, minHeight = 420 }: Props) {
         <Editor
         value={value}
         onValueChange={onChange}
-        highlight={(code: string) => Prism.highlight(code, Prism.languages.java, "java")}
+        highlight={(code: string) => highlightWithPrism(code, "java")}
         padding={14}
         tabSize={4}
         insertSpaces={true}

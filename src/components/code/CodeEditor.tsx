@@ -1,11 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as RSCE from "react-simple-code-editor";
-import { Prism } from "@/lib/prism-setup";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-c";
-import "prismjs/components/prism-cpp";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-java";
+import { highlightWithPrism, loadPrismLanguage } from "@/lib/prism-setup";
 import "prismjs/themes/prism-tomorrow.css";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { LANG_META, type CodeLang } from "@/lib/languages";
@@ -40,9 +35,19 @@ interface Props {
  */
 export function CodeEditor({ value, onChange, lang, minHeight = 420 }: Props) {
   const [maximized, setMaximized] = useState(false);
+  const [, setGrammarVersion] = useState(0);
   const effectiveMin = maximized ? Math.max(minHeight, 720) : minHeight;
   const prismLang = LANG_META[lang].prismLang;
-  const grammar = (Prism.languages as any)[prismLang] ?? Prism.languages.clike;
+
+  useEffect(() => {
+    let cancelled = false;
+    loadPrismLanguage(prismLang).then(() => {
+      if (!cancelled) setGrammarVersion((version) => version + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [prismLang]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement>) => {
@@ -86,7 +91,7 @@ export function CodeEditor({ value, onChange, lang, minHeight = 420 }: Props) {
         <Editor
           value={value}
           onValueChange={onChange}
-          highlight={(code: string) => Prism.highlight(code, grammar, prismLang)}
+          highlight={(code: string) => highlightWithPrism(code, prismLang)}
           padding={14}
           tabSize={4}
           insertSpaces={true}
