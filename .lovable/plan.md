@@ -1,84 +1,73 @@
 ## Goal
 
-Every section (SQL Practice, Python, GCP, Interview, Tutorial, Chat, Engine) restores exactly where the user left off — question index, typed code, filters, tab, messages — after they close the tab, refresh, or come back on another device.
+Turn the existing `/python` section into a **multi-language coding section**. A language dropdown at the top lets the user pick **Python, Java, C, or C++**. Everything downstream — question generation, starter code, editor highlighting, execution/grading, theory, "Show SQL version", solved library, and resume — adapts to the selected language.
+
+The separate `/java` route stays in place for now (no removal in this change) but the new unified flow is the primary path.
 
 ## UX
 
-On mount of a section, if a saved state exists and is newer than 60s of activity ago, a slim banner appears:
+Top of `/python` (all tabs: Today, Free Practice, Topic-wise, Targeted):
 
 ```text
-┌───────────────────────────────────────────────────────────┐
-│  Continue where you left off? (2h ago · Q7 of 20)         │
-│                                    [ Resume ]  [ Start fresh ] │
-└───────────────────────────────────────────────────────────┘
+Language: [ Python ▾ ]   Topic: [...]   Difficulty: [...]   [Start]
+           Python
+           Java
+           C
+           C++
 ```
 
-- Resume: hydrates state, dismisses banner.
-- Start fresh: wipes saved state for that section, dismisses banner.
-- No saved state → no banner, normal fresh start.
-
-Nothing auto-resumes silently (matches "Ask before resuming").
-
-## Storage model
-
-Local-first, cloud sync in background when signed in.
-
-- **localStorage** key: `sqlmentor:resume:<sectionKey>` → `{ state, updatedAt, version }`. Writes are debounced ~500ms.
-- **Cloud table** `session_state` scoped by `user_id`:
-  ```text
-  user_id uuid, section_key text, state jsonb, updated_at timestamptz
-  PK (user_id, section_key)
-  ```
-  RLS: user can only read/write their own rows. Grants for `authenticated`.
-- On sign-in, the newer of {local, cloud} wins per section and both sides are reconciled.
-- Signed-out users still get local-only resume.
-
-## Sections + what gets saved
-
-| Section key | Route | Persisted slice |
-|---|---|---|
-| `sql-today` | `/practice` (today tab) | current question id, typed SQL, elapsed |
-| `sql-topicwise` | `/practice` (topicwise) | topic filter, difficulty, current qid, typed SQL |
-| `sql-targeted` | `/practice` (targeted) | selected topics, current qid, typed SQL |
-| `topic:<slug>` | `/topic/$slug` | current qid, typed SQL |
-| `python:<tab>` | `/python` | active tab, qid per tab, code buffer per tab |
-| `gcp` | `/gcp` | current qid, answer draft |
-| `interview` | `/interview` | pre-interview setup, phase, full transcript, next-question index, voice |
-| `tutorial` | `/tutorial` | last lesson slug, scroll anchor |
-| `chat` | `/chat` | message array (already local, formalize under same hook) |
-| `engine` | `/engine` | last query/prompt |
+- Changing language mid-session prompts: "Switch language? Current code will be saved." → confirm swaps editor + regenerates a fresh question in the new language.
+- Editor label, file name (`solution.py` / `Solution.java` / `solution.c` / `solution.cpp`), and syntax highlighting update with the selection.
+- Section heading stays "Coding Practice" (rename from "Python Interview Engine") since it's no longer Python-only.
 
 ## Technical design
 
-**New shared module** `src/lib/resume.ts`
-- `useResumableState<T>(key, initial, { debounceMs = 500 })` — returns `{ state, setState, savedSnapshot, clear, hasResumable }`. Reads local on mount, subscribes cloud fetch (server fn) when a user is present, exposes `savedSnapshot` (unhydrated) so the caller can decide to show the prompt or hydrate directly.
-- `<ResumePrompt onResume onDismiss savedAt meta />` — small dismissible banner using existing shadcn `Alert`/`Button` styling; sits at top of section body.
+**New shared type** `src/lib/languages.ts`
+```ts
+export type CodeLang = "python" | "java" | "c" | "cpp";
+export const LANG_META: Record<CodeLang, { label; ext; prismLang; starter; fileName }>
+```
 
-**New server functions** `src/lib/resume.functions.ts`
-- `loadSessionState({ key })` — `requireSupabaseAuth`, returns `{ state, updatedAt } | null`.
-- `saveSessionState({ key, state })` — `requireSupabaseAuth`, upserts.
-- `clearSessionState({ key })` — deletes row.
+**Editor** — new `src/components/code/CodeEditor.tsx`
+- Single component wrapping `react-simple-code-editor` + Prism.
+- Loads the correct Prism grammar based on `lang` prop (`prism-python`, `prism-java`, `prism-c`, `prism-cpp`).
+- Reuses the maximize/resize behavior from existing `PythonEditor` / `JavaEditor`.
+- Existing `PythonEditor` / `JavaEditor` stay for backward compat, but `/python` route switches to `CodeEditor`.
 
-Client debounces `saveSessionState` (2s) so we don't hammer the network while typing.
+**Server functions** `src/lib/python-engine.functions.ts`
+- Extend `GENERATE_PY_QUESTION`, `GRADE_PY_SOLUTION`, `PYTHON_THEORY`, `PYTHON_TO_SQL` handlers to accept a `lang: CodeLang` input.
+- System prompt switches per language:
+  - Python → pandas/stdlib (current behavior)
+  - Java → Java 17 idiomatic, `Solution` class + `main`
+  - C → C11, `stdio.h`, `main`
+  - C++ → C++17, STL where helpful
+- Grader runs the same rubric but expects code in the chosen language; test cases stay language-agnostic (input/expected output described in prompt) since we already grade via LLM, not real execution.
+- "Show SQL version" (`PYTHON_TO_SQL`) works for any source language — prompt is updated to say "convert this <lang> solution to MySQL".
 
-**Migration** creates `public.session_state` with the correct GRANTs, RLS, and updated_at trigger via existing `touch_updated_at()`.
+No new tables. No new routes. `/java` route left untouched.
 
-**Route wiring** — each route adopts a small `useResumableState` at the top, replaces the local `useState` for the persisted slice, and renders `<ResumePrompt />` when `hasResumable` is true and the user hasn't chosen yet. Existing state/behavior stays; the hook is drop-in.
+**Route wiring** `src/routes/python.tsx`
+- Add `lang` to component state, default `"python"`.
+- Persist per tab in the existing resume key (append `:<lang>` so switching languages doesn't clobber the Python buffer).
+- Replace `<PythonEditor>` with `<CodeEditor lang={lang} …>`.
+- Update file-name badge and "Show SQL version" trigger label to say the current language.
+- Update tab heading + `HeaderTimer` label.
 
-**Interview specifics** — because the transcript matters, we save after every completed turn (not on every token). Resuming replays the transcript into the UI and continues from the next question index. Live TTS/audio state is not persisted (avatar just starts idle).
+**Solved Library**
+- `SolvedLibrary` gets a `lang` filter so Python/Java/C/C++ solves live side-by-side; the unique-functions extractor gains simple regexes per language (Python `def`, Java method signatures, C/C++ function definitions).
 
-**Safety**
-- JSON size cap 200KB per row; larger states (Chat) trimmed to last N messages.
-- `version` field lets us bump the schema and ignore stale local blobs.
-- Server functions authorize via `requireSupabaseAuth`; no admin client.
+**Resume**
+- Resume key format changes from `python:<tab>` to `code:<tab>:<lang>` so each language keeps its own draft.
+- Old `python:*` keys are read once as fallback (backwards compat) then migrated on first save.
 
 ## Scope of edits
 
-- New files: `src/lib/resume.ts`, `src/lib/resume.functions.ts`, `src/components/ResumePrompt.tsx`, one migration.
-- Edits (small, targeted, add hook + banner only): `practice.tsx`, `python.tsx`, `gcp.tsx`, `interview.tsx`, `topic.$slug.tsx`, `tutorial.tsx`, `chat.tsx`, `engine.tsx`.
+- New: `src/lib/languages.ts`, `src/components/code/CodeEditor.tsx`.
+- Edit: `src/routes/python.tsx`, `src/lib/python-engine.functions.ts`, `src/components/sql/SolvedLibrary.tsx` (add lang filter).
+- No DB migration. No changes to `/java`, `/practice`, or other subjects.
 
 ## Out of scope
 
-- Multi-tab live sync (last-writer-wins is fine).
-- Undo history / snapshots beyond the latest.
-- Persisting ephemeral UI (open modals, hover states, audio playback position).
+- Real code execution/sandboxing (grading stays LLM-based, same as today).
+- Removing the standalone `/java` route.
+- Adding more languages (Go, Rust, TS) — easy follow-up once the selector pattern lands.
