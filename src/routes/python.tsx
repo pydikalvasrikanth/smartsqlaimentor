@@ -9,7 +9,8 @@ import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, Ch
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
-import { PythonEditor } from "@/components/python/PythonEditor";
+import { CodeEditor } from "@/components/code/CodeEditor";
+import { LANG_META, LANG_OPTIONS, type CodeLang } from "@/lib/languages";
 import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
 import { ResizableSplit } from "@/components/sql/ResizableSplit";
 import { AiAssistant } from "@/components/AiAssistant";
@@ -369,6 +370,7 @@ function PythonWorkspace() {
   const [loading, setLoading] = useState<string | null>(null);
   const [sqlSolution, setSqlSolution] = useState<any>(null);
   const [tourOpen, setTourOpen] = useState(false);
+  const [lang, setLang] = useState<CodeLang>("python");
 
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
@@ -386,6 +388,7 @@ function PythonWorkspace() {
     pastIds: number[];
     covered: string[];
     interviewMode: boolean;
+    lang: CodeLang;
   };
   const resume = useResumableState<PyResume>(
     "python",
@@ -403,6 +406,7 @@ function PythonWorkspace() {
       pastIds: [],
       covered: [],
       interviewMode: false,
+      lang: "python",
     },
     {
       isEmpty: (s: any) =>
@@ -421,9 +425,9 @@ function PythonWorkspace() {
     if (!resume.ready) return;
     resume.setState({
       tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code,
-      question, sessionQid, qIndex, pastIds, covered, interviewMode,
+      question, sessionQid, qIndex, pastIds, covered, interviewMode, lang,
     });
-  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, lang, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
@@ -475,7 +479,7 @@ function PythonWorkspace() {
     setInterviewMode(false);
     const startDiff = opts?.difficulty ?? diffForIndex(1, planLevel);
     const concept = opts?.concept ?? pickConcept(1, []);
-    const data = await call("INIT_PYTHON_ENVIRONMENT", { difficulty: startDiff, target_concept: concept });
+    const data = await call("INIT_PYTHON_ENVIRONMENT", { difficulty: startDiff, target_concept: concept, lang });
     setLoading(null);
     if (!data) return;
     setQuestion(data.question);
@@ -495,6 +499,7 @@ function PythonWorkspace() {
       difficulty: interviewLevel,
       target_concept: concept,
       company: interviewCompany,
+      lang,
     });
     setLoading(null);
     if (!data) return;
@@ -517,6 +522,7 @@ function PythonWorkspace() {
       difficulty,
       target_concept: topicSlug,
       topic: topicLabel,
+      lang,
     });
     setLoading(null);
     if (!data) return;
@@ -558,6 +564,7 @@ function PythonWorkspace() {
       difficulty: fp.difficulty,
       target_concept: fp.concepts[0],
       topic: fp.focus_title,
+      lang,
     });
     setLoading(null);
     if (!data) return;
@@ -583,6 +590,7 @@ function PythonWorkspace() {
       target_concept: concept,
       covered_concepts: covered,
       previous_question_ids: pastIds,
+      lang,
     });
     setLoading(null);
     if (!data) return;
@@ -629,6 +637,7 @@ function PythonWorkspace() {
       covered_concepts: covered,
       previous_question_ids: pastIds,
       ...(interviewMode ? { company: interviewCompany } : {}),
+      lang,
     });
     setLoading(null);
     if (!data) return;
@@ -675,7 +684,7 @@ function PythonWorkspace() {
   async function handleHint() {
     if (!question) return;
     setLoading("hint");
-    const data = await call("PYTHON_HINT", { task: question.task, user_code: code });
+    const data = await call("PYTHON_HINT", { task: question.task, user_code: code, lang });
     setLoading(null);
     if (data) setHint(data);
   }
@@ -691,14 +700,14 @@ function PythonWorkspace() {
   async function handleDebug() {
     if (!question) return;
     setLoading("debug");
-    const data = await call("PYTHON_DEBUG", { task: question.task, user_code: code });
+    const data = await call("PYTHON_DEBUG", { task: question.task, user_code: code, lang });
     setLoading(null);
     if (data) setDebugInfo(data);
   }
   async function handleVisualize() {
     if (!question) return;
     setLoading("visualize");
-    const data = await call("PYTHON_VISUALIZE", { task: question.task, user_code: code });
+    const data = await call("PYTHON_VISUALIZE", { task: question.task, user_code: code, lang });
     setLoading(null);
     if (data) setVisual(data);
   }
@@ -788,10 +797,31 @@ function PythonWorkspace() {
                 setInterviewMode(!!s.interviewMode);
               }
               if (s.code) setCode(s.code);
+              if (s.lang) setLang(s.lang);
               resume.hydrate(resume.savedSnapshot);
             }}
             onDismiss={resume.dismiss}
           />
+        )}
+        {!question && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface-1 px-3 py-2">
+            <label htmlFor="lang-select" className="text-[11px] uppercase tracking-widest text-muted-foreground">
+              Language
+            </label>
+            <select
+              id="lang-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value as CodeLang)}
+              className="bg-background border border-input rounded-md px-2.5 py-1 text-sm font-mono"
+            >
+              {LANG_OPTIONS.map((l) => (
+                <option key={l} value={l}>{LANG_META[l].label}</option>
+              ))}
+            </select>
+            <span className="text-[11px] font-mono text-muted-foreground truncate">
+              {LANG_META[lang].hint}
+            </span>
+          </div>
         )}
         {!question && (
           <div className="flex items-center gap-1 border-b border-border overflow-x-auto whitespace-nowrap scrollbar-thin">
@@ -1134,10 +1164,31 @@ function PythonWorkspace() {
               <>
               <div data-tour="editor" className="rounded-lg border border-border bg-surface-1 overflow-hidden">
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
-                  <span>solution.py</span>
+                  <span className="flex items-center gap-2">
+                    <span>{LANG_META[lang].fileName}</span>
+                    <select
+                      aria-label="Change language"
+                      value={lang}
+                      onChange={(e) => {
+                        const next = e.target.value as CodeLang;
+                        if (next === lang) return;
+                        if (code && code.trim() && !confirm("Switch language? Your current code will be saved but the editor will load a fresh starter.")) return;
+                        setLang(next);
+                        // Reset code to a language-appropriate blank buffer so the
+                        // user isn't left with Python code inside a Java editor.
+                        setCode("");
+                        clearPanels();
+                      }}
+                      className="bg-background border border-input rounded px-1.5 py-0.5 text-[10px] font-mono"
+                    >
+                      {LANG_OPTIONS.map((l) => (
+                        <option key={l} value={l}>{LANG_META[l].label}</option>
+                      ))}
+                    </select>
+                  </span>
                   <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
                 </div>
-                <PythonEditor value={code} onChange={setCode} minHeight={440} />
+                <CodeEditor value={code} onChange={setCode} lang={lang} minHeight={440} />
               </div>
               <div className="flex flex-wrap gap-2">
                 <button data-tour="run" onClick={handleRun} disabled={!!loading} className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-primary text-primary-foreground text-base hover:opacity-90 disabled:opacity-50">
