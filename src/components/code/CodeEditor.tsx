@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
 import * as RSCE from "react-simple-code-editor";
-import Prism from "prismjs";
-// Prism language components reference a global `Prism`; expose it before importing them.
-(globalThis as any).Prism = Prism;
+import { Prism } from "@/lib/prism-setup";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
