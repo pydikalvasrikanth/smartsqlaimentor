@@ -1172,11 +1172,31 @@ function PythonWorkspace() {
                       onChange={(e) => {
                         const next = e.target.value as CodeLang;
                         if (next === lang) return;
-                        if (code && code.trim() && !confirm("Switch language? Your current code will be saved but the editor will load a fresh starter.")) return;
-                        setLang(next);
-                        // Reset code to a language-appropriate blank buffer so the
-                        // user isn't left with Python code inside a Java editor.
-                        setCode("");
+                        if (
+                          code &&
+                          code.trim() &&
+                          !confirm(
+                            "Switch language? Your current code will be saved for this language and restored if you switch back.",
+                          )
+                        )
+                          return;
+                        // Persist the current buffer under the outgoing language
+                        // so switching back restores it. Load any previously
+                        // saved buffer for the incoming language, or fall back
+                        // to the question's starter for that language.
+                        try {
+                          const key = `py-lang-buffers:${sessionQid ?? "adhoc"}`;
+                          const raw = localStorage.getItem(key);
+                          const map: Record<string, string> = raw ? JSON.parse(raw) : {};
+                          map[lang] = code;
+                          localStorage.setItem(key, JSON.stringify(map));
+                          const restored = map[next];
+                          setLang(next);
+                          setCode(restored ?? "");
+                        } catch {
+                          setLang(next);
+                          setCode("");
+                        }
                         clearPanels();
                       }}
                       className="bg-background border border-input rounded px-1.5 py-0.5 text-[10px] font-mono"
