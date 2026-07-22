@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { toast, Toaster } from "sonner";
 import {
-  Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft,
+  Loader2, Play, Lightbulb, Eye, ArrowRight, LogOut, ArrowLeft,
   CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame,
   AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle,
 } from "lucide-react";
