@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
 
-type Subject = "sql" | "python" | "java";
+type Subject = "sql" | "python" | "java" | "pyspark";
 
 interface Solved {
   id: string;
