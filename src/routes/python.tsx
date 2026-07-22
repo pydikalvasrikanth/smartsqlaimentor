@@ -24,7 +24,7 @@ export const Route = createFileRoute("/python")({
     meta: [
       { title: "Python Interview Engine — AI mentor practice" },
       { name: "description", content: "Python coding interview practice with AI-graded feedback, hints, and complexity analysis." },
-      { property: "og:title", content: "Python Interview Engine" },
+      { property: "og:title", content: "Python Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 50-question sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/python" },
     ],

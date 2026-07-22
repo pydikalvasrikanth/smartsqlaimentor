@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Interview Intelligence — SQL, Python & GCP practice" },
       { name: "description", content: "Pick a subject and practice with an AI mentor: SQL, Python, or GCP Data Engineer interview questions from top MNCs." },
-      { property: "og:title", content: "Interview Intelligence Engine" },
+      { property: "og:title", content: "Interview Intelligence Engine — AI Practice for SQL, Python & GCP" },
       { property: "og:description", content: "AI-powered interview practice for SQL, Python and GCP Data Engineering." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/" },
     ],

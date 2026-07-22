@@ -14,7 +14,7 @@ export const Route = createFileRoute("/gcp")({
     meta: [
       { title: "GCP Data Engineer Interview Bank — 100+ MNC questions" },
       { name: "description", content: "Curated GCP Data Engineer interview questions from top MNCs with answers, explanations, and follow-ups." },
-      { property: "og:title", content: "GCP Data Engineer Interview Bank" },
+      { property: "og:title", content: "GCP Data Engineer Interview Bank — 100+ MNC Questions" },
       { property: "og:description", content: "100+ curated GCP Data Engineer interview questions from top MNCs with answers and explanations." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/gcp" },
     ],
