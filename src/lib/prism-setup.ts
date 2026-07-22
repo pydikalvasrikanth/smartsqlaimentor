@@ -1,9 +1,15 @@
-import Prism from "prismjs";
+// Prism ships as CJS; the default export can be undefined under certain SSR
+// interop paths, which then leaves `globalThis.Prism` unset and any later
+// prism-* component module throws `ReferenceError: Prism is not defined`
+// during renderToReadableStream. Import as a namespace and fall back to it
+// so we always end up with a real Prism instance.
+import * as PrismNS from "prismjs";
+const Prism: any =
+  (PrismNS as any).default ?? (PrismNS as any).Prism ?? (PrismNS as any);
 
-// Prism language components (prism-java, prism-c, etc.) reference a global
-// `Prism` object. In an ESM build that global does not exist unless we set it
-// ourselves before those component modules are evaluated.
-(globalThis as any).Prism = Prism;
+if (typeof globalThis !== "undefined") {
+  (globalThis as any).Prism = Prism;
+}
 
 const loadedLanguages = new Set<string>();
 const loadingLanguages = new Map<string, Promise<void>>();
