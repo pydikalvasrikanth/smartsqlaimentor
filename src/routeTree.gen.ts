@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorialRouteImport } from './routes/tutorial'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PythonRouteImport } from './routes/python'
+import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
@@ -39,6 +40,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PythonRoute = PythonRouteImport.update({
   id: '/python',
   path: '/python',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PysparkRoute = PysparkRouteImport.update({
+  id: '/pyspark',
+  path: '/pyspark',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeRoute = PracticeRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/pyspark': typeof PysparkRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tutorial': typeof TutorialRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/pyspark': typeof PysparkRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tutorial': typeof TutorialRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/pyspark': typeof PysparkRoute
   '/python': typeof PythonRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tutorial': typeof TutorialRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/pyspark'
     | '/python'
     | '/reset-password'
     | '/tutorial'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/pyspark'
     | '/python'
     | '/reset-password'
     | '/tutorial'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/pyspark'
     | '/python'
     | '/reset-password'
     | '/tutorial'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   PracticeRoute: typeof PracticeRoute
+  PysparkRoute: typeof PysparkRoute
   PythonRoute: typeof PythonRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TutorialRoute: typeof TutorialRoute
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/python'
       fullPath: '/python'
       preLoaderRoute: typeof PythonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pyspark': {
+      id: '/pyspark'
+      path: '/pyspark'
+      fullPath: '/pyspark'
+      preLoaderRoute: typeof PysparkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice': {
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   PracticeRoute: PracticeRoute,
+  PysparkRoute: PysparkRoute,
   PythonRoute: PythonRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TutorialRoute: TutorialRoute,
