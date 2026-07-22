@@ -324,7 +324,7 @@ const PayloadSchemas = {
     target_concept: z.string().max(200),
     topic: z.string().max(500).optional(),
     company: z.string().max(100).optional(),
-    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
+    lang: z.enum(["python", "java", "c", "cpp", "pyspark"]).optional(),
   }),
   NEXT_PYTHON_QUESTION: z.object({
     target_difficulty: z.string().max(50),
@@ -332,7 +332,7 @@ const PayloadSchemas = {
     covered_concepts: z.array(z.string().max(100)).max(200).optional(),
     previous_question_ids: z.array(z.number()).max(500).optional(),
     company: z.string().max(100).optional(),
-    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
+    lang: z.enum(["python", "java", "c", "cpp", "pyspark"]).optional(),
   }),
   EVALUATE_PYTHON: z.object({
     session_question_id: z.string().uuid(),
@@ -341,7 +341,7 @@ const PayloadSchemas = {
   PYTHON_HINT: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
-    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
+    lang: z.enum(["python", "java", "c", "cpp", "pyspark"]).optional(),
   }),
   REVEAL_PYTHON_SOLUTION: z.object({
     session_question_id: z.string().uuid(),
@@ -349,12 +349,12 @@ const PayloadSchemas = {
   PYTHON_DEBUG: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
-    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
+    lang: z.enum(["python", "java", "c", "cpp", "pyspark"]).optional(),
   }),
   PYTHON_VISUALIZE: z.object({
     task: z.string().max(10_000),
     user_code: z.string().max(10_000),
-    lang: z.enum(["python", "java", "c", "cpp"]).optional(),
+    lang: z.enum(["python", "java", "c", "cpp", "pyspark"]).optional(),
   }),
   PYTHON_OPTIMIZE: z.object({
     session_question_id: z.string().uuid(),
