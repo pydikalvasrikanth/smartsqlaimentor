@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 interface Subject {
   id: string;
-  to: "/practice" | "/python" | "/java" | "/gcp";
+  to: "/practice" | "/python" | "/java" | "/gcp" | "/pyspark";
   title: string;
   tagline: string;
   description: string;
@@ -63,6 +63,16 @@ const SUBJECTS: Subject[] = [
     icon: Coffee,
     accent: "from-red-500 to-amber-500",
     highlights: ["Records, sealed types, virtual threads", "Collections, Streams & concurrency drills", "Backend & Spring Boot scenarios"],
+  },
+  {
+    id: "pyspark",
+    to: "/pyspark",
+    title: "PySpark",
+    tagline: "Apache Spark 3.5 · AI graded",
+    description: "PySpark DataFrame API practice: joins, window functions, UDFs, partitioning & streaming. Real data-engineering scenarios graded by AI.",
+    icon: Sparkles,
+    accent: "from-amber-500 to-rose-500",
+    highlights: ["DataFrame + Spark SQL fluency", "Window, joins & broadcast tuning", "Structured streaming & Delta"],
   },
   {
     id: "gcp",
