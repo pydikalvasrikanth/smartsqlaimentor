@@ -147,7 +147,7 @@ function highlightJava(code: string): string {
 }
 
 export function SolvedLibrary({ subject = "sql" }: { subject?: Subject } = {}) {
-  const isPython = subject === "python";
+  const isPython = subject === "python" || subject === "pyspark";
   const isJava = subject === "java";
   const [rows, setRows] = useState<Solved[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
