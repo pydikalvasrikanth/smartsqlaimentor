@@ -571,7 +571,7 @@ function InterviewPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+          <Link to="/" aria-label="Back to subjects" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-3.5 w-3.5" /> Home
           </Link>
           <h1 className="text-sm font-semibold tracking-tight">Live AI Interview</h1>
