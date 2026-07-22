@@ -23,7 +23,7 @@ export const Route = createFileRoute("/java")({
     meta: [
       { title: "Java Interview Engine — AI mentor practice" },
       { name: "description", content: "Java coding interview practice with AI-graded feedback, hints, and complexity analysis." },
-      { property: "og:title", content: "Java Interview Engine" },
+      { property: "og:title", content: "Java Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded Java coding practice: hints, complexity analysis, and progressive 50-question sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/java" },
     ],

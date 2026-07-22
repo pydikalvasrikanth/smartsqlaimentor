@@ -63,7 +63,7 @@ export const Route = createFileRoute("/practice")({
         content:
           "Interactive SQL practice with an AI Senior Data Engineer: generated schemas, ERDs, semantic query evaluation, hints, and debugging.",
       },
-      { property: "og:title", content: "SQL Intelligence Engine" },
+      { property: "og:title", content: "SQL Intelligence Engine — Interactive AI Practice" },
       {
         property: "og:description",
         content: "Practice MySQL with realistic schemas and AI mentor feedback.",

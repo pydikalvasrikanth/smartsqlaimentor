@@ -29,7 +29,7 @@ export const Route = createFileRoute("/pyspark")({
     meta: [
       { title: "PySpark Interview Engine — AI-graded Spark practice" },
       { name: "description", content: "PySpark coding interview practice: DataFrame API, joins, windows, UDFs, partitioning & streaming, all AI-graded." },
-      { property: "og:title", content: "PySpark Interview Engine" },
+      { property: "og:title", content: "PySpark Interview Engine — AI-Graded Spark Practice" },
       { property: "og:description", content: "AI-graded PySpark practice — DataFrame API, joins, window functions, structured streaming and more." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/pyspark" },
       { property: "og:type", content: "website" },
