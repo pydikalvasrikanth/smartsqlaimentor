@@ -1,4 +1,4 @@
-export type CodeLang = "python" | "java" | "c" | "cpp";
+export type CodeLang = "python" | "java" | "c" | "cpp" | "pyspark";
 
 export const LANG_META: Record<
   CodeLang,
@@ -28,6 +28,12 @@ export const LANG_META: Record<
     prismLang: "cpp",
     hint: "C++17 · STL welcome",
   },
+  pyspark: {
+    label: "PySpark",
+    fileName: "solution.py",
+    prismLang: "python",
+    hint: "PySpark 3.5 · DataFrame API · SparkSession",
+  },
 };
 
 export const LANG_OPTIONS: CodeLang[] = ["python", "java", "c", "cpp"];
@@ -52,5 +58,7 @@ export function languageSpec(lang: CodeLang): string {
       return `Target language: C11. function_signature must be a valid C function prototype such as \`int* twoSum(int* nums, int numsSize, int target, int* returnSize)\`. starter_code must include \`#include <stdio.h>\` (and stdlib.h / string.h where relevant) and a \`main()\` that calls the solution function. All code must be valid C11 — no C++ features. Test-case inputs/outputs are C literals or short array descriptions.`;
     case "cpp":
       return `Target language: C++17. function_signature must be a valid C++ method signature (either free function or inside a \`class Solution\`). starter_code must include the required \`#include\` headers, a \`class Solution\` (or free function) skeleton, and a small \`int main()\` that exercises it. Use STL containers (vector, unordered_map, etc.) idiomatically. All code must be valid C++17.`;
+    case "pyspark":
+      return `Target language: PySpark (Python 3.11 + Apache Spark 3.5). Every generated question MUST be solvable with the PySpark DataFrame API (or Spark SQL where clearly better). function_signature must be a valid Python \`def name(spark: SparkSession, ...) -> DataFrame:\` line that takes a \`SparkSession\` (and any input DataFrames) and returns a \`pyspark.sql.DataFrame\`. starter_code must import \`from pyspark.sql import SparkSession, DataFrame, functions as F, Window\` (as needed) and provide a function skeleton with \`pass\`. expected_solution and any generated code must be valid PySpark using \`F.col\`, \`.groupBy\`, \`.agg\`, \`.join\`, window functions, \`when/otherwise\`, etc. — NEVER pandas, NEVER a plain Python loop over rows, NEVER collect() unless the problem literally asks for a driver-side scalar. Test-case inputs are described as small in-memory rows (list of dicts / tuples) that would be turned into a DataFrame with \`spark.createDataFrame(...)\`; expected outputs are the resulting rows.`;
   }
 }
