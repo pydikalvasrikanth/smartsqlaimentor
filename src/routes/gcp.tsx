@@ -52,7 +52,7 @@ const LEVEL_LABEL: Record<GcpDifficulty, string> = {
   professional: "Professional",
 };
 // Focus areas the user asked about — surface these first, then "All" for the rest.
-const FOCUS_TOPICS = ["BigQuery", "SQL Modeling", "Warehousing", "ETL/ELT", "Power BI"];
+const FOCUS_TOPICS = ["BigQuery", "MySQL", "SQL Modeling", "Warehousing", "ETL/ELT", "Power BI"];
 const OTHER_TOPICS = Array.from(new Set(GCP_BANK.map((q) => q.topic)))
   .filter((t) => !FOCUS_TOPICS.includes(t))
   .sort();
