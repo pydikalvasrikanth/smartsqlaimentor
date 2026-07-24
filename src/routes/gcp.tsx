@@ -189,7 +189,7 @@ function GcpWorkspace() {
             onResume={() => {
               const s = resume.savedSnapshot!.state;
               setTopic(s.topic ?? "BigQuery");
-              setLevel(s.level ?? "beginner");
+              setLevel(s.level ?? (s as any).diff ?? "beginner");
               setMarks(s.marks ?? {});
               setCovered(s.covered ?? []);
               setTimeout(() => setIndex(s.index ?? 0), 0);
