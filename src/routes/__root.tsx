@@ -107,6 +107,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Lovable" },
+      { title: "Smart AI SQL Mentor — SQL, Python, Java, PySpark & GCP Practice" },
+      { name: "description", content: "Smart AI SQL Mentor: interactive playground and AI-graded interview practice for SQL, Python, Java, PySpark and GCP Data Engineering." },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Interview Intelligence Engine" },
       { name: "twitter:card", content: "summary" },
@@ -119,6 +121,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "shortcut icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
