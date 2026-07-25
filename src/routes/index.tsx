@@ -9,10 +9,10 @@ import { HeaderTimer } from "@/components/HeaderTimer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Smart AI SQL Mentor & Interactive Playground — SQL, Python, Java, PySpark & GCP" },
-      { name: "description", content: "Smart AI SQL Mentor: an interactive playground with AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineer interviews from top MNCs." },
-      { property: "og:title", content: "Smart AI SQL Mentor & Interactive Playground" },
-      { property: "og:description", content: "Interactive AI mentor and playground for SQL, Python, Java, PySpark and GCP Data Engineering interview practice." },
+      { title: "Smart AI Code Playground — SQL, Python, Java, PySpark, GCP" },
+      { name: "description", content: "Smart AI Code Playground: AI-graded coding practice and mock interviews for SQL, Python, Java, PySpark and GCP Data Engineering roles at top MNCs." },
+      { property: "og:title", content: "Smart AI Code Playground" },
+      { property: "og:description", content: "AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/" },
     ],
     links: [
@@ -131,7 +131,7 @@ function SubjectPicker() {
             <Sparkles className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <span className="text-sm font-semibold tracking-tight block">Interview Intelligence Engine</span>
+            <span className="text-sm font-semibold tracking-tight block">Smart AI Code Playground</span>
             <p className="text-[11px] text-muted-foreground font-mono">pick a subject · practice with AI</p>
           </div>
           <div className="ml-auto flex items-center gap-2 text-[11px] font-mono">
@@ -162,16 +162,13 @@ function SubjectPicker() {
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             AI mentor · live grading
           </span>
-          <h1
-            className="text-5xl md:text-6xl leading-[1.05] tracking-tight text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Smart AI SQL Mentor & Interactive{" "}
-            <em className="text-primary not-italic bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent italic">
+          <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight text-foreground">
+            Smart AI Code{" "}
+            <em className="text-primary not-italic bg-linear-to-r from-primary to-primary-glow bg-clip-text text-transparent italic">
               Playground
             </em>
           </h1>
-          <p className="sr-only">Smart AI SQL Mentor and interactive coding playground for SQL, Python, Java, PySpark, and GCP Data Engineering interview practice.</p>
+          <p className="sr-only">Smart AI Code Playground — AI-graded practice for SQL, Python, Java, PySpark, and GCP Data Engineering interview preparation.</p>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             Adaptive SQL, Python, and GCP tracks with an AI mentor that generates questions,
             grades your work, and tracks weak spots — personal to you.
@@ -280,7 +277,7 @@ function SubjectPicker() {
           </div>
         </div>
         <div className="border-t border-border/60 py-4 text-center text-[11px] font-mono text-muted-foreground">
-          © {new Date().getFullYear()} Smart AI SQL Mentor · Interview Intelligence Engine
+          © {new Date().getFullYear()} Smart AI Code Playground
         </div>
       </footer>
     </div>
