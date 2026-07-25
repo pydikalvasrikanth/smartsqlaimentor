@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://smartsqlaimentor.live/sitemap.xml
 Sitemap: https://smartsqlaimentor.lovable.app/sitemap.xml
