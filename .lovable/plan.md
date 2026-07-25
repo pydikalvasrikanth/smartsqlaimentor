@@ -1,73 +1,107 @@
-## Goal
+# Quality + SEO Overhaul — v01 → v02
 
-Turn the existing `/python` section into a **multi-language coding section**. A language dropdown at the top lets the user pick **Python, Java, C, or C++**. Everything downstream — question generation, starter code, editor highlighting, execution/grading, theory, "Show SQL version", solved library, and resume — adapts to the selected language.
+## 0. Baseline "v01"
 
-The separate `/java` route stays in place for now (no removal in this change) but the new unified flow is the primary path.
+Lovable auto-versions every change (full rollback history is already saved), so no DB table is needed. Before I start, I'll ask you to click **Publish** — that snapshots the current live app as your v01 baseline you can roll back to at any time. All work below lands as v02.
 
-## UX
+## 1. Design system reset (Cloud White + Sora/Manrope)
 
-Top of `/python` (all tabs: Today, Free Practice, Topic-wise, Targeted):
+Rewrite `src/styles.css` tokens and typography:
 
-```text
-Language: [ Python ▾ ]   Topic: [...]   Difficulty: [...]   [Start]
-           Python
-           Java
-           C
-           C++
-```
+- **Palette (light default, dark parity):**
+  - `--background` `#fafbfc` / dark `#0b1220`
+  - `--surface-2` `#f4f6fa` / dark `#111a2e`
+  - `--foreground` `#0f172a` / dark `#e8ecf1`
+  - `--muted-foreground` `#475569` / dark `#94a3b8`
+  - `--border` `#e2e8f0` / dark `#1e293b`
+  - `--primary` `#3b82f6`, `--primary-glow` `#60a5fa`, `--primary-foreground` `#ffffff`
+  - Success `#16a34a`, warning `#d97706`, destructive `#dc2626`
+- **Type scale (standardized):** Sora headings (600/700), Manrope body (400/500/600). H1 40/48, H2 30/36, H3 22/28, body 15/24, small 13/20, code JetBrains Mono 13. Loaded via `<link>` in `__root.tsx`.
+- **Spacing / radii:** radius 10px, cards 14px, buttons 8px. Consistent `p-4 md:p-6`, `gap-4 md:gap-6`.
+- **Shadows:** subtle elevation only (`0 1px 2px`, `0 8px 24px -12px` for popovers).
+- **Focus rings:** 2px `primary`, 2px offset — a11y compliant.
+- **Component sweep:** unify Button, Card, Input, Tabs, Badge variants so every route inherits the new tokens automatically. Removes ad‑hoc `bg-[#…]` and stray dark chrome (Monaco stays IDE-dark for readability but with the new accent).
 
-- Changing language mid-session prompts: "Switch language? Current code will be saved." → confirm swaps editor + regenerates a fresh question in the new language.
-- Editor label, file name (`solution.py` / `Solution.java` / `solution.c` / `solution.cpp`), and syntax highlighting update with the selection.
-- Section heading stays "Coding Practice" (rename from "Python Interview Engine") since it's no longer Python-only.
+## 2. Landing page rebuild (`src/routes/index.tsx`)
 
-## Technical design
+New composition using Cloud White system:
 
-**New shared type** `src/lib/languages.ts`
-```ts
-export type CodeLang = "python" | "java" | "c" | "cpp";
-export const LANG_META: Record<CodeLang, { label; ext; prismLang; starter; fileName }>
-```
+- Top nav (logo, primary links, theme toggle, sign‑in CTA).
+- Hero — H1 + subhead + two CTAs + trust strip.
+- "Practice tracks" bento (SQL / Python / Java / PySpark / GCP / Interview) — internal deep links.
+- How it works (3 steps).
+- Feature grid (AI grading, resumable sessions, animated theory, voice interview, adaptive difficulty, solved library).
+- FAQ (schema-marked).
+- Footer (all routes, contact, socials, legal placeholders).
 
-**Editor** — new `src/components/code/CodeEditor.tsx`
-- Single component wrapping `react-simple-code-editor` + Prism.
-- Loads the correct Prism grammar based on `lang` prop (`prism-python`, `prism-java`, `prism-c`, `prism-cpp`).
-- Reuses the maximize/resize behavior from existing `PythonEditor` / `JavaEditor`.
-- Existing `PythonEditor` / `JavaEditor` stay for backward compat, but `/python` route switches to `CodeEditor`.
+## 3. Performance pass
 
-**Server functions** `src/lib/python-engine.functions.ts`
-- Extend `GENERATE_PY_QUESTION`, `GRADE_PY_SOLUTION`, `PYTHON_THEORY`, `PYTHON_TO_SQL` handlers to accept a `lang: CodeLang` input.
-- System prompt switches per language:
-  - Python → pandas/stdlib (current behavior)
-  - Java → Java 17 idiomatic, `Solution` class + `main`
-  - C → C11, `stdio.h`, `main`
-  - C++ → C++17, STL where helpful
-- Grader runs the same rubric but expects code in the chosen language; test cases stay language-agnostic (input/expected output described in prompt) since we already grade via LLM, not real execution.
-- "Show SQL version" (`PYTHON_TO_SQL`) works for any source language — prompt is updated to say "convert this <lang> solution to MySQL".
+- Split route-level bundles that pull heavy libs (`monaco`, `mermaid`, `recharts`) behind `React.lazy` where they aren't already.
+- Preload the Sora/Manrope woff2 subsets via `<link rel="preload">`.
+- Convert PNG hero-adjacent assets to responsive `<img loading="lazy" decoding="async">`; add width/height to prevent CLS.
+- Add `Cache-Control` headers on `/sitemap.xml` (already), extend to `/robots.txt` route.
+- Debounce autosave writes (already local; keep server flush at 5s idle).
 
-No new tables. No new routes. `/java` route left untouched.
+## 4. SEO — on-page
 
-**Route wiring** `src/routes/python.tsx`
-- Add `lang` to component state, default `"python"`.
-- Persist per tab in the existing resume key (append `:<lang>` so switching languages doesn't clobber the Python buffer).
-- Replace `<PythonEditor>` with `<CodeEditor lang={lang} …>`.
-- Update file-name badge and "Show SQL version" trigger label to say the current language.
-- Update tab heading + `HeaderTimer` label.
+For each public route (`/`, `/practice`, `/python`, `/java`, `/pyspark`, `/gcp`, `/interview`, `/engine`, `/tutorial`, `/feedback`, `/chat`, `/auth`):
 
-**Solved Library**
-- `SolvedLibrary` gets a `lang` filter so Python/Java/C/C++ solves live side-by-side; the unique-functions extractor gains simple regexes per language (Python `def`, Java method signatures, C/C++ function definitions).
+- Unique `<title>` ≤60 chars with target keyword.
+- `<meta description>` ≤160 chars, benefit + keyword.
+- One `<h1>`, semantic h2/h3 tree.
+- `og:title`, `og:description`, `og:url`, `twitter:card=summary_large_image`.
+- Canonical → `https://smartsqlaimentor.live/<path>`.
+- Route-scoped JSON-LD: WebSite, Organization, LearningResource (per subject), FAQPage (landing), BreadcrumbList (subject pages).
 
-**Resume**
-- Resume key format changes from `python:<tab>` to `code:<tab>:<lang>` so each language keeps its own draft.
-- Old `python:*` keys are read once as fallback (backwards compat) then migrated on first save.
+## 5. SEO — technical
 
-## Scope of edits
+- `public/robots.txt` — keep `Allow: /`, add both live domains to `Sitemap:`.
+- Migrate `public/sitemap.xml` → server route `src/routes/sitemap[.]xml.ts` that reflects every current public route with weekly changefreq. Delete stale static file.
+- `alt` text audit on every `<img>`.
+- Add `hreflang` = en, `lang="en"` on `<html>` (already).
+- Web‑vitals: preconnect fonts, defer GA (already async), inline critical CSS via Vite plugin default.
 
-- New: `src/lib/languages.ts`, `src/components/code/CodeEditor.tsx`.
-- Edit: `src/routes/python.tsx`, `src/lib/python-engine.functions.ts`, `src/components/sql/SolvedLibrary.tsx` (add lang filter).
-- No DB migration. No changes to `/java`, `/practice`, or other subjects.
+## 6. SEO — new landing pages (rank targets)
 
-## Out of scope
+Add SEO-tuned public routes (no functional change to existing engines):
 
-- Real code execution/sandboxing (grading stays LLM-based, same as today).
-- Removing the standalone `/java` route.
-- Adding more languages (Go, Rust, TS) — easy follow-up once the selector pattern lands.
+- `/sql-interview-questions` — curated list linking into `/practice` topics.
+- `/pyspark-practice` — hero + benefits → CTA to `/pyspark`.
+- `/gcp-data-engineer-interview` — role-focused → CTA to `/gcp`.
+- `/python-coding-practice` — → CTA to `/python`.
+
+Each: 800–1200 words, H1/H2/H3 tree, FAQ block, JSON-LD, internal links.
+
+## 7. SEO — backlink-ready guides
+
+- `/guides/sql-window-functions` — cheat-sheet-style, code snippets, diagrams.
+- `/guides/pyspark-vs-pandas` — comparison table.
+- `/guides/gcp-data-engineer-roadmap` — checklist.
+
+Added to sitemap.
+
+## 8. Functionality guardrail
+
+No changes to: auth, resume/session logic, engine RPCs, editors, interview flow, GCP question bank, email pipeline. Only presentation, metadata, and net-new marketing routes.
+
+## Technical execution order
+
+1. `src/styles.css` token rewrite + font links.
+2. Shared UI component variants (`src/components/ui/*`) — light audit only.
+3. Landing rebuild.
+4. Route metadata sweep (`head()` in each route file).
+5. Sitemap server route + robots update.
+6. New landing + guide routes (7 files).
+7. `route.tree.gen.ts` regenerates automatically.
+8. Verify build, spot‑check preview at mobile (420×805) and desktop.
+
+## Deliverables
+
+- v02 published build with new visual system, standardized typography, unified spacing.
+- 4 SEO landing pages + 3 long-form guides live in sitemap.
+- Full metadata + JSON-LD coverage.
+- Lighthouse target: Performance ≥90 mobile, SEO 100, A11y ≥95.
+
+Reply **approve** to proceed, or tell me what to change (e.g. skip guides, keep current landing, different accent blue, etc.).
+
+Change the heading correct and also the main page heading interview intelligence engine to smart AI Code playground 

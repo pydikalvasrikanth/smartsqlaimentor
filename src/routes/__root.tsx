@@ -107,11 +107,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Lovable" },
-      { title: "Smart AI SQL Mentor — SQL, Python, Java, PySpark & GCP Practice" },
-      { name: "description", content: "Smart AI SQL Mentor: interactive playground and AI-graded interview practice for SQL, Python, Java, PySpark and GCP Data Engineering." },
+      { title: "Smart AI Code Playground — SQL, Python, Java, PySpark & GCP" },
+      { name: "description", content: "Smart AI Code Playground: AI-graded practice, live interviews, and adaptive tutorials for SQL, Python, Java, PySpark and GCP Data Engineering." },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "Interview Intelligence Engine" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:site_name", content: "Smart AI Code Playground" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/3c24b2c7-3512-4025-914c-88c3d8f96a90" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/3c24b2c7-3512-4025-914c-88c3d8f96a90" },
@@ -128,7 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
     ],
     scripts: [
@@ -145,9 +145,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Interview Intelligence Engine",
+          name: "Smart AI Code Playground",
           url: "https://smartsqlaimentor.lovable.app",
-          description: "Adaptive AI-mentored interview practice for SQL, Python, Java, PySpark and GCP Data Engineering.",
+          description: "AI-graded practice and mock interviews for SQL, Python, Java, PySpark and GCP Data Engineering.",
         }),
       },
       {
@@ -155,7 +155,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Interview Intelligence Engine",
+          name: "Smart AI Code Playground",
           url: "https://smartsqlaimentor.lovable.app",
         }),
       },
