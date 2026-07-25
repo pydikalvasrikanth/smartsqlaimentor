@@ -10,12 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorialRouteImport } from './routes/tutorial'
+import { Route as SqlInterviewQuestionsRouteImport } from './routes/sql-interview-questions'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding-practice'
 import { Route as PythonRouteImport } from './routes/python'
+import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
+import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-engineer-interview'
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
@@ -32,14 +37,34 @@ const TutorialRoute = TutorialRouteImport.update({
   path: '/tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SqlInterviewQuestionsRoute = SqlInterviewQuestionsRouteImport.update({
+  id: '/sql-interview-questions',
+  path: '/sql-interview-questions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonCodingPracticeRoute = PythonCodingPracticeRouteImport.update({
+  id: '/python-coding-practice',
+  path: '/python-coding-practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PythonRoute = PythonRouteImport.update({
   id: '/python',
   path: '/python',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PysparkPracticeRoute = PysparkPracticeRouteImport.update({
+  id: '/pyspark-practice',
+  path: '/pyspark-practice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PysparkRoute = PysparkRouteImport.update({
@@ -62,6 +87,12 @@ const InterviewRoute = InterviewRouteImport.update({
   path: '/interview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GcpDataEngineerInterviewRoute =
+  GcpDataEngineerInterviewRouteImport.update({
+    id: '/gcp-data-engineer-interview',
+    path: '/gcp-data-engineer-interview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GcpRoute = GcpRouteImport.update({
   id: '/gcp',
   path: '/gcp',
@@ -121,12 +152,17 @@ export interface FileRoutesByFullPath {
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
+  '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/pyspark': typeof PysparkRoute
+  '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
+  '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -140,12 +176,17 @@ export interface FileRoutesByTo {
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
+  '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/pyspark': typeof PysparkRoute
+  '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
+  '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -160,12 +201,17 @@ export interface FileRoutesById {
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
+  '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
   '/pyspark': typeof PysparkRoute
+  '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
+  '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -181,12 +227,17 @@ export interface FileRouteTypes {
     | '/engine'
     | '/feedback'
     | '/gcp'
+    | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
     | '/pyspark'
+    | '/pyspark-practice'
     | '/python'
+    | '/python-coding-practice'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/sql-interview-questions'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -200,12 +251,17 @@ export interface FileRouteTypes {
     | '/engine'
     | '/feedback'
     | '/gcp'
+    | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
     | '/pyspark'
+    | '/pyspark-practice'
     | '/python'
+    | '/python-coding-practice'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/sql-interview-questions'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -219,12 +275,17 @@ export interface FileRouteTypes {
     | '/engine'
     | '/feedback'
     | '/gcp'
+    | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
     | '/pyspark'
+    | '/pyspark-practice'
     | '/python'
+    | '/python-coding-practice'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/sql-interview-questions'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -239,12 +300,17 @@ export interface RootRouteChildren {
   EngineRoute: typeof EngineRoute
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
+  GcpDataEngineerInterviewRoute: typeof GcpDataEngineerInterviewRoute
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   PracticeRoute: typeof PracticeRoute
   PysparkRoute: typeof PysparkRoute
+  PysparkPracticeRoute: typeof PysparkPracticeRoute
   PythonRoute: typeof PythonRoute
+  PythonCodingPracticeRoute: typeof PythonCodingPracticeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
   TutorialRoute: typeof TutorialRoute
   TopicSlugRoute: typeof TopicSlugRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -261,6 +327,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sql-interview-questions': {
+      id: '/sql-interview-questions'
+      path: '/sql-interview-questions'
+      fullPath: '/sql-interview-questions'
+      preLoaderRoute: typeof SqlInterviewQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -268,11 +348,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-coding-practice': {
+      id: '/python-coding-practice'
+      path: '/python-coding-practice'
+      fullPath: '/python-coding-practice'
+      preLoaderRoute: typeof PythonCodingPracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/python': {
       id: '/python'
       path: '/python'
       fullPath: '/python'
       preLoaderRoute: typeof PythonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pyspark-practice': {
+      id: '/pyspark-practice'
+      path: '/pyspark-practice'
+      fullPath: '/pyspark-practice'
+      preLoaderRoute: typeof PysparkPracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pyspark': {
@@ -301,6 +395,13 @@ declare module '@tanstack/react-router' {
       path: '/interview'
       fullPath: '/interview'
       preLoaderRoute: typeof InterviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gcp-data-engineer-interview': {
+      id: '/gcp-data-engineer-interview'
+      path: '/gcp-data-engineer-interview'
+      fullPath: '/gcp-data-engineer-interview'
+      preLoaderRoute: typeof GcpDataEngineerInterviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gcp': {
@@ -383,12 +484,17 @@ const rootRouteChildren: RootRouteChildren = {
   EngineRoute: EngineRoute,
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
+  GcpDataEngineerInterviewRoute: GcpDataEngineerInterviewRoute,
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   PracticeRoute: PracticeRoute,
   PysparkRoute: PysparkRoute,
+  PysparkPracticeRoute: PysparkPracticeRoute,
   PythonRoute: PythonRoute,
+  PythonCodingPracticeRoute: PythonCodingPracticeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
   TutorialRoute: TutorialRoute,
   TopicSlugRoute: TopicSlugRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
@@ -398,3 +504,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
