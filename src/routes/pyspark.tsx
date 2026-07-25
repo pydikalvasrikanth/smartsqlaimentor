@@ -36,6 +36,28 @@ export const Route = createFileRoute("/pyspark")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/pyspark" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LearningResource",
+          name: "PySpark Interview Engine",
+          description: "AI-graded PySpark practice covering DataFrame API, joins, window functions, UDFs, partitioning, and structured streaming.",
+          teaches: [
+            "PySpark DataFrame API",
+            "Spark SQL",
+            "Window functions",
+            "Joins and broadcast tuning",
+            "Structured Streaming",
+            "Delta Lake",
+          ],
+          url: "https://smartsqlaimentor.lovable.app/pyspark",
+          inLanguage: "en",
+          learningResourceType: "Interactive practice",
+        }),
+      },
+    ],
   }),
   component: PySparkWorkspace,
 });
