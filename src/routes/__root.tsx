@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Lovable" },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "SQL Intelligence Engine" },
+      { property: "og:site_name", content: "Interview Intelligence Engine" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/3c24b2c7-3512-4025-914c-88c3d8f96a90" },
@@ -132,9 +132,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "SQL Intelligence Engine",
+          name: "Interview Intelligence Engine",
           url: "https://smartsqlaimentor.lovable.app",
-          description: "Adaptive MySQL practice with an AI mentor.",
+          description: "Adaptive AI-mentored interview practice for SQL, Python, Java, PySpark and GCP Data Engineering.",
         }),
       },
       {
@@ -142,7 +142,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "SQL Intelligence Engine",
+          name: "Interview Intelligence Engine",
           url: "https://smartsqlaimentor.lovable.app",
         }),
       },
