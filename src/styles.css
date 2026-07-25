@@ -19,7 +19,9 @@
  */
 
 @theme inline {
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -70,31 +72,32 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.985 0.005 250);
-  --foreground: oklch(0.15 0.03 260);
+  /* Cloud White palette — light mode */
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.22 0.03 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.03 260);
+  --card-foreground: oklch(0.22 0.03 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.55 0.2 270);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --primary-glow: oklch(0.7 0.18 280);
-  --surface-2: oklch(0.96 0.01 250);
+  --popover-foreground: oklch(0.22 0.03 260);
+  --primary: oklch(0.62 0.19 256);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.72 0.17 250);
+  --surface-2: oklch(0.97 0.005 250);
   --success: oklch(0.62 0.17 150);
   --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.78 0.16 75);
+  --warning: oklch(0.75 0.16 60);
   --warning-foreground: oklch(0.2 0.05 60);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.42 0.04 258);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.9 0.015 255);
-  --input: oklch(0.9 0.015 255);
-  --ring: oklch(0.704 0.04 256.788);
+  --secondary: oklch(0.96 0.007 250);
+  --secondary-foreground: oklch(0.28 0.04 260);
+  --muted: oklch(0.965 0.006 250);
+  --muted-foreground: oklch(0.5 0.03 258);
+  --accent: oklch(0.96 0.007 250);
+  --accent-foreground: oklch(0.28 0.04 260);
+  --destructive: oklch(0.62 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.9 0.01 250);
+  --input: oklch(0.9 0.01 250);
+  --ring: oklch(0.62 0.19 256);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -111,31 +114,32 @@
 }
 
 .dark {
-  --background: oklch(0.14 0.035 265);
-  --foreground: oklch(0.98 0.005 250);
-  --card: oklch(0.2 0.04 265);
-  --card-foreground: oklch(0.98 0.005 250);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.62 0.2 275);
-  --primary-foreground: oklch(0.99 0.003 248);
-  --primary-glow: oklch(0.78 0.17 285);
-  --surface-2: oklch(0.17 0.04 265);
-  --success: oklch(0.7 0.17 150);
-  --success-foreground: oklch(0.12 0.04 260);
+  /* Cloud White palette — dark mode parity */
+  --background: oklch(0.17 0.025 260);
+  --foreground: oklch(0.96 0.005 250);
+  --card: oklch(0.21 0.028 260);
+  --card-foreground: oklch(0.96 0.005 250);
+  --popover: oklch(0.21 0.028 260);
+  --popover-foreground: oklch(0.96 0.005 250);
+  --primary: oklch(0.7 0.17 250);
+  --primary-foreground: oklch(0.14 0.03 260);
+  --primary-glow: oklch(0.78 0.15 245);
+  --surface-2: oklch(0.22 0.028 260);
+  --success: oklch(0.72 0.17 150);
+  --success-foreground: oklch(0.14 0.03 260);
   --warning: oklch(0.82 0.16 75);
-  --warning-foreground: oklch(0.15 0.04 60);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.78 0.03 257);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 14%);
-  --input: oklch(1 0 0 / 18%);
-  --ring: oklch(0.551 0.027 264.364);
+  --warning-foreground: oklch(0.14 0.03 60);
+  --secondary: oklch(0.26 0.03 260);
+  --secondary-foreground: oklch(0.96 0.005 250);
+  --muted: oklch(0.26 0.03 260);
+  --muted-foreground: oklch(0.78 0.02 255);
+  --accent: oklch(0.26 0.03 260);
+  --accent-foreground: oklch(0.96 0.005 250);
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.7 0.17 250);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -159,7 +163,8 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -167,40 +172,44 @@
   }
 
   h1 {
-    font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 2.75rem);
     line-height: 1.15;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--color-foreground);
   }
   h2 {
-    font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2rem);
     line-height: 1.2;
     font-weight: 700;
     letter-spacing: -0.015em;
     color: var(--color-foreground);
   }
   h3 {
-    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 1.02rem + 0.75vw, 1.5rem);
     line-height: 1.3;
     font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--color-foreground);
   }
   h4 {
+    font-family: var(--font-display);
     font-size: 1.125rem;
     line-height: 1.4;
     font-weight: 600;
     color: var(--color-foreground);
   }
-  h5 { font-size: 1rem; font-weight: 600; line-height: 1.45; }
-  h6 { font-size: 0.9375rem; font-weight: 600; line-height: 1.45; }
+  h5 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; line-height: 1.45; }
+  h6 { font-family: var(--font-display); font-size: 0.9375rem; font-weight: 600; line-height: 1.45; }
 
-  p { font-size: 1rem; line-height: 1.7; }
+  p { font-size: 0.9375rem; line-height: 1.65; }
   small { font-size: 0.8125rem; line-height: 1.5; }
 
   code, kbd, pre, samp {
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-family: var(--font-mono);
     font-size: 0.9em;
   }
 
