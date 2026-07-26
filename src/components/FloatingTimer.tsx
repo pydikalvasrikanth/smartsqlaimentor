@@ -11,7 +11,23 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
-const HIDE_ON = ["/auth", "/reset-password", "/sitemap.xml", "/practice", "/python", "/java", "/gcp", "/interview", "/"];
+const HIDE_ON = [
+  "/auth",
+  "/reset-password",
+  "/sitemap.xml",
+  "/practice",
+  "/python",
+  "/java",
+  "/gcp",
+  "/interview",
+  "/tutorial",
+  "/about",
+  "/contact",
+  "/faq",
+  "/privacy",
+  "/terms",
+  "/",
+];
 const POS_KEY = "focus_timer_pos_v1";
 const OPEN_KEY = "focus_timer_open_v1";
 const MIN_KEY = "focus_timer_min_v1";

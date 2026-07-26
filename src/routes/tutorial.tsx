@@ -4,6 +4,7 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, BookOpen, ArrowRight, Layers } from "lucide-react";
+import { HeaderTimer } from "@/components/HeaderTimer";
 
 export const Route = createFileRoute("/tutorial")({
   head: () => ({
@@ -131,6 +132,9 @@ function TutorialPage() {
               <h1 className="text-sm font-semibold tracking-tight">{active.title}</h1>
               <p className="text-[11px] text-muted-foreground font-mono">{active.badge.toLowerCase()}</p>
             </div>
+            <div className="ml-auto">
+              <HeaderTimer storageKey="header_timer:sql" />
+            </div>
           </div>
         </header>
         <iframe
@@ -161,6 +165,9 @@ function TutorialPage() {
             <p className="text-[11px] text-muted-foreground font-mono">
               interactive tutorials · basics to advanced
             </p>
+          </div>
+          <div className="ml-auto">
+            <HeaderTimer storageKey="header_timer:sql" />
           </div>
         </div>
       </header>

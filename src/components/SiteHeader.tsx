@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkles, Menu, X } from "lucide-react";
+import { Sparkles, Menu, X, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 
 const NAV = [
@@ -14,10 +14,27 @@ const NAV = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  function goBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.history.back();
+    } else {
+      router.navigate({ to: "/" });
+    }
+  }
 
   return (
     <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-30">
       <div className="max-w-[1200px] mx-auto px-4 py-3 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={goBack}
+          aria-label="Go back"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <span className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
             <Sparkles className="h-4 w-4 text-primary-foreground" />
