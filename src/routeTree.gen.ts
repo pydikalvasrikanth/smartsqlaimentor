@@ -26,6 +26,7 @@ import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
 import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as CCppCodingPracticeRouteImport } from './routes/c-cpp-coding-practice'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
@@ -119,6 +120,11 @@ const ChatRoute = ChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CCppCodingPracticeRoute = CCppCodingPracticeRouteImport.update({
+  id: '/c-cpp-coding-practice',
+  path: '/c-cpp-coding-practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -154,6 +160,7 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
     | '/cpp'
     | '/engine'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
     | '/cpp'
     | '/engine'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
     | '/cpp'
     | '/engine'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CCppCodingPracticeRoute: typeof CCppCodingPracticeRoute
   ChatRoute: typeof ChatRoute
   CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/c-cpp-coding-practice': {
+      id: '/c-cpp-coding-practice'
+      path: '/c-cpp-coding-practice'
+      fullPath: '/c-cpp-coding-practice'
+      preLoaderRoute: typeof CCppCodingPracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -500,6 +520,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CCppCodingPracticeRoute: CCppCodingPracticeRoute,
   ChatRoute: ChatRoute,
   CppRoute: CppRoute,
   EngineRoute: EngineRoute,
