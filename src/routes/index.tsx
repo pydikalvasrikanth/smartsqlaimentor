@@ -261,6 +261,7 @@ function SubjectPicker() {
               <li><Link to="/python" className="hover:text-primary">Python Coding</Link></li>
               <li><Link to="/java" className="hover:text-primary">Java Coding</Link></li>
               <li><Link to="/pyspark" className="hover:text-primary">PySpark</Link></li>
+              <li><Link to="/cpp" className="hover:text-primary">C / C++ Coding</Link></li>
               <li><Link to="/gcp" className="hover:text-primary">GCP Data Engineer</Link></li>
             </ul>
           </div>
