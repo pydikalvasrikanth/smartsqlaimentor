@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorialRouteImport } from './routes/tutorial'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SqlInterviewQuestionsRouteImport } from './routes/sql-interview-questions'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -17,17 +18,21 @@ import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-engineer-interview'
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EngineRouteImport } from './routes/engine'
 import { Route as CppRouteImport } from './routes/cpp'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CCppCodingPracticeRouteImport } from './routes/c-cpp-coding-practice'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -37,6 +42,11 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
   path: '/tutorial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SqlInterviewQuestionsRoute = SqlInterviewQuestionsRouteImport.update({
@@ -74,6 +84,11 @@ const PysparkRoute = PysparkRouteImport.update({
   path: '/pyspark',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
@@ -105,6 +120,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EngineRoute = EngineRouteImport.update({
   id: '/engine',
   path: '/engine',
@@ -113,6 +133,11 @@ const EngineRoute = EngineRouteImport.update({
 const CppRoute = CppRouteImport.update({
   id: '/cpp',
   path: '/cpp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -128,6 +153,11 @@ const CCppCodingPracticeRoute = CCppCodingPracticeRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -159,17 +189,21 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -177,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -185,17 +220,21 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -203,6 +242,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -212,17 +252,21 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -230,6 +274,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -240,17 +285,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -258,6 +307,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -266,17 +316,21 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -284,6 +338,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -292,17 +347,21 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -310,6 +369,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -319,17 +379,21 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CCppCodingPracticeRoute: typeof CCppCodingPracticeRoute
   ChatRoute: typeof ChatRoute
+  ContactRoute: typeof ContactRoute
   CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
+  FaqRoute: typeof FaqRoute
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
   GcpDataEngineerInterviewRoute: typeof GcpDataEngineerInterviewRoute
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   PracticeRoute: typeof PracticeRoute
+  PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
   PysparkPracticeRoute: typeof PysparkPracticeRoute
   PythonRoute: typeof PythonRoute
@@ -337,6 +401,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
+  TermsRoute: typeof TermsRoute
   TutorialRoute: typeof TutorialRoute
   TopicSlugRoute: typeof TopicSlugRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -351,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/tutorial'
       fullPath: '/tutorial'
       preLoaderRoute: typeof TutorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sql-interview-questions': {
@@ -402,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PysparkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/practice': {
       id: '/practice'
       path: '/practice'
@@ -444,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/engine': {
       id: '/engine'
       path: '/engine'
@@ -456,6 +542,13 @@ declare module '@tanstack/react-router' {
       path: '/cpp'
       fullPath: '/cpp'
       preLoaderRoute: typeof CppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -477,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -519,17 +619,21 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CCppCodingPracticeRoute: CCppCodingPracticeRoute,
   ChatRoute: ChatRoute,
+  ContactRoute: ContactRoute,
   CppRoute: CppRoute,
   EngineRoute: EngineRoute,
+  FaqRoute: FaqRoute,
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
   GcpDataEngineerInterviewRoute: GcpDataEngineerInterviewRoute,
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   PracticeRoute: PracticeRoute,
+  PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
   PysparkPracticeRoute: PysparkPracticeRoute,
   PythonRoute: PythonRoute,
@@ -537,6 +641,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
+  TermsRoute: TermsRoute,
   TutorialRoute: TutorialRoute,
   TopicSlugRoute: TopicSlugRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
@@ -546,13 +651,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

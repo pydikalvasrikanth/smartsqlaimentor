@@ -278,12 +278,19 @@ function SubjectPicker() {
             <ul className="space-y-2">
               <li><Link to="/interview" className="hover:text-primary">Live AI Interview</Link></li>
               <li><Link to="/feedback" className="hover:text-primary">Feedback</Link></li>
+              <li><Link to="/faq" className="hover:text-primary">FAQ</Link></li>
             </ul>
           </div>
           <div>
-            <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-3">About</h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Smart AI SQL Mentor is an interactive playground with AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews.
+            <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-3">Company</h2>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="hover:text-primary">About</Link></li>
+              <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
+              <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-primary">Terms of Use</Link></li>
+            </ul>
+            <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+              AI-graded practice for SQL, Python, Java, PySpark, C/C++ and GCP Data Engineering interviews.
             </p>
           </div>
         </div>
