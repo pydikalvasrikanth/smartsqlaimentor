@@ -4,6 +4,7 @@ import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, BookOpen, ArrowRight, Layers } from "lucide-react";
+import { HeaderTimer } from "@/components/HeaderTimer";
 
 export const Route = createFileRoute("/tutorial")({
   head: () => ({
