@@ -25,6 +25,7 @@ import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-engineer-interview'
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EngineRouteImport } from './routes/engine'
 import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -119,6 +120,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EngineRoute = EngineRouteImport.update({
   id: '/engine',
   path: '/engine',
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
+  '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cpp'
     | '/engine'
+    | '/faq'
     | '/feedback'
     | '/gcp'
     | '/gcp-data-engineer-interview'
@@ -374,6 +386,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
+  FaqRoute: typeof FaqRoute
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
   GcpDataEngineerInterviewRoute: typeof GcpDataEngineerInterviewRoute
@@ -510,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/engine': {
       id: '/engine'
       path: '/engine'
@@ -606,6 +626,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CppRoute: CppRoute,
   EngineRoute: EngineRoute,
+  FaqRoute: FaqRoute,
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
   GcpDataEngineerInterviewRoute: GcpDataEngineerInterviewRoute,
