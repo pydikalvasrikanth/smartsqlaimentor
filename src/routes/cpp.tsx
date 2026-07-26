@@ -391,7 +391,7 @@ function CppWorkspace() {
     lang: CodeLang;
   };
   const resume = useResumableState<PyResume>(
-    "python",
+    "cpp",
     {
       tab: "today",
       topicLevel: "intermediate",
