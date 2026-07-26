@@ -25,9 +25,11 @@ import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
 import { Route as CppRouteImport } from './routes/cpp'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CCppCodingPracticeRouteImport } from './routes/c-cpp-coding-practice'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -115,6 +117,11 @@ const CppRoute = CppRouteImport.update({
   path: '/cpp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -128,6 +135,11 @@ const CCppCodingPracticeRoute = CCppCodingPracticeRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -159,9 +171,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
@@ -185,9 +199,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
@@ -212,9 +228,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
@@ -240,9 +258,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
     | '/feedback'
@@ -266,9 +286,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
     | '/feedback'
@@ -292,9 +314,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/auth'
     | '/c-cpp-coding-practice'
     | '/chat'
+    | '/contact'
     | '/cpp'
     | '/engine'
     | '/feedback'
@@ -319,9 +343,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CCppCodingPracticeRoute: typeof CCppCodingPracticeRoute
   ChatRoute: typeof ChatRoute
+  ContactRoute: typeof ContactRoute
   CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
   FeedbackRoute: typeof FeedbackRoute
@@ -458,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
@@ -477,6 +510,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -519,9 +559,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CCppCodingPracticeRoute: CCppCodingPracticeRoute,
   ChatRoute: ChatRoute,
+  ContactRoute: ContactRoute,
   CppRoute: CppRoute,
   EngineRoute: EngineRoute,
   FeedbackRoute: FeedbackRoute,
