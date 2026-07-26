@@ -24,7 +24,9 @@ import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
+import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as CCppCodingPracticeRouteImport } from './routes/c-cpp-coding-practice'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
@@ -108,9 +110,19 @@ const EngineRoute = EngineRouteImport.update({
   path: '/engine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CppRoute = CppRouteImport.update({
+  id: '/cpp',
+  path: '/cpp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCppCodingPracticeRoute = CCppCodingPracticeRouteImport.update({
+  id: '/c-cpp-coding-practice',
+  path: '/c-cpp-coding-practice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -148,7 +160,9 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -172,7 +186,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -197,7 +213,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/c-cpp-coding-practice': typeof CCppCodingPracticeRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -223,7 +241,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -247,7 +267,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -271,7 +293,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/c-cpp-coding-practice'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -296,7 +320,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CCppCodingPracticeRoute: typeof CCppCodingPracticeRoute
   ChatRoute: typeof ChatRoute
+  CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
@@ -425,11 +451,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EngineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpp': {
+      id: '/cpp'
+      path: '/cpp'
+      fullPath: '/cpp'
+      preLoaderRoute: typeof CppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c-cpp-coding-practice': {
+      id: '/c-cpp-coding-practice'
+      path: '/c-cpp-coding-practice'
+      fullPath: '/c-cpp-coding-practice'
+      preLoaderRoute: typeof CCppCodingPracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -480,7 +520,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CCppCodingPracticeRoute: CCppCodingPracticeRoute,
   ChatRoute: ChatRoute,
+  CppRoute: CppRoute,
   EngineRoute: EngineRoute,
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
@@ -504,13 +546,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
