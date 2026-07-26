@@ -1,107 +1,62 @@
-# Quality + SEO Overhaul — v01 → v02
+# Add C & C++ Practice Section
 
-## 0. Baseline "v01"
+Create a new `/cpp` section that mirrors the Python section feature-for-feature, with a language toggle to switch between **C** and **C++**. Engine already accepts `c` and `cpp` as `lang` values, so no backend schema changes are needed — this is primarily a new route + subject wiring.
 
-Lovable auto-versions every change (full rollback history is already saved), so no DB table is needed. Before I start, I'll ask you to click **Publish** — that snapshots the current live app as your v01 baseline you can roll back to at any time. All work below lands as v02.
+## Scope (feature parity with `/python`)
 
-## 1. Design system reset (Cloud White + Sora/Manrope)
+The new section will include the same tabs and functions currently in `/python`:
+- Today's Question
+- Free Practice
+- Topic-wise
+- Companies
+- Solved library
+- Theory panel (below question) with mermaid flow diagrams
+- Resizable split between question and editor
+- Product tour for new users
+- HeaderTimer fixed at top
+- Resume / autosave per-subject (separate resume key from python/java)
+- Show "Python version" card after solve (reusing the cross-language explainer pattern, adapted: show a Python reference solution after the C/C++ solve)
 
-Rewrite `src/styles.css` tokens and typography:
+## Language toggle
 
-- **Palette (light default, dark parity):**
-  - `--background` `#fafbfc` / dark `#0b1220`
-  - `--surface-2` `#f4f6fa` / dark `#111a2e`
-  - `--foreground` `#0f172a` / dark `#e8ecf1`
-  - `--muted-foreground` `#475569` / dark `#94a3b8`
-  - `--border` `#e2e8f0` / dark `#1e293b`
-  - `--primary` `#3b82f6`, `--primary-glow` `#60a5fa`, `--primary-foreground` `#ffffff`
-  - Success `#16a34a`, warning `#d97706`, destructive `#dc2626`
-- **Type scale (standardized):** Sora headings (600/700), Manrope body (400/500/600). H1 40/48, H2 30/36, H3 22/28, body 15/24, small 13/20, code JetBrains Mono 13. Loaded via `<link>` in `__root.tsx`.
-- **Spacing / radii:** radius 10px, cards 14px, buttons 8px. Consistent `p-4 md:p-6`, `gap-4 md:gap-6`.
-- **Shadows:** subtle elevation only (`0 1px 2px`, `0 8px 24px -12px` for popovers).
-- **Focus rings:** 2px `primary`, 2px offset — a11y compliant.
-- **Component sweep:** unify Button, Card, Input, Tabs, Badge variants so every route inherits the new tokens automatically. Removes ad‑hoc `bg-[#…]` and stray dark chrome (Monaco stays IDE-dark for readability but with the new accent).
+At the top of the editor panel, a two-option pill selector: **C | C++**.
+- Persists selection per user in localStorage.
+- Switching language keeps in-progress code per-language (same buffer strategy already used in `/python`).
+- File name shown in editor tab updates (`solution.c` ↔ `solution.cpp`) from `LANG_META`.
+- Passed as `lang` to every engine call (`init`, `next`, `evaluate`, `hint`, `reveal`, `debug`, `visualize`, `optimize`, `theory`, `to_sql`).
 
-## 2. Landing page rebuild (`src/routes/index.tsx`)
+## Files to add
 
-New composition using Cloud White system:
+- `src/routes/cpp.tsx` — new route, cloned from `src/routes/python.tsx` with:
+  - `subject = "cpp"` for resume + attempts + solved library
+  - Language toggle limited to `["c", "cpp"]`
+  - Default language: `cpp`
+  - Header renamed to "C / C++ Interview Engine"
+- `src/routes/c-cpp-coding-practice.tsx` — SEO landing page mirroring `python-coding-practice.tsx` (H1, FAQ + LearningResource JSON-LD, internal links).
 
-- Top nav (logo, primary links, theme toggle, sign‑in CTA).
-- Hero — H1 + subhead + two CTAs + trust strip.
-- "Practice tracks" bento (SQL / Python / Java / PySpark / GCP / Interview) — internal deep links.
-- How it works (3 steps).
-- Feature grid (AI grading, resumable sessions, animated theory, voice interview, adaptive difficulty, solved library).
-- FAQ (schema-marked).
-- Footer (all routes, contact, socials, legal placeholders).
+## Files to edit
 
-## 3. Performance pass
+- `src/routes/index.tsx` — add a practice card linking to `/cpp` in the tracks grid + footer link.
+- `src/routes/__root.tsx` — no change (fonts/analytics already global).
+- `src/routes/sitemap[.]xml.ts` — add `/cpp` and `/c-cpp-coding-practice`.
+- `src/components/sql/SolvedLibrary.tsx` — extend `Subject` union with `"cpp"`; add C/C++ keyword + STL highlighting (reuse Java-style extractor list adapted for C/C++: `printf`, `scanf`, `malloc`, `free`, `std::vector`, `std::map`, `std::sort`, `std::unordered_map`, iterators, etc.). Add a C/C++ highlighter branch (keywords: `int`, `char`, `struct`, `class`, `template`, `const`, `static`, `void`, `return`, `if`, `else`, `for`, `while`, `switch`, `case`, `new`, `delete`, `nullptr`, `auto`, `namespace`, `using`, etc.).
+- `src/components/code/CodeEditor.tsx` — confirm `c` and `cpp` Prism grammars load (add to prism-setup if missing).
+- `src/lib/prism-setup.ts` — ensure `prismjs/components/prism-c` and `prism-cpp` are dynamically imported.
+- `public/robots.txt` — no change (sitemap already referenced).
+- `src/lib/resume.ts` — add `"cpp"` to subject key list so the per-subject resume slot exists.
 
-- Split route-level bundles that pull heavy libs (`monaco`, `mermaid`, `recharts`) behind `React.lazy` where they aren't already.
-- Preload the Sora/Manrope woff2 subsets via `<link rel="preload">`.
-- Convert PNG hero-adjacent assets to responsive `<img loading="lazy" decoding="async">`; add width/height to prevent CLS.
-- Add `Cache-Control` headers on `/sitemap.xml` (already), extend to `/robots.txt` route.
-- Debounce autosave writes (already local; keep server flush at 5s idle).
+## Backend
 
-## 4. SEO — on-page
+Engine already supports `lang: "c" | "cpp"` via `languageSpec()` in `src/lib/languages.ts` and the Zod enum in `python-engine.functions.ts`. No migration needed. Attempts table already has a `subject` text column; we'll store `"cpp"` as the subject regardless of C vs C++ (language is captured separately in the code / prompt), so the Solved tab shows all C & C++ solves together.
 
-For each public route (`/`, `/practice`, `/python`, `/java`, `/pyspark`, `/gcp`, `/interview`, `/engine`, `/tutorial`, `/feedback`, `/chat`, `/auth`):
+## SEO
 
-- Unique `<title>` ≤60 chars with target keyword.
-- `<meta description>` ≤160 chars, benefit + keyword.
-- One `<h1>`, semantic h2/h3 tree.
-- `og:title`, `og:description`, `og:url`, `twitter:card=summary_large_image`.
-- Canonical → `https://smartsqlaimentor.live/<path>`.
-- Route-scoped JSON-LD: WebSite, Organization, LearningResource (per subject), FAQPage (landing), BreadcrumbList (subject pages).
+- New landing route `c-cpp-coding-practice.tsx`: H1 "C & C++ Interview Coding Practice", 500-word intro covering pointers, memory, STL, competitive programming; FAQ JSON-LD; internal links to `/cpp`, `/python`, `/java`.
+- Route `head()` for `/cpp` with unique title/description/og.
+- Sitemap entries added.
 
-## 5. SEO — technical
+## Out of scope
 
-- `public/robots.txt` — keep `Allow: /`, add both live domains to `Sitemap:`.
-- Migrate `public/sitemap.xml` → server route `src/routes/sitemap[.]xml.ts` that reflects every current public route with weekly changefreq. Delete stale static file.
-- `alt` text audit on every `<img>`.
-- Add `hreflang` = en, `lang="en"` on `<html>` (already).
-- Web‑vitals: preconnect fonts, defer GA (already async), inline critical CSS via Vite plugin default.
-
-## 6. SEO — new landing pages (rank targets)
-
-Add SEO-tuned public routes (no functional change to existing engines):
-
-- `/sql-interview-questions` — curated list linking into `/practice` topics.
-- `/pyspark-practice` — hero + benefits → CTA to `/pyspark`.
-- `/gcp-data-engineer-interview` — role-focused → CTA to `/gcp`.
-- `/python-coding-practice` — → CTA to `/python`.
-
-Each: 800–1200 words, H1/H2/H3 tree, FAQ block, JSON-LD, internal links.
-
-## 7. SEO — backlink-ready guides
-
-- `/guides/sql-window-functions` — cheat-sheet-style, code snippets, diagrams.
-- `/guides/pyspark-vs-pandas` — comparison table.
-- `/guides/gcp-data-engineer-roadmap` — checklist.
-
-Added to sitemap.
-
-## 8. Functionality guardrail
-
-No changes to: auth, resume/session logic, engine RPCs, editors, interview flow, GCP question bank, email pipeline. Only presentation, metadata, and net-new marketing routes.
-
-## Technical execution order
-
-1. `src/styles.css` token rewrite + font links.
-2. Shared UI component variants (`src/components/ui/*`) — light audit only.
-3. Landing rebuild.
-4. Route metadata sweep (`head()` in each route file).
-5. Sitemap server route + robots update.
-6. New landing + guide routes (7 files).
-7. `route.tree.gen.ts` regenerates automatically.
-8. Verify build, spot‑check preview at mobile (420×805) and desktop.
-
-## Deliverables
-
-- v02 published build with new visual system, standardized typography, unified spacing.
-- 4 SEO landing pages + 3 long-form guides live in sitemap.
-- Full metadata + JSON-LD coverage.
-- Lighthouse target: Performance ≥90 mobile, SEO 100, A11y ≥95.
-
-Reply **approve** to proceed, or tell me what to change (e.g. skip guides, keep current landing, different accent blue, etc.).
-
-Change the heading correct and also the main page heading interview intelligence engine to smart AI Code playground 
+- No changes to the Python, Java, PySpark, SQL, or GCP sections.
+- No new database migrations.
+- No AI model/provider changes.
