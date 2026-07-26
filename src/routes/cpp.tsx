@@ -370,7 +370,7 @@ function CppWorkspace() {
   const [loading, setLoading] = useState<string | null>(null);
   const [sqlSolution, setSqlSolution] = useState<any>(null);
   const [tourOpen, setTourOpen] = useState(false);
-  const [lang, setLang] = useState<CodeLang>("python");
+  const [lang, setLang] = useState<CodeLang>("cpp");
 
   // Cross-device resume for tab / filters / typed code. In-session question is
   // rebuilt from the engine when the user picks Next.
@@ -406,7 +406,7 @@ function CppWorkspace() {
       pastIds: [],
       covered: [],
       interviewMode: false,
-      lang: "python",
+      lang: "cpp",
     },
     {
       isEmpty: (s: any) =>

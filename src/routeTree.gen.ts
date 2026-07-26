@@ -24,6 +24,7 @@ import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-
 import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EngineRouteImport } from './routes/engine'
+import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -108,6 +109,11 @@ const EngineRoute = EngineRouteImport.update({
   path: '/engine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CppRoute = CppRouteImport.update({
+  id: '/cpp',
+  path: '/cpp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/cpp': typeof CppRoute
   '/engine': typeof EngineRoute
   '/feedback': typeof FeedbackRoute
   '/gcp': typeof GcpRoute
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/chat'
+    | '/cpp'
     | '/engine'
     | '/feedback'
     | '/gcp'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   ChatRoute: typeof ChatRoute
+  CppRoute: typeof CppRoute
   EngineRoute: typeof EngineRoute
   FeedbackRoute: typeof FeedbackRoute
   GcpRoute: typeof GcpRoute
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EngineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpp': {
+      id: '/cpp'
+      path: '/cpp'
+      fullPath: '/cpp'
+      preLoaderRoute: typeof CppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
@@ -481,6 +501,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   ChatRoute: ChatRoute,
+  CppRoute: CppRoute,
   EngineRoute: EngineRoute,
   FeedbackRoute: FeedbackRoute,
   GcpRoute: GcpRoute,
