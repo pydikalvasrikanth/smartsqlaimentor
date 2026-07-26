@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
-import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic } from "lucide-react";
+import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, Terminal } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
 
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 interface Subject {
   id: string;
-  to: "/practice" | "/python" | "/java" | "/gcp" | "/pyspark";
+  to: "/practice" | "/python" | "/java" | "/gcp" | "/pyspark" | "/cpp";
   title: string;
   tagline: string;
   description: string;
@@ -73,6 +73,16 @@ const SUBJECTS: Subject[] = [
     icon: Sparkles,
     accent: "from-amber-500 to-rose-500",
     highlights: ["DataFrame + Spark SQL fluency", "Window, joins & broadcast tuning", "Structured streaming & Delta"],
+  },
+  {
+    id: "cpp",
+    to: "/cpp",
+    title: "C / C++",
+    tagline: "C11 & C++17 · AI graded",
+    description: "One playground for C and C++. Toggle the language per question and drill pointers, memory, STL, templates and classic DSA — all AI-graded.",
+    icon: Terminal,
+    accent: "from-indigo-500 to-blue-500",
+    highlights: ["C ↔ C++ language toggle", "Pointers, memory & STL fluency", "Beginner → Advanced ramp"],
   },
   {
     id: "gcp",
