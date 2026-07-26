@@ -19,6 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/python", changefreq: "weekly", priority: "0.9" },
           { path: "/java", changefreq: "weekly", priority: "0.8" },
           { path: "/pyspark", changefreq: "weekly", priority: "0.8" },
+          { path: "/cpp", changefreq: "weekly", priority: "0.85" },
           { path: "/gcp", changefreq: "weekly", priority: "0.9" },
           { path: "/interview", changefreq: "weekly", priority: "0.8" },
           { path: "/engine", changefreq: "monthly", priority: "0.6" },
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/python-coding-practice", changefreq: "weekly", priority: "0.85" },
           { path: "/pyspark-practice", changefreq: "weekly", priority: "0.8" },
           { path: "/gcp-data-engineer-interview", changefreq: "weekly", priority: "0.85" },
+          { path: "/c-cpp-coding-practice", changefreq: "weekly", priority: "0.8" },
         ];
 
         const urls = entries
