@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TutorialRouteImport } from './routes/tutorial'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SqlInterviewQuestionsRouteImport } from './routes/sql-interview-questions'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -17,6 +18,7 @@ import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PracticeRouteImport } from './routes/practice'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
@@ -39,6 +41,11 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
   path: '/tutorial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SqlInterviewQuestionsRoute = SqlInterviewQuestionsRouteImport.update({
@@ -74,6 +81,11 @@ const PysparkPracticeRoute = PysparkPracticeRouteImport.update({
 const PysparkRoute = PysparkRouteImport.update({
   id: '/pyspark',
   path: '/pyspark',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PracticeRoute = PracticeRouteImport.update({
@@ -184,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -191,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -212,6 +226,7 @@ export interface FileRoutesByTo {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -219,6 +234,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -241,6 +257,7 @@ export interface FileRoutesById {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/practice': typeof PracticeRoute
+  '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
@@ -248,6 +265,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
+  '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -271,6 +289,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -278,6 +297,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -299,6 +319,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -306,6 +327,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -327,6 +349,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/practice'
+    | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
     | '/python'
@@ -334,6 +357,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
+    | '/terms'
     | '/tutorial'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
@@ -356,6 +380,7 @@ export interface RootRouteChildren {
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   PracticeRoute: typeof PracticeRoute
+  PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
   PysparkPracticeRoute: typeof PysparkPracticeRoute
   PythonRoute: typeof PythonRoute
@@ -363,6 +388,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
+  TermsRoute: typeof TermsRoute
   TutorialRoute: typeof TutorialRoute
   TopicSlugRoute: typeof TopicSlugRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -377,6 +403,13 @@ declare module '@tanstack/react-router' {
       path: '/tutorial'
       fullPath: '/tutorial'
       preLoaderRoute: typeof TutorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sql-interview-questions': {
@@ -426,6 +459,13 @@ declare module '@tanstack/react-router' {
       path: '/pyspark'
       fullPath: '/pyspark'
       preLoaderRoute: typeof PysparkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/practice': {
@@ -572,6 +612,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   PracticeRoute: PracticeRoute,
+  PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
   PysparkPracticeRoute: PysparkPracticeRoute,
   PythonRoute: PythonRoute,
@@ -579,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
+  TermsRoute: TermsRoute,
   TutorialRoute: TutorialRoute,
   TopicSlugRoute: TopicSlugRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
