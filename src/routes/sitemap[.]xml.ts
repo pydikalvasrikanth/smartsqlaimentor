@@ -5,7 +5,7 @@ const BASE_URL = "https://smartsqlaimentor.live";
 
 interface Entry {
   path: string;
-  changefreq?: "weekly" | "monthly" | "daily";
+  changefreq?: "weekly" | "monthly" | "daily" | "yearly";
   priority?: string;
 }
 
