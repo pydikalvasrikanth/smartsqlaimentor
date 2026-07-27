@@ -82,7 +82,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
       <nav className="mt-10 flex items-center justify-between gap-4">
         {prev ? (
           <Link
-            to="/learn/$moduleId/$lessonId"
+            to="/pyspark-tutorial/learn/$moduleId/$lessonId"
             params={{ moduleId: prev.module.id, lessonId: prev.lesson.id }}
             className="group flex-1 rounded-xl border border-border p-4 hover:border-[color:var(--java-orange)]"
           >
@@ -94,7 +94,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
         )}
         {next ? (
           <Link
-            to="/learn/$moduleId/$lessonId"
+            to="/pyspark-tutorial/learn/$moduleId/$lessonId"
             params={{ moduleId: next.module.id, lessonId: next.lesson.id }}
             className="group flex-1 rounded-xl border border-border p-4 text-right hover:border-[color:var(--java-orange)]"
           >

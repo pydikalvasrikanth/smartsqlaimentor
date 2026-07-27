@@ -4,7 +4,7 @@ import { flatLessons } from "@/tutorials/ccpp/content/types";
 
 export function TrackIndex({ curriculum }: { curriculum: Curriculum }) {
   const total = flatLessons(curriculum).length;
-  const route = curriculum.track === "c" ? "/c/$moduleId/$lessonId" : "/cpp/$moduleId/$lessonId";
+  const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="font-mono mb-3 text-xs uppercase tracking-widest" style={{ color: curriculum.accent }}>

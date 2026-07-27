@@ -15,8 +15,8 @@ export function LessonView({
   lesson: Lesson;
 }) {
   const { prev, next, index, total } = neighbours(curriculum, module.id, lesson.id);
-  const route = curriculum.track === "c" ? "/c/$moduleId/$lessonId" : "/cpp/$moduleId/$lessonId";
-  const trackRoute = curriculum.track === "c" ? "/c" : "/cpp";
+  const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
+  const trackRoute = curriculum.track === "c" ? "/cpp-tutorial/c" : "/cpp-tutorial/cpp";
   const navigate = useNavigate();
   const { isDone, toggle } = useProgress();
   const key = lessonKey(curriculum.track, module.id, lesson.id);
@@ -41,7 +41,7 @@ export function LessonView({
   return (
     <article className="mx-auto max-w-7xl px-4 py-8 md:px-8">
       <nav className="font-mono mb-4 flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-widest text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">Home</Link>
+        <Link to="/cpp-tutorial" className="hover:text-foreground">Home</Link>
         <span>›</span>
         <Link to={trackRoute} className="hover:text-foreground">{curriculum.name}</Link>
         <span>›</span>

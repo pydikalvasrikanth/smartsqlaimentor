@@ -5,7 +5,7 @@ import { flatLessons } from "@/tutorials/ccpp/content/types";
 
 export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curriculum; onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const route = curriculum.track === "c" ? "/c/$moduleId/$lessonId" : "/cpp/$moduleId/$lessonId";
+  const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
   const badge = curriculum.track === "c" ? "C" : "C++";
   const { isDone } = useProgress();
   const total = flatLessons(curriculum).length;
@@ -15,7 +15,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
   const pct = total ? Math.round((done / total) * 100) : 0;
   return (
     <aside className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-border bg-[color:var(--sidebar)] py-6">
-      <Link to="/" onClick={onNavigate} className="mx-6 mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+      <Link to="/cpp-tutorial" onClick={onNavigate} className="mx-6 mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
         <span
           className="grid h-8 w-8 place-items-center rounded-lg text-white"
           style={{ background: curriculum.accent }}
@@ -35,7 +35,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
       </div>
       <div className="mx-6 mb-5 flex gap-1 rounded-lg bg-[color:var(--surface2)] p-1 text-xs">
         <Link
-          to="/c"
+          to="/cpp-tutorial/c"
           onClick={onNavigate}
           className={`flex-1 rounded-md px-2 py-1 text-center font-semibold transition ${
             curriculum.track === "c" ? "bg-[color:var(--java-blue)] text-white" : "text-muted-foreground"
@@ -44,7 +44,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
           C
         </Link>
         <Link
-          to="/cpp"
+          to="/cpp-tutorial/cpp"
           onClick={onNavigate}
           className={`flex-1 rounded-md px-2 py-1 text-center font-semibold transition ${
             curriculum.track === "cpp" ? "bg-[color:var(--purple)] text-white" : "text-muted-foreground"

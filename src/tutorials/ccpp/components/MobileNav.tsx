@@ -23,7 +23,7 @@ export function MobileNav({ curriculum }: { curriculum: Curriculum }) {
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <Link to="/" className="flex items-center gap-2 text-sm font-semibold">
+        <Link to="/cpp-tutorial" className="flex items-center gap-2 text-sm font-semibold">
           <span
             className="grid h-7 w-7 place-items-center rounded-md text-white text-[11px]"
             style={{ background: curriculum.accent }}

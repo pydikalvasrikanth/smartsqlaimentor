@@ -14,6 +14,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SqlInterviewQuestionsRouteImport } from './routes/sql-interview-questions'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PythonTutorialRouteImport } from './routes/python-tutorial'
 import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding-practice'
 import { Route as PythonRouteImport } from './routes/python'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
@@ -63,6 +64,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PythonTutorialRoute = PythonTutorialRouteImport.update({
+  id: '/python-tutorial',
+  path: '/python-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PythonCodingPracticeRoute = PythonCodingPracticeRouteImport.update({
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
@@ -280,6 +288,7 @@ export interface FileRoutesById {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
@@ -314,6 +323,7 @@ export interface FileRouteTypes {
     | '/pyspark-practice'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
@@ -346,6 +356,7 @@ export interface FileRouteTypes {
     | '/pyspark-practice'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
@@ -378,6 +389,7 @@ export interface FileRouteTypes {
     | '/pyspark-practice'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
@@ -411,6 +423,7 @@ export interface RootRouteChildren {
   PysparkPracticeRoute: typeof PysparkPracticeRoute
   PythonRoute: typeof PythonRoute
   PythonCodingPracticeRoute: typeof PythonCodingPracticeRoute
+  PythonTutorialRoute: typeof PythonTutorialRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/python-tutorial': {
+      id: '/python-tutorial'
+      path: '/python-tutorial'
+      fullPath: '/python-tutorial'
+      preLoaderRoute: typeof PythonTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/python-coding-practice': {
@@ -659,6 +679,7 @@ const rootRouteChildren: RootRouteChildren = {
   PysparkPracticeRoute: PysparkPracticeRoute,
   PythonRoute: PythonRoute,
   PythonCodingPracticeRoute: PythonCodingPracticeRoute,
+  PythonTutorialRoute: PythonTutorialRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
