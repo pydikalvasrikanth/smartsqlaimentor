@@ -73,7 +73,7 @@ export function SearchPalette() {
               if (e.key === "ArrowUp") { e.preventDefault(); setI((n) => Math.max(n - 1, 0)); }
               if (e.key === "Enter" && results[i]) {
                 setOpen(false);
-                navigate({ to: "/learn/$topicId", params: { topicId: results[i].id } });
+                navigate({ to: "/python-tutorial/$topicId", params: { topicId: results[i].id } });
               }
             }}
             placeholder="Find any topic…"
@@ -87,7 +87,7 @@ export function SearchPalette() {
                 onMouseEnter={() => setI(idx)}
                 onClick={() => {
                   setOpen(false);
-                  navigate({ to: "/learn/$topicId", params: { topicId: t.id } });
+                  navigate({ to: "/python-tutorial/$topicId", params: { topicId: t.id } });
                 }}
                 className={`flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition ${
                   idx === i ? "bg-primary/15" : "hover:bg-surface-2"
