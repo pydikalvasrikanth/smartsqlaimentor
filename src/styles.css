@@ -68,6 +68,21 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-primary-glow: var(--primary-glow);
+  /* Tokens used by the embedded visual tutorials (scoped via .tut-* below) */
+  --color-java-orange: var(--java-orange);
+  --color-java-blue: var(--java-blue);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface2);
+  --color-surface3: var(--surface3);
+  --color-line: var(--line);
+  --color-teal: var(--teal);
+  --color-purple: var(--purple);
+  --color-pink: var(--pink);
+  --color-gold: var(--gold);
+  --color-blue: var(--blue);
+  --color-orange: var(--orange);
+  --color-ok: var(--ok);
+  --color-err: var(--err);
 }
 
 :root {
