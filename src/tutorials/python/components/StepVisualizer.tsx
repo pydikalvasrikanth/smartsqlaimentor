@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, Pause, RotateCcw } from "lucide-react";
-import type { TraceFrame } from "@/data/topics";
+import type { TraceFrame } from "@/tutorials/python/data/topics";
 import { CodeBlock } from "./CodeBlock";
 
 export function StepVisualizer({ code, trace }: { code: string; trace: TraceFrame[] }) {

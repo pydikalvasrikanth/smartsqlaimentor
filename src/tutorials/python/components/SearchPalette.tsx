@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import { TOPICS } from "@/data/topics";
+import { TOPICS } from "@/tutorials/python/data/topics";
 import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 

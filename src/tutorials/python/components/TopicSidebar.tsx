@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LEVELS, TOPICS } from "@/data/topics";
+import { LEVELS, TOPICS } from "@/tutorials/python/data/topics";
 import { useEffect, useState } from "react";
-import { getProgress } from "@/lib/progress";
+import { getProgress } from "@/tutorials/python/lib/progress";
 import { Check } from "lucide-react";
 
 export function TopicSidebar() {
@@ -42,7 +42,7 @@ export function TopicSidebar() {
                   return (
                     <li key={topic.id}>
                       <Link
-                        to="/learn/$topicId"
+                        to="/python-tutorial/$topicId"
                         params={{ topicId: topic.id }}
                         className={`group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition ${
                           isActive

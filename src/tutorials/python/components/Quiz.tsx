@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Trophy, RotateCcw } from "lucide-react";
-import type { QuizQ } from "@/data/topics";
-import { setQuizScore } from "@/lib/progress";
+import type { QuizQ } from "@/tutorials/python/data/topics";
+import { setQuizScore } from "@/tutorials/python/lib/progress";
 
 export function Quiz({ topicId, questions }: { topicId: string; questions: QuizQ[] }) {
   const [i, setI] = useState(0);
