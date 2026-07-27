@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ClientOnly } from "@tanstack/react-router";
+import { useMounted } from "@/tutorials/pyspark/hooks/use-mounted";
 import type { Lesson, Module } from "@/tutorials/pyspark/content/pyspark-lessons";
 import { neighbours } from "@/tutorials/pyspark/content/pyspark-lessons";
 import { CodeBlock } from "@/tutorials/pyspark/components/CodeBlock";
@@ -24,6 +24,7 @@ function Callout({ tone, text }: { tone: "tip" | "warn" | "note"; text: string }
 
 export function LessonView({ module, lesson }: { module: Module; lesson: Lesson }) {
   const { prev, next, index, total } = neighbours(module.id, lesson.id);
+  const mounted = useMounted();
   return (
     <article className="mx-auto max-w-3xl px-6 py-10">
       <div className="mono mb-3 text-xs uppercase tracking-widest" style={{ color: module.color }}>
@@ -53,15 +54,13 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
 
       {lesson.scene && (
         <div className="my-8">
-          <ClientOnly
-            fallback={
-              <div className="grid h-[420px] place-items-center rounded-2xl border border-border bg-[color:var(--surface2)]">
-                <span className="mono text-xs text-muted-foreground">Loading 3D scene…</span>
-              </div>
-            }
-          >
+          {mounted ? (
             <SceneFor sceneKey={lesson.scene} />
-          </ClientOnly>
+          ) : (
+            <div className="grid h-[420px] place-items-center rounded-2xl border border-border bg-[color:var(--surface2)]">
+              <span className="mono text-xs text-muted-foreground">Loading 3D scene…</span>
+            </div>
+          )}
         </div>
       )}
 
