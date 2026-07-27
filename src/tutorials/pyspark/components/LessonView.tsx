@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
-import type { Lesson, Module } from "@/content/pyspark-lessons";
-import { neighbours } from "@/content/pyspark-lessons";
-import { CodeBlock } from "./CodeBlock";
-import { SceneFor } from "./SceneRegistry";
+import type { Lesson, Module } from "@/tutorials/pyspark/content/pyspark-lessons";
+import { neighbours } from "@/tutorials/pyspark/content/pyspark-lessons";
+import { CodeBlock } from "@/tutorials/pyspark/components/CodeBlock";
+import { SceneFor } from "@/tutorials/pyspark/components/SceneRegistry";
 
 function Callout({ tone, text }: { tone: "tip" | "warn" | "note"; text: string }) {
   const colors = {

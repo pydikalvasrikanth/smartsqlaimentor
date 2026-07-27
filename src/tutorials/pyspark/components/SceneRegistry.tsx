@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import type { SceneKey } from "@/content/pyspark-lessons";
-import { ThreeScene } from "./scenes/ThreeScene";
+import type { SceneKey } from "@/tutorials/pyspark/content/pyspark-lessons";
+import { ThreeScene } from "@/tutorials/pyspark/components/scenes/ThreeScene";
 
 const scenes = {
   sparkArch: lazy(() => import("./scenes/JvmScene")),

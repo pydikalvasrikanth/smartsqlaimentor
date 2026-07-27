@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { modules } from "@/content/pyspark-lessons";
+import { modules } from "@/tutorials/pyspark/content/pyspark-lessons";
 
 export function LessonSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
