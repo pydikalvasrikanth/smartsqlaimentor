@@ -37,6 +37,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
+import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -182,6 +183,11 @@ const TopicSlugRoute = TopicSlugRouteImport.update({
   path: '/topic/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonTutorialTopicIdRoute = PythonTutorialTopicIdRouteImport.update({
+  id: '/$topicId',
+  path: '/$topicId',
+  getParentRoute: () => PythonTutorialRoute,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -221,12 +227,13 @@ export interface FileRoutesByFullPath {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
-  '/python-tutorial': typeof PythonTutorialRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -254,12 +261,13 @@ export interface FileRoutesByTo {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
-  '/python-tutorial': typeof PythonTutorialRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -288,12 +296,13 @@ export interface FileRoutesById {
   '/pyspark-practice': typeof PysparkPracticeRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
-  '/python-tutorial': typeof PythonTutorialRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -423,7 +435,7 @@ export interface RootRouteChildren {
   PysparkPracticeRoute: typeof PysparkPracticeRoute
   PythonRoute: typeof PythonRoute
   PythonCodingPracticeRoute: typeof PythonCodingPracticeRoute
-  PythonTutorialRoute: typeof PythonTutorialRoute
+  PythonTutorialRoute: typeof PythonTutorialRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
@@ -633,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-tutorial/$topicId': {
+      id: '/python-tutorial/$topicId'
+      path: '/$topicId'
+      fullPath: '/python-tutorial/$topicId'
+      preLoaderRoute: typeof PythonTutorialTopicIdRouteImport
+      parentRoute: typeof PythonTutorialRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -657,6 +676,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PythonTutorialRouteChildren {
+  PythonTutorialTopicIdRoute: typeof PythonTutorialTopicIdRoute
+}
+
+const PythonTutorialRouteChildren: PythonTutorialRouteChildren = {
+  PythonTutorialTopicIdRoute: PythonTutorialTopicIdRoute,
+}
+
+const PythonTutorialRouteWithChildren = PythonTutorialRoute._addFileChildren(
+  PythonTutorialRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -679,7 +710,7 @@ const rootRouteChildren: RootRouteChildren = {
   PysparkPracticeRoute: PysparkPracticeRoute,
   PythonRoute: PythonRoute,
   PythonCodingPracticeRoute: PythonCodingPracticeRoute,
-  PythonTutorialRoute: PythonTutorialRoute,
+  PythonTutorialRoute: PythonTutorialRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
@@ -693,13 +724,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
