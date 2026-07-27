@@ -235,6 +235,104 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Embedded visual tutorials (Java / Python / C-C++ / PySpark).        */
+/* Each tutorial ships its own dark palette; the values are scoped to  */
+/* a wrapper class so they never leak into the rest of the app.        */
+/* ------------------------------------------------------------------ */
+.tut-dark {
+  --radius: 0.75rem;
+  --background: oklch(0.16 0.02 265);
+  --foreground: oklch(0.94 0.01 250);
+  --card: oklch(0.20 0.02 265);
+  --card-foreground: oklch(0.94 0.01 250);
+  --popover: oklch(0.20 0.02 265);
+  --popover-foreground: oklch(0.94 0.01 250);
+  --primary: oklch(0.75 0.17 55);
+  --primary-foreground: oklch(0.16 0.02 265);
+  --secondary: oklch(0.28 0.03 260);
+  --secondary-foreground: oklch(0.94 0.01 250);
+  --muted: oklch(0.24 0.02 260);
+  --muted-foreground: oklch(0.70 0.02 255);
+  --accent: oklch(0.62 0.13 245);
+  --accent-foreground: oklch(0.98 0.01 250);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 250);
+  --border: oklch(0.28 0.03 260);
+  --input: oklch(0.28 0.03 260);
+  --ring: oklch(0.75 0.17 55);
+  --sidebar: oklch(0.14 0.02 265);
+  --sidebar-foreground: oklch(0.90 0.01 250);
+  --sidebar-accent: oklch(0.22 0.02 260);
+  --sidebar-accent-foreground: oklch(0.94 0.01 250);
+  --sidebar-border: oklch(0.24 0.02 260);
+  --java-orange: oklch(0.75 0.17 55);
+  --java-blue: oklch(0.62 0.13 245);
+  --surface2: oklch(0.22 0.02 260);
+  --surface3: oklch(0.26 0.03 260);
+  --line: oklch(0.32 0.03 260);
+  --teal: oklch(0.78 0.14 175);
+  --purple: oklch(0.72 0.16 295);
+  --pink: oklch(0.72 0.18 350);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.tut-python {
+  --radius: 0.75rem;
+  --background: #0a0e1a;
+  --foreground: #e2e8f8;
+  --surface: #111827;
+  --surface-2: #1a2236;
+  --surface2: #1a2236;
+  --card: #111827;
+  --card-foreground: #e2e8f8;
+  --popover: #111827;
+  --popover-foreground: #e2e8f8;
+  --primary: #f5c842;
+  --primary-foreground: #0a0e1a;
+  --secondary: #1a2236;
+  --secondary-foreground: #e2e8f8;
+  --muted: #1a2236;
+  --muted-foreground: #94a3b8;
+  --accent: #1f2b42;
+  --accent-foreground: #e2e8f8;
+  --destructive: #f87171;
+  --destructive-foreground: #0a0e1a;
+  --border: #1e2d45;
+  --input: #1e2d45;
+  --ring: #f5c842;
+  --line: #1e2d45;
+  --gold: #f5c842;
+  --teal: #34d9a5;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --orange: #fb923c;
+  --pink: #f472b6;
+  --ok: #4ade80;
+  --err: #f87171;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.tut-python .tok-kw { color: var(--gold); }
+.tut-python .tok-fn { color: var(--blue); }
+.tut-python .tok-str { color: #6ee7b7; }
+.tut-python .tok-num { color: #fdba74; }
+.tut-python .tok-com { color: #64748b; font-style: italic; }
+.tut-python .tok-op  { color: var(--pink); }
+.tut-python .tok-cls { color: var(--purple); }
+.tut-python .tok-bi  { color: var(--orange); }
+.tut-python .glow-gold { box-shadow: 0 0 0 1px var(--gold), 0 8px 30px -8px rgba(245,200,66,0.35); }
+
+.tut-dark .glow-orange { box-shadow: 0 0 40px -10px oklch(0.75 0.17 55 / 0.4); }
+.tut-dark .grid-bg {
+  background-image:
+    linear-gradient(oklch(0.32 0.03 260 / 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.32 0.03 260 / 0.4) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ------------------------------------------------------------------ */
 /* Animated SQL flow diagram (used by theory tab).                     */
 /* Makes mermaid arrows visibly "flow" so students can watch how rows  */
 /* travel through JOIN → WHERE → GROUP BY → SELECT.                    */
