@@ -14,12 +14,15 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SqlInterviewQuestionsRouteImport } from './routes/sql-interview-questions'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PythonTutorialRouteImport } from './routes/python-tutorial'
 import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding-practice'
 import { Route as PythonRouteImport } from './routes/python'
+import { Route as PysparkTutorialRouteImport } from './routes/pyspark-tutorial'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as JavaTutorialRouteImport } from './routes/java-tutorial'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-engineer-interview'
@@ -27,6 +30,7 @@ import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EngineRouteImport } from './routes/engine'
+import { Route as CppTutorialRouteImport } from './routes/cpp-tutorial'
 import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -35,9 +39,18 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
+import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
+import { Route as PysparkTutorialLearnRouteImport } from './routes/pyspark-tutorial.learn'
+import { Route as CppTutorialCppRouteImport } from './routes/cpp-tutorial.cpp'
+import { Route as CppTutorialCRouteImport } from './routes/cpp-tutorial.c'
+import { Route as CppTutorialCppIndexRouteImport } from './routes/cpp-tutorial.cpp.index'
+import { Route as CppTutorialCIndexRouteImport } from './routes/cpp-tutorial.c.index'
+import { Route as PysparkTutorialLearnModuleIdLessonIdRouteImport } from './routes/pyspark-tutorial.learn.$moduleId.$lessonId'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as CppTutorialCppModuleIdLessonIdRouteImport } from './routes/cpp-tutorial.cpp.$moduleId.$lessonId'
+import { Route as CppTutorialCModuleIdLessonIdRouteImport } from './routes/cpp-tutorial.c.$moduleId.$lessonId'
 
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
@@ -64,6 +77,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonTutorialRoute = PythonTutorialRouteImport.update({
+  id: '/python-tutorial',
+  path: '/python-tutorial',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PythonCodingPracticeRoute = PythonCodingPracticeRouteImport.update({
   id: '/python-coding-practice',
   path: '/python-coding-practice',
@@ -72,6 +90,11 @@ const PythonCodingPracticeRoute = PythonCodingPracticeRouteImport.update({
 const PythonRoute = PythonRouteImport.update({
   id: '/python',
   path: '/python',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PysparkTutorialRoute = PysparkTutorialRouteImport.update({
+  id: '/pyspark-tutorial',
+  path: '/pyspark-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PysparkPracticeRoute = PysparkPracticeRouteImport.update({
@@ -92,6 +115,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JavaTutorialRoute = JavaTutorialRouteImport.update({
+  id: '/java-tutorial',
+  path: '/java-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JavaRoute = JavaRouteImport.update({
@@ -128,6 +156,11 @@ const FaqRoute = FaqRouteImport.update({
 const EngineRoute = EngineRouteImport.update({
   id: '/engine',
   path: '/engine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CppTutorialRoute = CppTutorialRouteImport.update({
+  id: '/cpp-tutorial',
+  path: '/cpp-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CppRoute = CppRouteImport.update({
@@ -170,6 +203,42 @@ const TopicSlugRoute = TopicSlugRouteImport.update({
   path: '/topic/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonTutorialTopicIdRoute = PythonTutorialTopicIdRouteImport.update({
+  id: '/$topicId',
+  path: '/$topicId',
+  getParentRoute: () => PythonTutorialRoute,
+} as any)
+const PysparkTutorialLearnRoute = PysparkTutorialLearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => PysparkTutorialRoute,
+} as any)
+const CppTutorialCppRoute = CppTutorialCppRouteImport.update({
+  id: '/cpp',
+  path: '/cpp',
+  getParentRoute: () => CppTutorialRoute,
+} as any)
+const CppTutorialCRoute = CppTutorialCRouteImport.update({
+  id: '/c',
+  path: '/c',
+  getParentRoute: () => CppTutorialRoute,
+} as any)
+const CppTutorialCppIndexRoute = CppTutorialCppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CppTutorialCppRoute,
+} as any)
+const CppTutorialCIndexRoute = CppTutorialCIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CppTutorialCRoute,
+} as any)
+const PysparkTutorialLearnModuleIdLessonIdRoute =
+  PysparkTutorialLearnModuleIdLessonIdRouteImport.update({
+    id: '/$moduleId/$lessonId',
+    path: '/$moduleId/$lessonId',
+    getParentRoute: () => PysparkTutorialLearnRoute,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -186,6 +255,18 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CppTutorialCppModuleIdLessonIdRoute =
+  CppTutorialCppModuleIdLessonIdRouteImport.update({
+    id: '/$moduleId/$lessonId',
+    path: '/$moduleId/$lessonId',
+    getParentRoute: () => CppTutorialCppRoute,
+  } as any)
+const CppTutorialCModuleIdLessonIdRoute =
+  CppTutorialCModuleIdLessonIdRouteImport.update({
+    id: '/$moduleId/$lessonId',
+    path: '/$moduleId/$lessonId',
+    getParentRoute: () => CppTutorialCRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -195,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -202,21 +284,33 @@ export interface FileRoutesByFullPath {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRouteWithChildren
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
+  '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
+  '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/pyspark-tutorial/learn/$moduleId/$lessonId': typeof PysparkTutorialLearnModuleIdLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -226,6 +320,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -233,21 +328,31 @@ export interface FileRoutesByTo {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRouteWithChildren
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/pyspark-tutorial/learn/$moduleId/$lessonId': typeof PysparkTutorialLearnModuleIdLessonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -258,6 +363,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -265,21 +371,33 @@ export interface FileRoutesById {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRouteWithChildren
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
+  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
+  '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
+  '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
+  '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/pyspark-tutorial/learn/$moduleId/$lessonId': typeof PysparkTutorialLearnModuleIdLessonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -291,6 +409,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -298,21 +417,33 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
+    | '/pyspark-tutorial/learn'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c/'
+    | '/cpp-tutorial/cpp/'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/pyspark-tutorial/learn/$moduleId/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -322,6 +453,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -329,21 +461,31 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/pyspark-tutorial/learn'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/pyspark-tutorial/learn/$moduleId/$lessonId'
   id:
     | '__root__'
     | '/'
@@ -353,6 +495,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -360,21 +503,33 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
+    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
+    | '/pyspark-tutorial/learn'
+    | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c/'
+    | '/cpp-tutorial/cpp/'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/pyspark-tutorial/learn/$moduleId/$lessonId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -385,6 +540,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   ContactRoute: typeof ContactRoute
   CppRoute: typeof CppRoute
+  CppTutorialRoute: typeof CppTutorialRouteWithChildren
   EngineRoute: typeof EngineRoute
   FaqRoute: typeof FaqRoute
   FeedbackRoute: typeof FeedbackRoute
@@ -392,12 +548,15 @@ export interface RootRouteChildren {
   GcpDataEngineerInterviewRoute: typeof GcpDataEngineerInterviewRoute
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
+  JavaTutorialRoute: typeof JavaTutorialRoute
   PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
   PysparkPracticeRoute: typeof PysparkPracticeRoute
+  PysparkTutorialRoute: typeof PysparkTutorialRouteWithChildren
   PythonRoute: typeof PythonRoute
   PythonCodingPracticeRoute: typeof PythonCodingPracticeRoute
+  PythonTutorialRoute: typeof PythonTutorialRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
@@ -446,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-tutorial': {
+      id: '/python-tutorial'
+      path: '/python-tutorial'
+      fullPath: '/python-tutorial'
+      preLoaderRoute: typeof PythonTutorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/python-coding-practice': {
       id: '/python-coding-practice'
       path: '/python-coding-practice'
@@ -458,6 +624,13 @@ declare module '@tanstack/react-router' {
       path: '/python'
       fullPath: '/python'
       preLoaderRoute: typeof PythonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pyspark-tutorial': {
+      id: '/pyspark-tutorial'
+      path: '/pyspark-tutorial'
+      fullPath: '/pyspark-tutorial'
+      preLoaderRoute: typeof PysparkTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pyspark-practice': {
@@ -486,6 +659,13 @@ declare module '@tanstack/react-router' {
       path: '/practice'
       fullPath: '/practice'
       preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/java-tutorial': {
+      id: '/java-tutorial'
+      path: '/java-tutorial'
+      fullPath: '/java-tutorial'
+      preLoaderRoute: typeof JavaTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/java': {
@@ -535,6 +715,13 @@ declare module '@tanstack/react-router' {
       path: '/engine'
       fullPath: '/engine'
       preLoaderRoute: typeof EngineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cpp-tutorial': {
+      id: '/cpp-tutorial'
+      path: '/cpp-tutorial'
+      fullPath: '/cpp-tutorial'
+      preLoaderRoute: typeof CppTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cpp': {
@@ -593,6 +780,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-tutorial/$topicId': {
+      id: '/python-tutorial/$topicId'
+      path: '/$topicId'
+      fullPath: '/python-tutorial/$topicId'
+      preLoaderRoute: typeof PythonTutorialTopicIdRouteImport
+      parentRoute: typeof PythonTutorialRoute
+    }
+    '/pyspark-tutorial/learn': {
+      id: '/pyspark-tutorial/learn'
+      path: '/learn'
+      fullPath: '/pyspark-tutorial/learn'
+      preLoaderRoute: typeof PysparkTutorialLearnRouteImport
+      parentRoute: typeof PysparkTutorialRoute
+    }
+    '/cpp-tutorial/cpp': {
+      id: '/cpp-tutorial/cpp'
+      path: '/cpp'
+      fullPath: '/cpp-tutorial/cpp'
+      preLoaderRoute: typeof CppTutorialCppRouteImport
+      parentRoute: typeof CppTutorialRoute
+    }
+    '/cpp-tutorial/c': {
+      id: '/cpp-tutorial/c'
+      path: '/c'
+      fullPath: '/cpp-tutorial/c'
+      preLoaderRoute: typeof CppTutorialCRouteImport
+      parentRoute: typeof CppTutorialRoute
+    }
+    '/cpp-tutorial/cpp/': {
+      id: '/cpp-tutorial/cpp/'
+      path: '/'
+      fullPath: '/cpp-tutorial/cpp/'
+      preLoaderRoute: typeof CppTutorialCppIndexRouteImport
+      parentRoute: typeof CppTutorialCppRoute
+    }
+    '/cpp-tutorial/c/': {
+      id: '/cpp-tutorial/c/'
+      path: '/'
+      fullPath: '/cpp-tutorial/c/'
+      preLoaderRoute: typeof CppTutorialCIndexRouteImport
+      parentRoute: typeof CppTutorialCRoute
+    }
+    '/pyspark-tutorial/learn/$moduleId/$lessonId': {
+      id: '/pyspark-tutorial/learn/$moduleId/$lessonId'
+      path: '/$moduleId/$lessonId'
+      fullPath: '/pyspark-tutorial/learn/$moduleId/$lessonId'
+      preLoaderRoute: typeof PysparkTutorialLearnModuleIdLessonIdRouteImport
+      parentRoute: typeof PysparkTutorialLearnRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -614,8 +850,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpp-tutorial/cpp/$moduleId/$lessonId': {
+      id: '/cpp-tutorial/cpp/$moduleId/$lessonId'
+      path: '/$moduleId/$lessonId'
+      fullPath: '/cpp-tutorial/cpp/$moduleId/$lessonId'
+      preLoaderRoute: typeof CppTutorialCppModuleIdLessonIdRouteImport
+      parentRoute: typeof CppTutorialCppRoute
+    }
+    '/cpp-tutorial/c/$moduleId/$lessonId': {
+      id: '/cpp-tutorial/c/$moduleId/$lessonId'
+      path: '/$moduleId/$lessonId'
+      fullPath: '/cpp-tutorial/c/$moduleId/$lessonId'
+      preLoaderRoute: typeof CppTutorialCModuleIdLessonIdRouteImport
+      parentRoute: typeof CppTutorialCRoute
+    }
   }
 }
+
+interface CppTutorialCRouteChildren {
+  CppTutorialCIndexRoute: typeof CppTutorialCIndexRoute
+  CppTutorialCModuleIdLessonIdRoute: typeof CppTutorialCModuleIdLessonIdRoute
+}
+
+const CppTutorialCRouteChildren: CppTutorialCRouteChildren = {
+  CppTutorialCIndexRoute: CppTutorialCIndexRoute,
+  CppTutorialCModuleIdLessonIdRoute: CppTutorialCModuleIdLessonIdRoute,
+}
+
+const CppTutorialCRouteWithChildren = CppTutorialCRoute._addFileChildren(
+  CppTutorialCRouteChildren,
+)
+
+interface CppTutorialCppRouteChildren {
+  CppTutorialCppIndexRoute: typeof CppTutorialCppIndexRoute
+  CppTutorialCppModuleIdLessonIdRoute: typeof CppTutorialCppModuleIdLessonIdRoute
+}
+
+const CppTutorialCppRouteChildren: CppTutorialCppRouteChildren = {
+  CppTutorialCppIndexRoute: CppTutorialCppIndexRoute,
+  CppTutorialCppModuleIdLessonIdRoute: CppTutorialCppModuleIdLessonIdRoute,
+}
+
+const CppTutorialCppRouteWithChildren = CppTutorialCppRoute._addFileChildren(
+  CppTutorialCppRouteChildren,
+)
+
+interface CppTutorialRouteChildren {
+  CppTutorialCRoute: typeof CppTutorialCRouteWithChildren
+  CppTutorialCppRoute: typeof CppTutorialCppRouteWithChildren
+}
+
+const CppTutorialRouteChildren: CppTutorialRouteChildren = {
+  CppTutorialCRoute: CppTutorialCRouteWithChildren,
+  CppTutorialCppRoute: CppTutorialCppRouteWithChildren,
+}
+
+const CppTutorialRouteWithChildren = CppTutorialRoute._addFileChildren(
+  CppTutorialRouteChildren,
+)
+
+interface PysparkTutorialLearnRouteChildren {
+  PysparkTutorialLearnModuleIdLessonIdRoute: typeof PysparkTutorialLearnModuleIdLessonIdRoute
+}
+
+const PysparkTutorialLearnRouteChildren: PysparkTutorialLearnRouteChildren = {
+  PysparkTutorialLearnModuleIdLessonIdRoute:
+    PysparkTutorialLearnModuleIdLessonIdRoute,
+}
+
+const PysparkTutorialLearnRouteWithChildren =
+  PysparkTutorialLearnRoute._addFileChildren(PysparkTutorialLearnRouteChildren)
+
+interface PysparkTutorialRouteChildren {
+  PysparkTutorialLearnRoute: typeof PysparkTutorialLearnRouteWithChildren
+}
+
+const PysparkTutorialRouteChildren: PysparkTutorialRouteChildren = {
+  PysparkTutorialLearnRoute: PysparkTutorialLearnRouteWithChildren,
+}
+
+const PysparkTutorialRouteWithChildren = PysparkTutorialRoute._addFileChildren(
+  PysparkTutorialRouteChildren,
+)
+
+interface PythonTutorialRouteChildren {
+  PythonTutorialTopicIdRoute: typeof PythonTutorialTopicIdRoute
+}
+
+const PythonTutorialRouteChildren: PythonTutorialRouteChildren = {
+  PythonTutorialTopicIdRoute: PythonTutorialTopicIdRoute,
+}
+
+const PythonTutorialRouteWithChildren = PythonTutorialRoute._addFileChildren(
+  PythonTutorialRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -625,6 +953,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   ContactRoute: ContactRoute,
   CppRoute: CppRoute,
+  CppTutorialRoute: CppTutorialRouteWithChildren,
   EngineRoute: EngineRoute,
   FaqRoute: FaqRoute,
   FeedbackRoute: FeedbackRoute,
@@ -632,12 +961,15 @@ const rootRouteChildren: RootRouteChildren = {
   GcpDataEngineerInterviewRoute: GcpDataEngineerInterviewRoute,
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
+  JavaTutorialRoute: JavaTutorialRoute,
   PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
   PysparkPracticeRoute: PysparkPracticeRoute,
+  PysparkTutorialRoute: PysparkTutorialRouteWithChildren,
   PythonRoute: PythonRoute,
   PythonCodingPracticeRoute: PythonCodingPracticeRoute,
+  PythonTutorialRoute: PythonTutorialRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,

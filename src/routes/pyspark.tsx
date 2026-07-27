@@ -8,8 +8,7 @@ import { toast, Toaster } from "sonner";
 import {
   Loader2, Play, Lightbulb, Eye, ArrowRight, LogOut, ArrowLeft,
   CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame,
-  AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle,
-} from "lucide-react";
+  AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle, BookOpen } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
 import { AnimatedTrace } from "@/components/python/AnimatedTrace";
@@ -529,6 +528,9 @@ function PySparkWorkspace() {
           <div className="ml-2 sm:ml-6">
             <HeaderTimer storageKey="header_timer:pyspark" />
           </div>
+          <Link to="/pyspark-tutorial" aria-label="Open visual tutorial" className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border border-border hover:bg-accent">
+            <BookOpen className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Tutorial</span>
+          </Link>
           <div className="ml-auto flex flex-wrap items-center gap-2 text-xs font-mono">
             {question && (
               <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground">
