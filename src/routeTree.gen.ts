@@ -20,6 +20,7 @@ import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as JavaTutorialRouteImport } from './routes/java-tutorial'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
 import { Route as GcpDataEngineerInterviewRouteImport } from './routes/gcp-data-engineer-interview'
@@ -92,6 +93,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JavaTutorialRoute = JavaTutorialRouteImport.update({
+  id: '/java-tutorial',
+  path: '/java-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JavaRoute = JavaRouteImport.update({
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/java-tutorial': typeof JavaTutorialRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -392,6 +404,7 @@ export interface RootRouteChildren {
   GcpDataEngineerInterviewRoute: typeof GcpDataEngineerInterviewRoute
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
+  JavaTutorialRoute: typeof JavaTutorialRoute
   PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
@@ -486,6 +499,13 @@ declare module '@tanstack/react-router' {
       path: '/practice'
       fullPath: '/practice'
       preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/java-tutorial': {
+      id: '/java-tutorial'
+      path: '/java-tutorial'
+      fullPath: '/java-tutorial'
+      preLoaderRoute: typeof JavaTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/java': {
@@ -632,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   GcpDataEngineerInterviewRoute: GcpDataEngineerInterviewRoute,
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
+  JavaTutorialRoute: JavaTutorialRoute,
   PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
