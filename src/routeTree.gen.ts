@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PythonTutorialRouteImport } from './routes/python-tutorial'
 import { Route as PythonCodingPracticeRouteImport } from './routes/python-coding-practice'
 import { Route as PythonRouteImport } from './routes/python'
+import { Route as PysparkTutorialRouteImport } from './routes/pyspark-tutorial'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -87,6 +88,11 @@ const PythonCodingPracticeRoute = PythonCodingPracticeRouteImport.update({
 const PythonRoute = PythonRouteImport.update({
   id: '/python',
   path: '/python',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PysparkTutorialRoute = PysparkTutorialRouteImport.update({
+  id: '/pyspark-tutorial',
+  path: '/pyspark-tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PysparkPracticeRoute = PysparkPracticeRouteImport.update({
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/python-tutorial': typeof PythonTutorialRouteWithChildren
@@ -311,6 +318,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/python-tutorial': typeof PythonTutorialRouteWithChildren
@@ -351,6 +359,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
+  '/pyspark-tutorial': typeof PysparkTutorialRoute
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
   '/python-tutorial': typeof PythonTutorialRouteWithChildren
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
     | '/python-tutorial'
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
     | '/python-tutorial'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
+    | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
     | '/python-tutorial'
@@ -516,6 +528,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
   PysparkPracticeRoute: typeof PysparkPracticeRoute
+  PysparkTutorialRoute: typeof PysparkTutorialRoute
   PythonRoute: typeof PythonRoute
   PythonCodingPracticeRoute: typeof PythonCodingPracticeRoute
   PythonTutorialRoute: typeof PythonTutorialRouteWithChildren
@@ -586,6 +599,13 @@ declare module '@tanstack/react-router' {
       path: '/python'
       fullPath: '/python'
       preLoaderRoute: typeof PythonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pyspark-tutorial': {
+      id: '/pyspark-tutorial'
+      path: '/pyspark-tutorial'
+      fullPath: '/pyspark-tutorial'
+      preLoaderRoute: typeof PysparkTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pyspark-practice': {
@@ -883,6 +903,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
   PysparkPracticeRoute: PysparkPracticeRoute,
+  PysparkTutorialRoute: PysparkTutorialRoute,
   PythonRoute: PythonRoute,
   PythonCodingPracticeRoute: PythonCodingPracticeRoute,
   PythonTutorialRoute: PythonTutorialRouteWithChildren,
