@@ -29,6 +29,7 @@ import { Route as GcpRouteImport } from './routes/gcp'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EngineRouteImport } from './routes/engine'
+import { Route as CppTutorialRouteImport } from './routes/cpp-tutorial'
 import { Route as CppRouteImport } from './routes/cpp'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -38,9 +39,15 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
+import { Route as CppTutorialCppRouteImport } from './routes/cpp-tutorial.cpp'
+import { Route as CppTutorialCRouteImport } from './routes/cpp-tutorial.c'
+import { Route as CppTutorialCppIndexRouteImport } from './routes/cpp-tutorial.cpp.index'
+import { Route as CppTutorialCIndexRouteImport } from './routes/cpp-tutorial.c.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as CppTutorialCppModuleIdLessonIdRouteImport } from './routes/cpp-tutorial.cpp.$moduleId.$lessonId'
+import { Route as CppTutorialCModuleIdLessonIdRouteImport } from './routes/cpp-tutorial.c.$moduleId.$lessonId'
 
 const TutorialRoute = TutorialRouteImport.update({
   id: '/tutorial',
@@ -143,6 +150,11 @@ const EngineRoute = EngineRouteImport.update({
   path: '/engine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CppTutorialRoute = CppTutorialRouteImport.update({
+  id: '/cpp-tutorial',
+  path: '/cpp-tutorial',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CppRoute = CppRouteImport.update({
   id: '/cpp',
   path: '/cpp',
@@ -188,6 +200,26 @@ const PythonTutorialTopicIdRoute = PythonTutorialTopicIdRouteImport.update({
   path: '/$topicId',
   getParentRoute: () => PythonTutorialRoute,
 } as any)
+const CppTutorialCppRoute = CppTutorialCppRouteImport.update({
+  id: '/cpp',
+  path: '/cpp',
+  getParentRoute: () => CppTutorialRoute,
+} as any)
+const CppTutorialCRoute = CppTutorialCRouteImport.update({
+  id: '/c',
+  path: '/c',
+  getParentRoute: () => CppTutorialRoute,
+} as any)
+const CppTutorialCppIndexRoute = CppTutorialCppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CppTutorialCppRoute,
+} as any)
+const CppTutorialCIndexRoute = CppTutorialCIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CppTutorialCRoute,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -204,6 +236,18 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CppTutorialCppModuleIdLessonIdRoute =
+  CppTutorialCppModuleIdLessonIdRouteImport.update({
+    id: '/$moduleId/$lessonId',
+    path: '/$moduleId/$lessonId',
+    getParentRoute: () => CppTutorialCppRoute,
+  } as any)
+const CppTutorialCModuleIdLessonIdRoute =
+  CppTutorialCModuleIdLessonIdRouteImport.update({
+    id: '/$moduleId/$lessonId',
+    path: '/$moduleId/$lessonId',
+    getParentRoute: () => CppTutorialCRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -213,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -233,8 +278,14 @@ export interface FileRoutesByFullPath {
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
+  '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -247,6 +298,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -269,6 +321,10 @@ export interface FileRoutesByTo {
   '/tutorial': typeof TutorialRoute
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -282,6 +338,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/cpp': typeof CppRoute
+  '/cpp-tutorial': typeof CppTutorialRouteWithChildren
   '/engine': typeof EngineRoute
   '/faq': typeof FaqRoute
   '/feedback': typeof FeedbackRoute
@@ -302,8 +359,14 @@ export interface FileRoutesById {
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
+  '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
+  '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
+  '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
+  '/cpp-tutorial/cpp/$moduleId/$lessonId': typeof CppTutorialCppModuleIdLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -318,6 +381,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -338,8 +402,14 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c/'
+    | '/cpp-tutorial/cpp/'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -352,6 +422,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -374,6 +445,10 @@ export interface FileRouteTypes {
     | '/tutorial'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -386,6 +461,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/cpp'
+    | '/cpp-tutorial'
     | '/engine'
     | '/faq'
     | '/feedback'
@@ -406,8 +482,14 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/cpp-tutorial/c'
+    | '/cpp-tutorial/cpp'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/cpp-tutorial/c/'
+    | '/cpp-tutorial/cpp/'
+    | '/cpp-tutorial/c/$moduleId/$lessonId'
+    | '/cpp-tutorial/cpp/$moduleId/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -421,6 +503,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   ContactRoute: typeof ContactRoute
   CppRoute: typeof CppRoute
+  CppTutorialRoute: typeof CppTutorialRouteWithChildren
   EngineRoute: typeof EngineRoute
   FaqRoute: typeof FaqRoute
   FeedbackRoute: typeof FeedbackRoute
@@ -589,6 +672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EngineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpp-tutorial': {
+      id: '/cpp-tutorial'
+      path: '/cpp-tutorial'
+      fullPath: '/cpp-tutorial'
+      preLoaderRoute: typeof CppTutorialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cpp': {
       id: '/cpp'
       path: '/cpp'
@@ -652,6 +742,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PythonTutorialTopicIdRouteImport
       parentRoute: typeof PythonTutorialRoute
     }
+    '/cpp-tutorial/cpp': {
+      id: '/cpp-tutorial/cpp'
+      path: '/cpp'
+      fullPath: '/cpp-tutorial/cpp'
+      preLoaderRoute: typeof CppTutorialCppRouteImport
+      parentRoute: typeof CppTutorialRoute
+    }
+    '/cpp-tutorial/c': {
+      id: '/cpp-tutorial/c'
+      path: '/c'
+      fullPath: '/cpp-tutorial/c'
+      preLoaderRoute: typeof CppTutorialCRouteImport
+      parentRoute: typeof CppTutorialRoute
+    }
+    '/cpp-tutorial/cpp/': {
+      id: '/cpp-tutorial/cpp/'
+      path: '/'
+      fullPath: '/cpp-tutorial/cpp/'
+      preLoaderRoute: typeof CppTutorialCppIndexRouteImport
+      parentRoute: typeof CppTutorialCppRoute
+    }
+    '/cpp-tutorial/c/': {
+      id: '/cpp-tutorial/c/'
+      path: '/'
+      fullPath: '/cpp-tutorial/c/'
+      preLoaderRoute: typeof CppTutorialCIndexRouteImport
+      parentRoute: typeof CppTutorialCRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -673,8 +791,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cpp-tutorial/cpp/$moduleId/$lessonId': {
+      id: '/cpp-tutorial/cpp/$moduleId/$lessonId'
+      path: '/$moduleId/$lessonId'
+      fullPath: '/cpp-tutorial/cpp/$moduleId/$lessonId'
+      preLoaderRoute: typeof CppTutorialCppModuleIdLessonIdRouteImport
+      parentRoute: typeof CppTutorialCppRoute
+    }
+    '/cpp-tutorial/c/$moduleId/$lessonId': {
+      id: '/cpp-tutorial/c/$moduleId/$lessonId'
+      path: '/$moduleId/$lessonId'
+      fullPath: '/cpp-tutorial/c/$moduleId/$lessonId'
+      preLoaderRoute: typeof CppTutorialCModuleIdLessonIdRouteImport
+      parentRoute: typeof CppTutorialCRoute
+    }
   }
 }
+
+interface CppTutorialCRouteChildren {
+  CppTutorialCIndexRoute: typeof CppTutorialCIndexRoute
+  CppTutorialCModuleIdLessonIdRoute: typeof CppTutorialCModuleIdLessonIdRoute
+}
+
+const CppTutorialCRouteChildren: CppTutorialCRouteChildren = {
+  CppTutorialCIndexRoute: CppTutorialCIndexRoute,
+  CppTutorialCModuleIdLessonIdRoute: CppTutorialCModuleIdLessonIdRoute,
+}
+
+const CppTutorialCRouteWithChildren = CppTutorialCRoute._addFileChildren(
+  CppTutorialCRouteChildren,
+)
+
+interface CppTutorialCppRouteChildren {
+  CppTutorialCppIndexRoute: typeof CppTutorialCppIndexRoute
+  CppTutorialCppModuleIdLessonIdRoute: typeof CppTutorialCppModuleIdLessonIdRoute
+}
+
+const CppTutorialCppRouteChildren: CppTutorialCppRouteChildren = {
+  CppTutorialCppIndexRoute: CppTutorialCppIndexRoute,
+  CppTutorialCppModuleIdLessonIdRoute: CppTutorialCppModuleIdLessonIdRoute,
+}
+
+const CppTutorialCppRouteWithChildren = CppTutorialCppRoute._addFileChildren(
+  CppTutorialCppRouteChildren,
+)
+
+interface CppTutorialRouteChildren {
+  CppTutorialCRoute: typeof CppTutorialCRouteWithChildren
+  CppTutorialCppRoute: typeof CppTutorialCppRouteWithChildren
+}
+
+const CppTutorialRouteChildren: CppTutorialRouteChildren = {
+  CppTutorialCRoute: CppTutorialCRouteWithChildren,
+  CppTutorialCppRoute: CppTutorialCppRouteWithChildren,
+}
+
+const CppTutorialRouteWithChildren = CppTutorialRoute._addFileChildren(
+  CppTutorialRouteChildren,
+)
 
 interface PythonTutorialRouteChildren {
   PythonTutorialTopicIdRoute: typeof PythonTutorialTopicIdRoute
@@ -696,6 +870,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   ContactRoute: ContactRoute,
   CppRoute: CppRoute,
+  CppTutorialRoute: CppTutorialRouteWithChildren,
   EngineRoute: EngineRoute,
   FaqRoute: FaqRoute,
   FeedbackRoute: FeedbackRoute,
@@ -724,3 +899,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

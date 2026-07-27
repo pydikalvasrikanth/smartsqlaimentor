@@ -108,7 +108,7 @@ function TopicPage() {
 
         {/* Explanation sections */}
         <section className="space-y-6 mb-10">
-          {topic.sections.map((sec, idx) => (
+          {topic.sections.map((sec: { heading: string; body: string; code?: string }, idx: number) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, x: -8 }}
