@@ -7,7 +7,7 @@ interface PlanDay {
   day_index: number;
   topic_slug: string;
   target_concept: string;
-  difficulty: string;
+  difficulty: "beginner" | "intermediate" | "advanced" | "professional";
   completed: boolean;
 }
 

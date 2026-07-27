@@ -28,7 +28,7 @@ interface Subject {
   title: string;
   tagline: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   accent: string;
   highlights: string[];
 }
