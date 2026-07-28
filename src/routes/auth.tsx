@@ -196,35 +196,127 @@ function AuthPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background grid place-items-center p-4">
-      <Toaster theme="dark" position="top-right" richColors />
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-md bg-gradient-to-br from-primary to-primary-glow grid place-items-center">
-            <Terminal className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-base font-semibold">Sign in to SQL Intelligence Engine</h1>
-            <p className="text-[11px] text-muted-foreground font-mono">adaptive practice</p>
-          </div>
-        </div>
+    <main className="relative min-h-screen overflow-hidden bg-background">
+      <Toaster position="top-right" richColors />
+      {/* ambient background */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            "radial-gradient(60rem 40rem at 10% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 60%), radial-gradient(50rem 35rem at 110% 110%, color-mix(in oklab, var(--primary-glow) 20%, transparent), transparent 60%)",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.15]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "radial-gradient(70% 60% at 50% 40%, black, transparent)",
+        }}
+      />
 
-        <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setMode("signin")}
-              className={`flex-1 text-xs py-1.5 rounded transition-all duration-200 active:scale-[0.97] ${mode === "signin" ? "bg-accent ring-1 ring-primary/30" : "text-muted-foreground hover:bg-accent/60"}`}
-            >
-              Sign in
-            </button>
-            <button
-              onClick={() => setMode("signup")}
-              className={`flex-1 text-xs py-1.5 rounded transition-all duration-200 active:scale-[0.97] ${mode === "signup" ? "bg-accent ring-1 ring-primary/30" : "text-muted-foreground hover:bg-accent/60"}`}
-            >
-              Create account
-            </button>
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle />
+      </div>
+
+      <div className="relative mx-auto grid min-h-screen w-full max-w-[1100px] items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-16">
+        {/* brand panel */}
+        <section className="hidden lg:block">
+          <div className="flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/25">
+              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            </span>
+            <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
+          </div>
+          <h2 className="mt-8 text-3xl font-semibold leading-tight tracking-tight">
+            Practice like the interview is tomorrow.
+          </h2>
+          <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+            One workspace for SQL, Python, Java, C/C++, PySpark and GCP — with an AI mentor that
+            grades your reasoning, not just your output.
+          </p>
+          <ul className="mt-8 space-y-4">
+            {[
+              { icon: BrainCircuit, title: "AI-graded answers", body: "Semantic feedback on every query and function you write." },
+              { icon: Gauge, title: "Adaptive difficulty", body: "Questions shift with your mastery, topic by topic." },
+              { icon: Save, title: "Resume anywhere", body: "Your session, code buffers and progress follow you across devices." },
+            ].map((f) => (
+              <li key={f.title} className="flex gap-3">
+                <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-surface-2">
+                  <f.icon className="h-4 w-4 text-primary" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium">{f.title}</p>
+                  <p className="text-xs leading-5 text-muted-foreground">{f.body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* auth card */}
+        <div className="mx-auto w-full max-w-[26rem] space-y-5">
+          <div className="flex items-center gap-3 lg:hidden">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow">
+              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            </span>
+            <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
 
+          <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-xl shadow-primary/5 backdrop-blur space-y-5">
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight">
+                Sign in to Smart AI Code Playground
+              </h1>
+              <p className="mt-1 text-[11px] font-mono text-muted-foreground">
+                SQL · Python · Java · C/C++ · PySpark · GCP
+              </p>
+            </div>
+
+            <div className="relative grid grid-cols-2 rounded-xl border border-border bg-surface-2 p-1">
+              <span
+                aria-hidden="true"
+                className={`absolute inset-y-1 w-[calc(50%-0.25rem)] rounded-lg bg-background shadow-sm transition-transform duration-300 ${mode === "signup" ? "translate-x-[calc(100%+0.5rem)]" : "translate-x-1"}`}
+              />
+              <button
+                type="button"
+                onClick={() => setMode("signin")}
+                aria-pressed={mode === "signin"}
+                className={`relative z-10 rounded-lg py-2 text-xs font-medium transition-colors ${mode === "signin" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("signup")}
+                aria-pressed={mode === "signup"}
+                className={`relative z-10 rounded-lg py-2 text-xs font-medium transition-colors ${mode === "signup" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Create account
+              </button>
+            </div>
+
+            <button
+              onClick={handleGoogle}
+              disabled={busy}
+              className={`w-full rounded-xl border border-border bg-background py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2 transition-all duration-200 hover:bg-accent disabled:opacity-60 active:scale-[0.98] ${busy && activeAction === "google" ? "auth-processing ring-2 ring-primary/40" : ""}`}
+            >
+              {busy && activeAction === "google" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <GoogleMark />
+              )}
+              {busy && activeAction === "google" ? "Opening Google..." : "Continue with Google"}
+            </button>
+
+            <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              or use email
+              <div className="h-px flex-1 bg-border" />
+            </div>
           {notice === "verify" && (
             <div className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm">
               <div className="flex items-start gap-2">
@@ -240,7 +332,7 @@ function AuthPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="auth-email"
@@ -248,19 +340,23 @@ function AuthPage() {
               >
                 Email
               </label>
-              <input
-                id="auth-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setNotice(null);
-                }}
-                className="mt-1 w-full px-3 py-2 rounded-md border border-input bg-transparent text-sm"
-              />
+              <div className="relative mt-1.5">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="auth-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setNotice(null);
+                  }}
+                  className="h-11 w-full rounded-xl border border-input bg-background/60 pl-9 pr-3 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring/60"
+                />
+              </div>
             </div>
             <div>
               <label
@@ -269,7 +365,8 @@ function AuthPage() {
               >
                 Password
               </label>
-              <div className="relative mt-1">
+              <div className="relative mt-1.5">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   id="auth-password"
                   name="password"
@@ -279,17 +376,32 @@ function AuthPage() {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 pr-10 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring/60"
+                  className="h-11 w-full rounded-xl border border-input bg-background/60 pl-9 pr-11 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring/60"
                 />
                 <button
                   type="button"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-md text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground active:scale-90"
+                  className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-xl text-muted-foreground transition-all duration-200 hover:text-foreground active:scale-90"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {mode === "signup" && password.length > 0 && (
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex flex-1 gap-1">
+                    {[0, 1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${i < strength ? "bg-primary" : "bg-border"}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">
+                    {strength <= 1 ? "Weak" : strength === 2 ? "Fair" : strength === 3 ? "Good" : "Strong"}
+                  </span>
+                </div>
+              )}
               {mode === "signin" && (
                 <div className="mt-2 text-right">
                   <Link to="/reset-password" className="text-[11px] text-primary hover:underline">
@@ -301,7 +413,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className={`w-full py-2 rounded-md text-sm font-medium bg-gradient-to-r from-primary to-primary-glow text-primary-foreground disabled:opacity-70 inline-flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] ${busy && (activeAction === "signin" || activeAction === "signup") ? "auth-processing ring-2 ring-primary/60" : ""}`}
+              className={`w-full rounded-xl py-2.5 text-sm font-medium bg-gradient-to-r from-primary to-primary-glow text-primary-foreground disabled:opacity-70 inline-flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98] ${busy && (activeAction === "signin" || activeAction === "signup") ? "auth-processing ring-2 ring-primary/60" : ""}`}
             >
               {busy && (activeAction === "signin" || activeAction === "signup") && (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -321,7 +433,7 @@ function AuthPage() {
               type="button"
               onClick={resendVerification}
               disabled={busy}
-              className={`w-full py-2 rounded-md text-xs border border-border hover:bg-accent disabled:opacity-60 inline-flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97] ${busy && activeAction === "resend" ? "auth-processing ring-2 ring-primary/40" : ""}`}
+              className={`w-full rounded-xl py-2 text-xs border border-border hover:bg-accent disabled:opacity-60 inline-flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] ${busy && activeAction === "resend" ? "auth-processing ring-2 ring-primary/40" : ""}`}
             >
               {busy && activeAction === "resend" ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -333,28 +445,22 @@ function AuthPage() {
                 : "Resend verification email"}
             </button>
           )}
-
-          <div className="flex items-center gap-3 text-[10px] uppercase text-muted-foreground">
-            <div className="h-px flex-1 bg-border" />
-            or
-            <div className="h-px flex-1 bg-border" />
           </div>
 
-          <button
-            onClick={handleGoogle}
-            disabled={busy}
-            className={`w-full py-2 rounded-md text-sm border border-border hover:bg-accent disabled:opacity-60 inline-flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.97] ${busy && activeAction === "google" ? "auth-processing ring-2 ring-primary/40" : ""}`}
-          >
-            {busy && activeAction === "google" && <Loader2 className="h-4 w-4 animate-spin" />}
-            {busy && activeAction === "google" ? "Opening Google..." : "Continue with Google"}
-          </button>
+          <p className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
+            <Link to="/" className="hover:text-foreground hover:underline">
+              Back to home
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/privacy" className="hover:text-foreground hover:underline">
+              Privacy
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/terms" className="hover:text-foreground hover:underline">
+              Terms
+            </Link>
+          </p>
         </div>
-
-        <p className="text-center text-[11px] text-muted-foreground">
-          <Link to="/" className="hover:underline">
-            Back to home
-          </Link>
-        </p>
       </div>
     </main>
   );
