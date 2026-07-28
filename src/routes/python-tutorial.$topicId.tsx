@@ -39,7 +39,38 @@ export const Route = createFileRoute("/python-tutorial/$topicId")({
     };
   },
   component: TopicPage,
+  notFoundComponent: TopicComingSoon,
 });
+
+function TopicComingSoon() {
+  return (
+    <div className="px-5 sm:px-6 lg:px-10 py-16 max-w-2xl mx-auto">
+      <div className="rounded-xl border border-border bg-surface p-8 text-center">
+        <div className="text-4xl mb-3">🚧</div>
+        <h1 className="text-2xl font-extrabold tracking-tight">This topic isn't published yet</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          We're working on it — this lesson will be added soon. In the meantime, browse the topics that are
+          already live.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/python-tutorial"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+          >
+            Browse all topics
+          </Link>
+          <Link
+            to="/python-tutorial/$topicId"
+            params={{ topicId: TOPICS[0].id }}
+            className="rounded-md border border-border bg-surface px-4 py-2 text-sm hover:bg-surface-2"
+          >
+            Start from the beginning
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function TopicPage() {
   const { topic } = Route.useLoaderData();
@@ -54,28 +85,17 @@ function TopicPage() {
     return () => window.removeEventListener("pve-progress", sync);
   }, [topic.id]);
 
-  return (
-    <div className="tut-python min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-3 px-4">
-          <Link to="/python-tutorial" className="flex items-center gap-2 group">
-            <span className="text-2xl group-hover:scale-110 transition-transform">🐍</span>
-            <div className="hidden sm:flex flex-col leading-tight">
-              <span className="text-sm font-bold">Python Visual Explainer</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                interactive · animated · live
-              </span>
-            </div>
-          </Link>
-        </div>
-      </header>
+  const hasContent = topic.sections.length > 0 || !!topic.example?.code;
+  if (!hasContent) return <TopicComingSoon />;
 
+  return (
+    <>
       <motion.article
         key={topic.id}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="px-6 lg:px-10 py-8 max-w-4xl mx-auto"
+        className="px-5 sm:px-6 lg:px-10 py-8 max-w-4xl mx-auto"
       >
         {/* Header */}
         <div className="mb-8">
