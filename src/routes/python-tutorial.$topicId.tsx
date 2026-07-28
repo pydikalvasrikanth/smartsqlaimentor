@@ -244,6 +244,6 @@ function TopicPage() {
           )}
         </div>
       </motion.article>
-    </div>
+    </>
   );
 }
