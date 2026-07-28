@@ -87,6 +87,15 @@ function AuthPage() {
   >(null);
   const [notice, setNotice] = useState<"verify" | null>(null);
 
+  const strength = useMemo(() => {
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 10) score++;
+    if (/\d/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return score;
+  }, [password]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
