@@ -38,6 +38,7 @@ import { Route as CCppCodingPracticeRouteImport } from './routes/c-cpp-coding-pr
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PythonTutorialIndexRouteImport } from './routes/python-tutorial.index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
 import { Route as PysparkTutorialLearnRouteImport } from './routes/pyspark-tutorial.learn'
@@ -198,6 +199,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonTutorialIndexRoute = PythonTutorialIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PythonTutorialRoute,
+} as any)
 const TopicSlugRoute = TopicSlugRouteImport.update({
   id: '/topic/$slug',
   path: '/topic/$slug',
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
   '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
@@ -336,7 +343,6 @@ export interface FileRoutesByTo {
   '/pyspark-tutorial': typeof PysparkTutorialRouteWithChildren
   '/python': typeof PythonRoute
   '/python-coding-practice': typeof PythonCodingPracticeRoute
-  '/python-tutorial': typeof PythonTutorialRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
@@ -345,6 +351,7 @@ export interface FileRoutesByTo {
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/python-tutorial': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp': typeof CppTutorialCppIndexRoute
   '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
@@ -390,6 +397,7 @@ export interface FileRoutesById {
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
   '/cpp-tutorial/c/$moduleId/$lessonId': typeof CppTutorialCModuleIdLessonIdRoute
@@ -436,6 +444,7 @@ export interface FileRouteTypes {
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/python-tutorial/'
     | '/cpp-tutorial/c/'
     | '/cpp-tutorial/cpp/'
     | '/cpp-tutorial/c/$moduleId/$lessonId'
@@ -469,7 +478,6 @@ export interface FileRouteTypes {
     | '/pyspark-tutorial'
     | '/python'
     | '/python-coding-practice'
-    | '/python-tutorial'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sql-interview-questions'
@@ -478,6 +486,7 @@ export interface FileRouteTypes {
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/python-tutorial'
     | '/cpp-tutorial/c'
     | '/cpp-tutorial/cpp'
     | '/cpp-tutorial/c/$moduleId/$lessonId'
@@ -522,6 +531,7 @@ export interface FileRouteTypes {
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/topic/$slug'
+    | '/python-tutorial/'
     | '/cpp-tutorial/c/'
     | '/cpp-tutorial/cpp/'
     | '/cpp-tutorial/c/$moduleId/$lessonId'
@@ -773,6 +783,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-tutorial/': {
+      id: '/python-tutorial/'
+      path: '/'
+      fullPath: '/python-tutorial/'
+      preLoaderRoute: typeof PythonTutorialIndexRouteImport
+      parentRoute: typeof PythonTutorialRoute
+    }
     '/topic/$slug': {
       id: '/topic/$slug'
       path: '/topic/$slug'
@@ -935,10 +952,12 @@ const PysparkTutorialRouteWithChildren = PysparkTutorialRoute._addFileChildren(
 
 interface PythonTutorialRouteChildren {
   PythonTutorialTopicIdRoute: typeof PythonTutorialTopicIdRoute
+  PythonTutorialIndexRoute: typeof PythonTutorialIndexRoute
 }
 
 const PythonTutorialRouteChildren: PythonTutorialRouteChildren = {
   PythonTutorialTopicIdRoute: PythonTutorialTopicIdRoute,
+  PythonTutorialIndexRoute: PythonTutorialIndexRoute,
 }
 
 const PythonTutorialRouteWithChildren = PythonTutorialRoute._addFileChildren(
