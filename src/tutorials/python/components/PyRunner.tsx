@@ -106,7 +106,7 @@ export default function PyRunner({ initial }: { initial: string }) {
         globals.destroy?.();
       }
     } catch (e: any) {
-      chunks.push(String(e?.message ?? e));
+      chunks.push(cleanTraceback(String(e?.message ?? e)));
     }
     py.setStdout({});
     py.setStderr({});
