@@ -1,10 +1,45 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast, Toaster } from "sonner";
-import { CheckCircle2, Eye, EyeOff, Loader2, Mail, Terminal } from "lucide-react";
+import {
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  Sparkles,
+  BrainCircuit,
+  Gauge,
+  Save,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
+import { ThemeToggle } from "@/hooks/use-theme";
+
+function GoogleMark({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" aria-hidden="true">
+      <path
+        fill="#EA4335"
+        d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.2 17.7 9.5 24 9.5z"
+      />
+      <path
+        fill="#4285F4"
+        d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.6 6.9l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16.9z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.1-5.5c-2 1.4-4.6 2.2-8.8 2.2-6.3 0-11.6-3.7-13.5-9.1l-7.9 6.1C6.5 42.6 14.6 48 24 48z"
+      />
+    </svg>
+  );
+}
 
 function getAuthOrigin() {
   if (typeof window === "undefined") return "https://smartsqlaimentor.lovable.app";
@@ -18,17 +53,20 @@ function getAuthRedirect(path = "/") {
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — SQL Intelligence Engine" },
+      { title: "Sign in — Smart AI Code Playground" },
       {
         name: "description",
         content:
-          "Sign in or create an account to access adaptive MySQL practice, AI-mentored feedback, and per-topic mastery tracking.",
+          "Sign in or create an account to access AI-mentored practice in SQL, Python, Java, C/C++, PySpark and GCP with resumable sessions.",
       },
-      { property: "og:title", content: "Sign in — SQL Intelligence Engine" },
+      { property: "og:title", content: "Sign in — Smart AI Code Playground" },
       {
         property: "og:description",
-        content: "Sign in to your adaptive SQL practice account and resume your daily curriculum.",
+        content:
+          "Sign in to Smart AI Code Playground and resume your adaptive coding and interview practice.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://smartsqlaimentor.lovable.app/auth" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/auth" }],
