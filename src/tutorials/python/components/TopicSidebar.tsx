@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { getProgress } from "@/tutorials/python/lib/progress";
 import { Check } from "lucide-react";
 
-export function TopicSidebar() {
+export function TopicSidebar({
+  variant = "aside",
+  onNavigate,
+}: {
+  variant?: "aside" | "drawer";
+  onNavigate?: () => void;
+}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
 
@@ -19,8 +25,16 @@ export function TopicSidebar() {
     };
   }, []);
 
+  const isDrawer = variant === "drawer";
+
   return (
-    <aside className="hidden lg:flex w-72 shrink-0 flex-col border-r border-border bg-surface/50 h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto">
+    <aside
+      className={
+        isDrawer
+          ? "flex w-full flex-col"
+          : "hidden lg:flex w-72 shrink-0 flex-col border-r border-border bg-surface/50 h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto"
+      }
+    >
       <div className="p-4 space-y-6">
         {LEVELS.map((lvl) => {
           const items = TOPICS.filter((t) => t.level === lvl.n);
@@ -37,13 +51,14 @@ export function TopicSidebar() {
               </div>
               <ul className="space-y-0.5">
                 {items.map((topic) => {
-                  const isActive = pathname === `/learn/${topic.id}`;
+                  const isActive = pathname === `/python-tutorial/${topic.id}`;
                   const isDone = !!completed[topic.id];
                   return (
                     <li key={topic.id}>
                       <Link
                         to="/python-tutorial/$topicId"
                         params={{ topicId: topic.id }}
+                        onClick={onNavigate}
                         className={`group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition ${
                           isActive
                             ? "bg-primary/15 text-primary font-medium"
