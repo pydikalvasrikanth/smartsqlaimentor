@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Play, Loader2, RotateCcw } from "lucide-react";
+import { Play, Loader2, RotateCcw, AlertTriangle } from "lucide-react";
 
 // Declare global loadPyodide function
 declare global {
@@ -9,27 +9,60 @@ declare global {
   }
 }
 
-const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const PYODIDE_MIRRORS = [
+  "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
+  "https://pyodide-cdn2.iodide.io/v0.26.4/full/",
+];
+
+function injectScript(src: string) {
+  return new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[data-pyodide="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === "1") return resolve();
+      existing.addEventListener("load", () => resolve());
+      existing.addEventListener("error", () => reject(new Error("Failed to load Pyodide")));
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.dataset.pyodide = src;
+    s.onload = () => {
+      s.dataset.loaded = "1";
+      resolve();
+    };
+    s.onerror = () => reject(new Error("Failed to load Pyodide"));
+    document.head.appendChild(s);
+  });
+}
 
 function loadPyodideOnce() {
   if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
   if (window.__pyodidePromise) return window.__pyodidePromise;
 
   window.__pyodidePromise = (async () => {
-    if (!window.loadPyodide) {
-      await new Promise<void>((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = `${PYODIDE_URL}pyodide.js`;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load Pyodide script"));
-        document.head.appendChild(s);
-      });
+    let lastErr: unknown = null;
+    for (const base of PYODIDE_MIRRORS) {
+      try {
+        if (!window.loadPyodide) await injectScript(`${base}pyodide.js`);
+        return await window.loadPyodide!({ indexURL: base });
+      } catch (e) {
+        lastErr = e;
+      }
     }
-    const pyodide = await window.loadPyodide!({ indexURL: PYODIDE_URL });
-    return pyodide;
+    // Let a later attempt retry from scratch.
+    window.__pyodidePromise = undefined;
+    throw lastErr instanceof Error ? lastErr : new Error("Failed to load the Python runtime");
   })();
 
   return window.__pyodidePromise;
+}
+
+/** Hide Pyodide's internal frames so learners only see their own error. */
+function cleanTraceback(msg: string) {
+  const lines = msg.split("\n").filter(
+    (l) => !l.includes("/lib/python3") && !l.includes("_pyodide") && !l.trim().startsWith("^^^")
+  );
+  return lines.join("\n").replace(/\n{2,}/g, "\n").trim();
 }
 
 export default function PyRunner({ initial }: { initial: string }) {
@@ -51,7 +84,9 @@ export default function PyRunner({ initial }: { initial: string }) {
       setStatus("ready");
       return py;
     } catch (e: any) {
-      setErr(e?.message ?? "Failed to load Python runtime");
+      setErr(
+        "Couldn't load the Python runtime (it downloads ~5 MB from a CDN). Check your connection and press Run again."
+      );
       setStatus("idle");
       throw e;
     }
@@ -71,11 +106,19 @@ export default function PyRunner({ initial }: { initial: string }) {
     py.setStdout({ batched: (s: string) => chunks.push(s) });
     py.setStderr({ batched: (s: string) => chunks.push(s) });
     try {
-      await py.runPythonAsync(code);
+      // Fresh namespace per run so leftovers from a previous run can't leak.
+      const globals = py.globals.get("dict")();
+      try {
+        await py.runPythonAsync(code, { globals });
+      } finally {
+        globals.destroy?.();
+      }
     } catch (e: any) {
-      chunks.push(String(e?.message ?? e));
+      chunks.push(cleanTraceback(String(e?.message ?? e)));
     }
-    setOutput(chunks.join("\n"));
+    py.setStdout({});
+    py.setStderr({});
+    setOutput(chunks.join("\n").replace(/\n+$/, ""));
     setStatus("ready");
   }
 
@@ -119,7 +162,7 @@ export default function PyRunner({ initial }: { initial: string }) {
           >
             {status === "loading" ? <><Loader2 className="h-3 w-3 animate-spin" />loading python…</>
               : status === "running" ? <><Loader2 className="h-3 w-3 animate-spin" />running…</>
-              : <><Play className="h-3 w-3" />run  <span className="opacity-60">⌘⏎</span></>}
+              : <><Play className="h-3 w-3" />run <span className="hidden sm:inline opacity-60">⌘⏎</span></>}
           </button>
         </div>
       </div>
@@ -136,7 +179,12 @@ export default function PyRunner({ initial }: { initial: string }) {
           output
         </div>
         <pre className="mono max-h-64 overflow-auto whitespace-pre-wrap p-4 text-[13px] leading-6 min-h-[60px]">
-          {err && <span className="text-destructive">{err}</span>}
+          {err && (
+            <span className="flex items-start gap-2 text-destructive">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              {err}
+            </span>
+          )}
           {!err && output === "" && status !== "running" && (
             <span className="text-muted-foreground">Press Run to execute. Pyodide loads on first run (~5MB).</span>
           )}

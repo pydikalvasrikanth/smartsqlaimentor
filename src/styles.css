@@ -323,6 +323,21 @@
 .tut-python .tok-cls { color: var(--purple); }
 .tut-python .tok-bi  { color: var(--orange); }
 .tut-python .glow-gold { box-shadow: 0 0 0 1px var(--gold), 0 8px 30px -8px rgba(245,200,66,0.35); }
+.tut-python code,
+.tut-python kbd,
+.tut-python pre,
+.tut-python .mono { font-family: var(--font-mono); }
+.tut-python h1,
+.tut-python h2,
+.tut-python h3,
+.tut-python h4,
+.tut-python h5,
+.tut-python h6 { color: var(--foreground); }
+.tut-python ::selection { background-color: rgba(245, 200, 66, 0.35); color: var(--foreground); }
+.tut-python ::-webkit-scrollbar { width: 10px; height: 10px; }
+.tut-python ::-webkit-scrollbar-track { background: transparent; }
+.tut-python ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; }
+.tut-python ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 
 .tut-dark .glow-orange { box-shadow: 0 0 40px -10px oklch(0.75 0.17 55 / 0.4); }
 .tut-dark .grid-bg {
