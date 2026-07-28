@@ -4,13 +4,23 @@ import { ChevronLeft, ChevronRight, Play, Pause, RotateCcw } from "lucide-react"
 import type { TraceFrame } from "@/tutorials/python/data/topics";
 import { CodeBlock } from "./CodeBlock";
 
+const SPEEDS = [0.5, 1, 1.5, 2];
+
 export function StepVisualizer({ code, trace }: { code: string; trace: TraceFrame[] }) {
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const timer = useRef<number | null>(null);
+  const lineCount = code.split("\n").length;
+
+  // Reset whenever a different trace is rendered (topic navigation).
+  useEffect(() => {
+    setI(0);
+    setPlaying(false);
+  }, [trace]);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || trace.length < 2) return;
     timer.current = window.setInterval(() => {
       setI((n) => {
         if (n >= trace.length - 1) {
@@ -19,60 +29,91 @@ export function StepVisualizer({ code, trace }: { code: string; trace: TraceFram
         }
         return n + 1;
       });
-    }, 900);
+    }, 900 / speed);
     return () => {
       if (timer.current) window.clearInterval(timer.current);
     };
-  }, [playing, trace.length]);
+  }, [playing, speed, trace.length]);
 
-  const frame = trace[i];
+  const safeIndex = Math.min(i, trace.length - 1);
+  const frame = trace[safeIndex];
+  const prevFrame = safeIndex > 0 ? trace[safeIndex - 1] : undefined;
+  if (!frame) return <CodeBlock code={code} />;
+  const highlightLine = frame.line >= 1 && frame.line <= lineCount ? frame.line : undefined;
 
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface-2/60">
-        <div className="text-xs text-muted-foreground mono">
-          step {i + 1} / {trace.length}
+        <div className="text-xs text-muted-foreground mono min-w-0">
+          step {safeIndex + 1} / {trace.length}
           {frame.note && <span className="ml-3 text-foreground/80">// {frame.note}</span>}
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-1.5 rounded hover:bg-surface-2" onClick={() => setI(0)} aria-label="Reset">
+          <button
+            className="p-1.5 rounded hover:bg-surface-2"
+            onClick={() => {
+              setPlaying(false);
+              setI(0);
+            }}
+            aria-label="Reset"
+          >
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
           <button
             className="p-1.5 rounded hover:bg-surface-2 disabled:opacity-40"
-            onClick={() => setI((n) => Math.max(0, n - 1))}
-            disabled={i === 0}
+            onClick={() => {
+              setPlaying(false);
+              setI((n) => Math.max(0, n - 1));
+            }}
+            disabled={safeIndex === 0}
             aria-label="Previous"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             className="p-1.5 rounded hover:bg-surface-2"
-            onClick={() => setPlaying((p) => !p)}
+            onClick={() =>
+              setPlaying((p) => {
+                if (!p && safeIndex >= trace.length - 1) setI(0);
+                return !p;
+              })
+            }
             aria-label="Play/Pause"
           >
             {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
           </button>
           <button
             className="p-1.5 rounded hover:bg-surface-2 disabled:opacity-40"
-            onClick={() => setI((n) => Math.min(trace.length - 1, n + 1))}
-            disabled={i >= trace.length - 1}
+            onClick={() => {
+              setPlaying(false);
+              setI((n) => Math.min(trace.length - 1, n + 1));
+            }}
+            disabled={safeIndex >= trace.length - 1}
             aria-label="Next"
           >
             <ChevronRight className="h-4 w-4" />
+          </button>
+          <button
+            className="ml-1 rounded px-1.5 py-1 mono text-[10px] text-muted-foreground hover:bg-surface-2"
+            onClick={() => setSpeed((s) => SPEEDS[(SPEEDS.indexOf(s) + 1) % SPEEDS.length])}
+            aria-label="Playback speed"
+          >
+            {speed}×
           </button>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-0">
-        <div className="p-3 border-r border-border">
-          <CodeBlock code={code} highlightLine={frame.line} />
+        <div className="p-3 border-b md:border-b-0 md:border-r border-border">
+          <CodeBlock code={code} highlightLine={highlightLine} />
         </div>
         <div className="p-4 space-y-4 bg-surface-2/30">
           <Panel title="Variables">
             <div className="flex flex-wrap gap-2">
               <AnimatePresence mode="popLayout">
-                {Object.entries(frame.vars).map(([k, v]) => (
+                {Object.entries(frame.vars).map(([k, v]) => {
+                  const changed = !prevFrame || prevFrame.vars[k] !== v;
+                  return (
                   <motion.div
                     key={k}
                     layout
@@ -80,13 +121,15 @@ export function StepVisualizer({ code, trace }: { code: string; trace: TraceFram
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                    className="flex items-center gap-2 rounded-md border border-border bg-surface px-2 py-1"
+                    className={`flex items-center gap-2 rounded-md border bg-surface px-2 py-1 ${
+                      changed ? "border-primary/60" : "border-border"
+                    }`}
                   >
                     <span className="mono text-xs text-muted-foreground">{k}</span>
                     <span className="mono text-xs text-primary">→</span>
                     <motion.span
-                      key={v}
-                      initial={{ backgroundColor: "rgba(245,200,66,0.35)" }}
+                      key={`${k}-${v}`}
+                      initial={{ backgroundColor: changed ? "rgba(245,200,66,0.35)" : "rgba(245,200,66,0)" }}
                       animate={{ backgroundColor: "rgba(245,200,66,0)" }}
                       transition={{ duration: 0.7 }}
                       className="mono text-xs px-1.5 py-0.5 rounded"
@@ -94,7 +137,8 @@ export function StepVisualizer({ code, trace }: { code: string; trace: TraceFram
                       {v}
                     </motion.span>
                   </motion.div>
-                ))}
+                  );
+                })}
               </AnimatePresence>
               {Object.keys(frame.vars).length === 0 && (
                 <span className="text-xs text-muted-foreground">— none yet —</span>
@@ -145,7 +189,7 @@ export function StepVisualizer({ code, trace }: { code: string; trace: TraceFram
       <div className="h-1 bg-surface-2">
         <motion.div
           className="h-full bg-primary"
-          animate={{ width: `${((i + 1) / trace.length) * 100}%` }}
+          animate={{ width: `${((safeIndex + 1) / trace.length) * 100}%` }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
         />
       </div>
