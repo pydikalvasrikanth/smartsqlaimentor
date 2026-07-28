@@ -1,26 +1,49 @@
-## What I found
+## Goal
 
-I compared the uploaded `python-playbook-interactive-main.zip` against what's already live at `/python-tutorial` in this project (Smart AI Code Playground):
+Modernize `/auth` (the sign in / create account page) and rename the heading from "Sign in to SQL Intelligence Engine" to "Sign in to Smart AI Code Playground".
 
-- Lesson data is already an exact copy — 35 topics, 6 levels (`src/tutorials/python/data/topics.ts`, byte-identical to the zip's `src/data/topics.ts`).
-- All 6 components are ported and already slightly hardened versions of the originals: `CodeBlock`, `PyRunner`, `Quiz`, `SearchPalette`, `StepVisualizer`, `TopicSidebar`.
-- The home page (`/python-tutorial`) matches the zip's `index.tsx` hero, progress bar, and level grids.
-- The dark gold-on-navy theme is ported as a scoped `.tut-python` block in `src/styles.css`.
+## Copy changes (src/routes/auth.tsx)
 
-Three things from the zip are **not** ported yet, and that's most likely what looks "different" to you.
+- H1: `Sign in to Smart AI Code Playground`
+- Sub-label: replace `adaptive practice` with `SQL · Python · Java · C/C++ · PySpark · GCP`
+- Head metadata: title `Sign in — Smart AI Code Playground`, matching description, `og:title`, `og:description` (keeps canonical `/auth`).
 
-## What to build
+## Visual upgrade
 
-1. **Tutorial About page** — port the zip's `about.tsx` to `/python-tutorial/about`: how each lesson works (explanation → animated step-through → live playground → quiz), the "progress is stored only in your browser" note, and the **Reset progress** button (wired to the existing `resetProgress()`). Link it from the tutorial header and the footer.
+Two-panel layout on desktop, single column on mobile:
 
-2. **Light/dark toggle for the tutorial** — the zip ships a `ThemeToggle` and a `.light` palette (cream background, dark gold accent). Add the equivalent light palette under the scoped `.tut-python` styles and a toggle button in the tutorial header, persisted to localStorage. The tutorial stays dark by default, matching the zip.
+```text
++---------------------+---------------------+
+|  Brand / value      |   Auth card         |
+|  panel (lg+ only)   |   - segmented tabs  |
+|  - logo + tagline   |   - Google first    |
+|  - 3 feature bullets|   - divider "or"    |
+|  - subtle gradient  |   - email/password  |
++---------------------+---------------------+
+```
 
-3. **Parity pass + verification** — walk the reference file-by-file against the port and fix any remaining behaviour drift (quiz scoring at ≥80% marking a topic complete, step-visualizer frame handling, sidebar active state), then run a browser pass on desktop and mobile: load the index, open a topic, run Pyodide, step the visualizer, take a quiz, and confirm progress persists after refresh.
+- Ambient background using existing semantic tokens (`--primary`, `--primary-glow`, `--surface-2`) — soft radial glow + grid, no hardcoded colors, works in light and dark.
+- Auth card: elevated surface, rounded-xl, border, `shadow-elegant`, generous spacing, larger inputs (h-11) with icon prefixes (Mail, Lock) and clear focus rings.
+- Sliding segmented control for Sign in / Create account instead of the two flat buttons.
+- Google button promoted above the email form with a real Google "G" mark and neutral styling.
+- Password field: keep show/hide toggle; in signup mode add a lightweight strength meter (length/number/symbol) rendered from local state only.
+- Buttons: keep gradient primary, add loading spinner states already present; consistent `active:scale` micro-interactions.
+- Add a theme toggle in the top-right so the page respects light mode.
+- Footer line: "Back to home" plus small links to Privacy and Terms.
 
-Also adds `/python-tutorial/about` to `src/routes/sitemap[.]xml.ts`.
+## Behavior
 
-## Technical notes
+No auth logic changes — same `signUp`, `signInWithPassword`, `resend`, and `lovable.auth.signInWithOAuth("google")` calls, same redirect handling, same verify-email notice and error toasts.
 
-- New route file: `src/routes/python-tutorial.about.tsx` with `createFileRoute("/python-tutorial/about")` and its own `head()` metadata.
-- Light theme goes in `src/styles.css` as `.tut-python.light` overrides so it can never leak into the main Cloud White app shell.
-- No backend, no dependency, and no changes to the main site — everything stays inside `src/routes/python-tutorial.*` and `src/tutorials/python/*`.
+## Files touched
+
+- `src/routes/auth.tsx` (layout, copy, metadata)
+- `src/styles.css` only if a new shared utility/token is needed for the ambient panel
+
+## Accessibility
+
+Single H1, labeled inputs, `aria-label` on icon buttons, visible focus states, mobile layout verified at 420px.
+
+&nbsp;
+
+I will provide the logo please add that logo to my url search 
