@@ -58,6 +58,7 @@ function loadPyodideOnce() {
 }
 
 export default function PyRunner({ initial }: { initial: string }) {
+  // defined below
   const [code, setCode] = useState(initial);
   const [output, setOutput] = useState<string>("");
   const [status, setStatus] = useState<"idle" | "loading" | "running" | "ready">("idle");
