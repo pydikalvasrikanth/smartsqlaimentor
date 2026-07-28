@@ -57,8 +57,15 @@ function loadPyodideOnce() {
   return window.__pyodidePromise;
 }
 
+/** Hide Pyodide's internal frames so learners only see their own error. */
+function cleanTraceback(msg: string) {
+  const lines = msg.split("\n").filter(
+    (l) => !l.includes("/lib/python3") && !l.includes("_pyodide") && !l.trim().startsWith("^^^")
+  );
+  return lines.join("\n").replace(/\n{2,}/g, "\n").trim();
+}
+
 export default function PyRunner({ initial }: { initial: string }) {
-  // defined below
   const [code, setCode] = useState(initial);
   const [output, setOutput] = useState<string>("");
   const [status, setStatus] = useState<"idle" | "loading" | "running" | "ready">("idle");
