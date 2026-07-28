@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate, ClientOnly } from "@tanst
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
-import { TOPIC_BY_ID, neighborTopics, type Topic } from "@/tutorials/python/data/topics";
+import { TOPIC_BY_ID, TOPICS, neighborTopics, type Topic } from "@/tutorials/python/data/topics";
 import { CodeBlock } from "@/tutorials/python/components/CodeBlock";
 import { StepVisualizer } from "@/tutorials/python/components/StepVisualizer";
 import { Quiz } from "@/tutorials/python/components/Quiz";
