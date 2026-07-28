@@ -40,6 +40,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PythonTutorialIndexRouteImport } from './routes/python-tutorial.index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
+import { Route as PythonTutorialAboutRouteImport } from './routes/python-tutorial.about'
 import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
 import { Route as PysparkTutorialLearnRouteImport } from './routes/pyspark-tutorial.learn'
 import { Route as CppTutorialCppRouteImport } from './routes/cpp-tutorial.cpp'
@@ -209,6 +210,11 @@ const TopicSlugRoute = TopicSlugRouteImport.update({
   path: '/topic/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PythonTutorialAboutRoute = PythonTutorialAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => PythonTutorialRoute,
+} as any)
 const PythonTutorialTopicIdRoute = PythonTutorialTopicIdRouteImport.update({
   id: '/$topicId',
   path: '/$topicId',
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
+  '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
@@ -350,6 +357,7 @@ export interface FileRoutesByTo {
   '/tutorial': typeof TutorialRoute
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
+  '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/python-tutorial': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c': typeof CppTutorialCIndexRoute
@@ -396,6 +404,7 @@ export interface FileRoutesById {
   '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
+  '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
   '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
     | '/cpp-tutorial/cpp'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
+    | '/python-tutorial/about'
     | '/topic/$slug'
     | '/python-tutorial/'
     | '/cpp-tutorial/c/'
@@ -485,6 +495,7 @@ export interface FileRouteTypes {
     | '/tutorial'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
+    | '/python-tutorial/about'
     | '/topic/$slug'
     | '/python-tutorial'
     | '/cpp-tutorial/c'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/cpp-tutorial/cpp'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
+    | '/python-tutorial/about'
     | '/topic/$slug'
     | '/python-tutorial/'
     | '/cpp-tutorial/c/'
@@ -797,6 +809,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/python-tutorial/about': {
+      id: '/python-tutorial/about'
+      path: '/about'
+      fullPath: '/python-tutorial/about'
+      preLoaderRoute: typeof PythonTutorialAboutRouteImport
+      parentRoute: typeof PythonTutorialRoute
+    }
     '/python-tutorial/$topicId': {
       id: '/python-tutorial/$topicId'
       path: '/$topicId'
@@ -952,11 +971,13 @@ const PysparkTutorialRouteWithChildren = PysparkTutorialRoute._addFileChildren(
 
 interface PythonTutorialRouteChildren {
   PythonTutorialTopicIdRoute: typeof PythonTutorialTopicIdRoute
+  PythonTutorialAboutRoute: typeof PythonTutorialAboutRoute
   PythonTutorialIndexRoute: typeof PythonTutorialIndexRoute
 }
 
 const PythonTutorialRouteChildren: PythonTutorialRouteChildren = {
   PythonTutorialTopicIdRoute: PythonTutorialTopicIdRoute,
+  PythonTutorialAboutRoute: PythonTutorialAboutRoute,
   PythonTutorialIndexRoute: PythonTutorialIndexRoute,
 }
 

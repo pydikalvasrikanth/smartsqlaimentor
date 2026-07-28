@@ -133,7 +133,11 @@ function TutorialIndex() {
       </div>
 
       <footer className="mt-16 pt-8 border-t border-border text-xs text-muted-foreground">
-        Built with TanStack Start, Pyodide, and Framer Motion. Progress is saved to your browser only.
+        Built with TanStack Start, Pyodide, and Framer Motion. Progress is saved to your browser only.{" "}
+        <Link to="/python-tutorial/about" className="text-primary hover:underline">
+          How this works
+        </Link>
+        .
       </footer>
     </div>
   );
