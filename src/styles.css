@@ -314,6 +314,43 @@
   color: var(--foreground);
 }
 
+.tut-python.light {
+  --background: #fbfaf5;
+  --foreground: #0a0e1a;
+  --surface: #ffffff;
+  --surface-2: #f4f1e8;
+  --surface2: #f4f1e8;
+  --card: #ffffff;
+  --card-foreground: #0a0e1a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0e1a;
+  --primary: #b8860b;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f1e8;
+  --secondary-foreground: #0a0e1a;
+  --muted: #f4f1e8;
+  --muted-foreground: #64748b;
+  --accent: #f4f1e8;
+  --accent-foreground: #0a0e1a;
+  --border: #e5e0d0;
+  --input: #e5e0d0;
+  --ring: #b8860b;
+  --line: #e5e0d0;
+  --gold: #b8860b;
+  --teal: #0d9668;
+  --blue: #2563eb;
+  --purple: #7c3aed;
+  --orange: #ea580c;
+  --pink: #db2777;
+  --ok: #15803d;
+  --err: #dc2626;
+}
+
+.tut-python.light .tok-str { color: #0f766e; }
+.tut-python.light .tok-num { color: #b45309; }
+.tut-python.light .tok-com { color: #94a3b8; }
+.tut-python.light ::selection { background-color: rgba(184, 134, 11, 0.25); color: var(--foreground); }
+
 .tut-python .tok-kw { color: var(--gold); }
 .tut-python .tok-fn { color: var(--blue); }
 .tut-python .tok-str { color: #6ee7b7; }

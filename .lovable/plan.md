@@ -1,46 +1,26 @@
-## Goal
+## What I found
 
-Bring `/python-tutorial` up to the same behaviour as the uploaded `python-playbook-interactive-main` reference app, and fix the four problem areas you selected.
+I compared the uploaded `python-playbook-interactive-main.zip` against what's already live at `/python-tutorial` in this project (Smart AI Code Playground):
 
-## What I verified
+- Lesson data is already an exact copy — 35 topics, 6 levels (`src/tutorials/python/data/topics.ts`, byte-identical to the zip's `src/data/topics.ts`).
+- All 6 components are ported and already slightly hardened versions of the originals: `CodeBlock`, `PyRunner`, `Quiz`, `SearchPalette`, `StepVisualizer`, `TopicSidebar`.
+- The home page (`/python-tutorial`) matches the zip's `index.tsx` hero, progress bar, and level grids.
+- The dark gold-on-navy theme is ported as a scoped `.tut-python` block in `src/styles.css`.
 
-- Both `/python-tutorial` and `/python-tutorial/variables` return 200 — the pages load, but the port is incomplete.
-- `TopicSidebar.tsx` exists in `src/tutorials/python/components/` but is **not imported anywhere** — no topic page has sidebar navigation.
-- `SearchPalette` is only on the index page, not on topic pages.
-- The tutorial's dark palette is scoped via `.tut-python` in `src/styles.css`, but the wrapper is applied only at the page root, so portalled UI (search dialog, popovers) and some nested elements fall back to the site's light "Cloud White" theme.
-- The topic route has no `notFoundComponent`, so an unknown topic id falls through to the generic app error page.
+Three things from the zip are **not** ported yet, and that's most likely what looks "different" to you.
 
-## Changes
+## What to build
 
-**1. Sidebar + shared tutorial layout**
-- Convert `src/routes/python-tutorial.tsx` into a layout route that renders the sticky header (logo, search, theme toggle, back-to-playground) plus `TopicSidebar` and an `<Outlet />`.
-- Move the current landing content into a new `python-tutorial.index.tsx` leaf.
-- Sidebar: grouped by level, per-level progress, completion ticks, active-topic highlight, collapsible on desktop, slide-over drawer on mobile.
-- Add `SearchPalette` to the topic pages via the shared header (⌘K / Ctrl+K).
+1. **Tutorial About page** — port the zip's `about.tsx` to `/python-tutorial/about`: how each lesson works (explanation → animated step-through → live playground → quiz), the "progress is stored only in your browser" note, and the **Reset progress** button (wired to the existing `resetProgress()`). Link it from the tutorial header and the footer.
 
-**2. Live Python runner reliability**
-- Harden `PyRunner`: load Pyodide from a pinned CDN with a fallback mirror, surface a clear error + retry button on failure, show a load-progress state, and reset `stdout`/`stderr` handlers per run so repeated runs don't duplicate output.
-- Run user code in a fresh namespace each execution so leftover variables don't corrupt later runs; support `input()` via a prompt shim.
-- Keep it client-only and lazy so SSR is unaffected.
+2. **Light/dark toggle for the tutorial** — the zip ships a `ThemeToggle` and a `.light` palette (cream background, dark gold accent). Add the equivalent light palette under the scoped `.tut-python` styles and a toggle button in the tutorial header, persisted to localStorage. The tutorial stays dark by default, matching the zip.
 
-**3. Step visualizer**
-- Fix the trace playback: reliable play/pause/step/reset, speed control, current-line highlight synced to the trace index, variable-diff highlighting when a value changes, and stdout accumulation per step.
-- Guard against topics whose `trace` is shorter/longer than the code lines.
+3. **Parity pass + verification** — walk the reference file-by-file against the port and fix any remaining behaviour drift (quiz scoring at ≥80% marking a topic complete, step-visualizer frame handling, sidebar active state), then run a browser pass on desktop and mobile: load the index, open a topic, run Pyodide, step the visualizer, take a quiz, and confirm progress persists after refresh.
 
-**4. Theme / styling parity**
-- Apply the `.tut-python` scope to the layout wrapper so every child (including the sidebar and mobile drawer) inherits it.
-- Add the missing reference tokens and `.mono`, scrollbar, and glow rules under the scope; make search/dialog portals inherit the tutorial palette.
-- Verify contrast for body text, code tokens, and muted labels in both site themes.
-
-**5. "Coming soon" for missing topics**
-- Add `notFoundComponent` to `python-tutorial.$topicId.tsx`: friendly card saying this topic isn't published yet — "We're working on it, this topic will be added soon" — with links back to the tutorial index and the nearest available topic. Keep `robots: noindex` on that state.
-- Same fallback if a topic exists but has no sections/example content yet.
-
-**6. Verification**
-- Playwright pass on desktop + mobile viewport: index → topic navigation, sidebar open/close, run a Python snippet and confirm output, step through the visualizer, complete a quiz, and hit an unknown topic id.
+Also adds `/python-tutorial/about` to `src/routes/sitemap[.]xml.ts`.
 
 ## Technical notes
 
-- No data changes: `src/tutorials/python/data/topics.ts` already matches the reference `src/data/topics.ts` (785 vs 786 lines), so content stays as-is.
-- Route ids follow the existing dot-file convention: `python-tutorial.tsx` (layout), `python-tutorial.index.tsx`, `python-tutorial.$topicId.tsx`.
-- Per-page `head()` metadata stays on the leaf routes; the layout will not add `og:image`.
+- New route file: `src/routes/python-tutorial.about.tsx` with `createFileRoute("/python-tutorial/about")` and its own `head()` metadata.
+- Light theme goes in `src/styles.css` as `.tut-python.light` overrides so it can never leak into the main Cloud White app shell.
+- No backend, no dependency, and no changes to the main site — everything stays inside `src/routes/python-tutorial.*` and `src/tutorials/python/*`.
