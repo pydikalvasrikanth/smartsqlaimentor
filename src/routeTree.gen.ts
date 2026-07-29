@@ -43,6 +43,7 @@ import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as PythonTutorialAboutRouteImport } from './routes/python-tutorial.about'
 import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
 import { Route as PysparkTutorialLearnRouteImport } from './routes/pyspark-tutorial.learn'
+import { Route as GuideSeniorSqlInterviewQuestionsRouteImport } from './routes/guide.senior-sql-interview-questions'
 import { Route as CppTutorialCppRouteImport } from './routes/cpp-tutorial.cpp'
 import { Route as CppTutorialCRouteImport } from './routes/cpp-tutorial.c'
 import { Route as CppTutorialCppIndexRouteImport } from './routes/cpp-tutorial.cpp.index'
@@ -225,6 +226,12 @@ const PysparkTutorialLearnRoute = PysparkTutorialLearnRouteImport.update({
   path: '/learn',
   getParentRoute: () => PysparkTutorialRoute,
 } as any)
+const GuideSeniorSqlInterviewQuestionsRoute =
+  GuideSeniorSqlInterviewQuestionsRouteImport.update({
+    id: '/guide/senior-sql-interview-questions',
+    path: '/guide/senior-sql-interview-questions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CppTutorialCppRoute = CppTutorialCppRouteImport.update({
   id: '/cpp',
   path: '/cpp',
@@ -312,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/tutorial': typeof TutorialRoute
   '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
   '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
+  '/guide/senior-sql-interview-questions': typeof GuideSeniorSqlInterviewQuestionsRoute
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
@@ -355,6 +363,7 @@ export interface FileRoutesByTo {
   '/sql-interview-questions': typeof SqlInterviewQuestionsRoute
   '/terms': typeof TermsRoute
   '/tutorial': typeof TutorialRoute
+  '/guide/senior-sql-interview-questions': typeof GuideSeniorSqlInterviewQuestionsRoute
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
@@ -402,6 +411,7 @@ export interface FileRoutesById {
   '/tutorial': typeof TutorialRoute
   '/cpp-tutorial/c': typeof CppTutorialCRouteWithChildren
   '/cpp-tutorial/cpp': typeof CppTutorialCppRouteWithChildren
+  '/guide/senior-sql-interview-questions': typeof GuideSeniorSqlInterviewQuestionsRoute
   '/pyspark-tutorial/learn': typeof PysparkTutorialLearnRouteWithChildren
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/tutorial'
     | '/cpp-tutorial/c'
     | '/cpp-tutorial/cpp'
+    | '/guide/senior-sql-interview-questions'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
@@ -493,6 +504,7 @@ export interface FileRouteTypes {
     | '/sql-interview-questions'
     | '/terms'
     | '/tutorial'
+    | '/guide/senior-sql-interview-questions'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
@@ -539,6 +551,7 @@ export interface FileRouteTypes {
     | '/tutorial'
     | '/cpp-tutorial/c'
     | '/cpp-tutorial/cpp'
+    | '/guide/senior-sql-interview-questions'
     | '/pyspark-tutorial/learn'
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
@@ -584,6 +597,7 @@ export interface RootRouteChildren {
   SqlInterviewQuestionsRoute: typeof SqlInterviewQuestionsRoute
   TermsRoute: typeof TermsRoute
   TutorialRoute: typeof TutorialRoute
+  GuideSeniorSqlInterviewQuestionsRoute: typeof GuideSeniorSqlInterviewQuestionsRoute
   TopicSlugRoute: typeof TopicSlugRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -830,6 +844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PysparkTutorialLearnRouteImport
       parentRoute: typeof PysparkTutorialRoute
     }
+    '/guide/senior-sql-interview-questions': {
+      id: '/guide/senior-sql-interview-questions'
+      path: '/guide/senior-sql-interview-questions'
+      fullPath: '/guide/senior-sql-interview-questions'
+      preLoaderRoute: typeof GuideSeniorSqlInterviewQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cpp-tutorial/cpp': {
       id: '/cpp-tutorial/cpp'
       path: '/cpp'
@@ -1015,6 +1036,7 @@ const rootRouteChildren: RootRouteChildren = {
   SqlInterviewQuestionsRoute: SqlInterviewQuestionsRoute,
   TermsRoute: TermsRoute,
   TutorialRoute: TutorialRoute,
+  GuideSeniorSqlInterviewQuestionsRoute: GuideSeniorSqlInterviewQuestionsRoute,
   TopicSlugRoute: TopicSlugRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
