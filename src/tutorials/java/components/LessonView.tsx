@@ -111,7 +111,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
           to="/java"
           className="mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
         >
-          ← Back to home
+          ← Back to Java playground
         </Link>
       </div>
 
