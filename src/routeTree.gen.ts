@@ -39,6 +39,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PythonTutorialIndexRouteImport } from './routes/python-tutorial.index'
+import { Route as JavaTutorialIndexRouteImport } from './routes/java-tutorial.index'
 import { Route as TopicSlugRouteImport } from './routes/topic.$slug'
 import { Route as PythonTutorialAboutRouteImport } from './routes/python-tutorial.about'
 import { Route as PythonTutorialTopicIdRouteImport } from './routes/python-tutorial.$topicId'
@@ -208,6 +209,11 @@ const PythonTutorialIndexRoute = PythonTutorialIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PythonTutorialRoute,
 } as any)
+const JavaTutorialIndexRoute = JavaTutorialIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => JavaTutorialRoute,
+} as any)
 const TopicSlugRoute = TopicSlugRouteImport.update({
   id: '/topic/$slug',
   path: '/topic/$slug',
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/java-tutorial/': typeof JavaTutorialIndexRoute
   '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
@@ -365,7 +372,6 @@ export interface FileRoutesByTo {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
-  '/java-tutorial': typeof JavaTutorialRouteWithChildren
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -384,6 +390,7 @@ export interface FileRoutesByTo {
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/java-tutorial': typeof JavaTutorialIndexRoute
   '/python-tutorial': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp': typeof CppTutorialCppIndexRoute
@@ -434,6 +441,7 @@ export interface FileRoutesById {
   '/python-tutorial/$topicId': typeof PythonTutorialTopicIdRoute
   '/python-tutorial/about': typeof PythonTutorialAboutRoute
   '/topic/$slug': typeof TopicSlugRoute
+  '/java-tutorial/': typeof JavaTutorialIndexRoute
   '/python-tutorial/': typeof PythonTutorialIndexRoute
   '/cpp-tutorial/c/': typeof CppTutorialCIndexRoute
   '/cpp-tutorial/cpp/': typeof CppTutorialCppIndexRoute
@@ -485,6 +493,7 @@ export interface FileRouteTypes {
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
     | '/topic/$slug'
+    | '/java-tutorial/'
     | '/python-tutorial/'
     | '/cpp-tutorial/c/'
     | '/cpp-tutorial/cpp/'
@@ -512,7 +521,6 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
-    | '/java-tutorial'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -531,6 +539,7 @@ export interface FileRouteTypes {
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
     | '/topic/$slug'
+    | '/java-tutorial'
     | '/python-tutorial'
     | '/cpp-tutorial/c'
     | '/cpp-tutorial/cpp'
@@ -580,6 +589,7 @@ export interface FileRouteTypes {
     | '/python-tutorial/$topicId'
     | '/python-tutorial/about'
     | '/topic/$slug'
+    | '/java-tutorial/'
     | '/python-tutorial/'
     | '/cpp-tutorial/c/'
     | '/cpp-tutorial/cpp/'
@@ -841,6 +851,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PythonTutorialIndexRouteImport
       parentRoute: typeof PythonTutorialRoute
     }
+    '/java-tutorial/': {
+      id: '/java-tutorial/'
+      path: '/'
+      fullPath: '/java-tutorial/'
+      preLoaderRoute: typeof JavaTutorialIndexRouteImport
+      parentRoute: typeof JavaTutorialRoute
+    }
     '/topic/$slug': {
       id: '/topic/$slug'
       path: '/topic/$slug'
@@ -1019,10 +1036,12 @@ const JavaTutorialLearnRouteWithChildren =
 
 interface JavaTutorialRouteChildren {
   JavaTutorialLearnRoute: typeof JavaTutorialLearnRouteWithChildren
+  JavaTutorialIndexRoute: typeof JavaTutorialIndexRoute
 }
 
 const JavaTutorialRouteChildren: JavaTutorialRouteChildren = {
   JavaTutorialLearnRoute: JavaTutorialLearnRouteWithChildren,
+  JavaTutorialIndexRoute: JavaTutorialIndexRoute,
 }
 
 const JavaTutorialRouteWithChildren = JavaTutorialRoute._addFileChildren(
@@ -1108,3 +1127,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
