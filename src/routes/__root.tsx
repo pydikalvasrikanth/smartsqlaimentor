@@ -106,6 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "google-site-verification",
+        content: "0rMYP2PR3d4aQMUqUlB7V-y7CVk6z5xhL224WdOQ86U",
+      },
       { name: "author", content: "Lovable" },
       { title: "Smart AI Code Playground — SQL, Python, Java, PySpark & GCP" },
       { name: "description", content: "Smart AI Code Playground: AI-graded practice, live interviews, and adaptive tutorials for SQL, Python, Java, PySpark and GCP Data Engineering." },
