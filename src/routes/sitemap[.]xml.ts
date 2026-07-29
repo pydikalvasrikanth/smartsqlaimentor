@@ -42,6 +42,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/pyspark-practice", changefreq: "weekly", priority: "0.8" },
           { path: "/gcp-data-engineer-interview", changefreq: "weekly", priority: "0.85" },
           { path: "/c-cpp-coding-practice", changefreq: "weekly", priority: "0.8" },
+          {
+            path: "/guide/senior-sql-interview-questions",
+            changefreq: "monthly",
+            priority: "0.8",
+          },
         ];
 
         const urls = entries
