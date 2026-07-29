@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import type { SceneKey } from "@/content/java-lessons";
-import { ThreeScene } from "./scenes/ThreeScene";
+import type { SceneKey } from "@/tutorials/java/content/java-lessons";
+import { ThreeScene } from "@/tutorials/java/components/scenes/ThreeScene";
 
 const scenes = {
   jvm: lazy(() => import("./scenes/JvmScene")),

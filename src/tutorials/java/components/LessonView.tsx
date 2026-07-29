@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
-import type { Lesson, Module } from "@/content/java-lessons";
-import { neighbours } from "@/content/java-lessons";
-import { CodeBlock } from "./CodeBlock";
-import { SceneFor } from "./SceneRegistry";
+import type { Lesson, Module } from "@/tutorials/java/content/java-lessons";
+import { neighbours } from "@/tutorials/java/content/java-lessons";
+import { CodeBlock } from "@/tutorials/java/components/CodeBlock";
+import { SceneFor } from "@/tutorials/java/components/SceneRegistry";
 
 function Callout({ tone, text }: { tone: "tip" | "warn" | "note"; text: string }) {
   const colors = {
@@ -82,7 +82,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
       <nav className="mt-10 flex items-center justify-between gap-4">
         {prev ? (
           <Link
-            to="/learn/$moduleId/$lessonId"
+            to="/java-tutorial/learn/$moduleId/$lessonId"
             params={{ moduleId: prev.module.id, lessonId: prev.lesson.id }}
             className="group flex-1 rounded-xl border border-border p-4 hover:border-[color:var(--java-orange)]"
           >
@@ -94,7 +94,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
         )}
         {next ? (
           <Link
-            to="/learn/$moduleId/$lessonId"
+            to="/java-tutorial/learn/$moduleId/$lessonId"
             params={{ moduleId: next.module.id, lessonId: next.lesson.id }}
             className="group flex-1 rounded-xl border border-border p-4 text-right hover:border-[color:var(--java-orange)]"
           >
@@ -108,7 +108,7 @@ export function LessonView({ module, lesson }: { module: Module; lesson: Lesson 
 
       <div className="mt-6 text-center">
         <Link
-          to="/"
+          to="/java"
           className="mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
         >
           ← Back to home

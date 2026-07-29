@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { modules } from "@/content/java-lessons";
+import { modules } from "@/tutorials/java/content/java-lessons";
 
 export function LessonSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-border bg-[color:var(--sidebar)] py-6 md:block">
       <Link
-        to="/"
+        to="/java"
         className="mx-6 mb-6 flex items-center gap-2 text-sm font-semibold text-foreground"
       >
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-[color:var(--java-orange)] text-[color:var(--primary-foreground)]">
@@ -29,7 +29,7 @@ export function LessonSidebar() {
               return (
                 <li key={l.id}>
                   <Link
-                    to="/learn/$moduleId/$lessonId"
+                    to="/java-tutorial/learn/$moduleId/$lessonId"
                     params={{ moduleId: m.id, lessonId: l.id }}
                     className={`block border-l-2 px-6 py-1.5 text-sm transition-colors ${
                       active
