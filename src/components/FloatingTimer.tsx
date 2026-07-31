@@ -26,6 +26,17 @@ const HIDE_ON = [
   "/faq",
   "/privacy",
   "/terms",
+  "/cpp",
+  "/pyspark",
+  "/chat",
+  "/engine",
+  "/feedback",
+  "/topic",
+  "/guide",
+  "/python-tutorial",
+  "/java-tutorial",
+  "/pyspark-tutorial",
+  "/cpp-tutorial",
   "/",
 ];
 const POS_KEY = "focus_timer_pos_v1";
