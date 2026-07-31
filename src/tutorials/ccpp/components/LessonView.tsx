@@ -16,7 +16,7 @@ export function LessonView({
 }) {
   const { prev, next, index, total } = neighbours(curriculum, module.id, lesson.id);
   const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
-  const trackRoute = curriculum.track === "c" ? "/c" : "/cpp";
+  const trackRoute = curriculum.track === "c" ? "/cpp-tutorial/c" : "/cpp-tutorial/cpp";
   const navigate = useNavigate();
   const { isDone, toggle } = useProgress();
   const key = lessonKey(curriculum.track, module.id, lesson.id);
