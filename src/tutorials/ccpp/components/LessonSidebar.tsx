@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { Curriculum } from "@/tutorials/ccpp/content/types";
-import { lessonKey, useProgress } from "@/tutorials/ccpp/hooks/useProgress";
-import { flatLessons } from "@/tutorials/ccpp/content/types";
+import type { Curriculum } from "@/content/types";
+import { lessonKey, useProgress } from "@/hooks/useProgress";
+import { flatLessons } from "@/content/types";
 
 export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curriculum; onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
+  const route = curriculum.track === "c" ? "/c/$moduleId/$lessonId" : "/cpp/$moduleId/$lessonId";
   const badge = curriculum.track === "c" ? "C" : "C++";
   const { isDone } = useProgress();
   const total = flatLessons(curriculum).length;
@@ -15,7 +15,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
   const pct = total ? Math.round((done / total) * 100) : 0;
   return (
     <aside className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-border bg-[color:var(--sidebar)] py-6">
-      <Link to="/cpp-tutorial" onClick={onNavigate} className="mx-6 mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+      <Link to="/" onClick={onNavigate} className="mx-6 mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
         <span
           className="grid h-8 w-8 place-items-center rounded-lg text-white"
           style={{ background: curriculum.accent }}
@@ -25,7 +25,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
         {curriculum.name} Explainer
       </Link>
       <div className="mx-6 mb-4">
-        <div className="font-mono mb-1 flex justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="mono mb-1 flex justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>Progress</span>
           <span>{done}/{total} · {pct}%</span>
         </div>
@@ -35,7 +35,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
       </div>
       <div className="mx-6 mb-5 flex gap-1 rounded-lg bg-[color:var(--surface2)] p-1 text-xs">
         <Link
-          to="/cpp-tutorial/c"
+          to="/c"
           onClick={onNavigate}
           className={`flex-1 rounded-md px-2 py-1 text-center font-semibold transition ${
             curriculum.track === "c" ? "bg-[color:var(--java-blue)] text-white" : "text-muted-foreground"
@@ -44,7 +44,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
           C
         </Link>
         <Link
-          to="/cpp-tutorial/cpp"
+          to="/cpp"
           onClick={onNavigate}
           className={`flex-1 rounded-md px-2 py-1 text-center font-semibold transition ${
             curriculum.track === "cpp" ? "bg-[color:var(--purple)] text-white" : "text-muted-foreground"
@@ -56,7 +56,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
       {curriculum.modules.map((m) => (
         <div key={m.id} className="mb-5">
           <div
-            className="font-mono mb-2 px-6 text-[10px] font-bold uppercase tracking-widest"
+            className="mono mb-2 px-6 text-[10px] font-bold uppercase tracking-widest"
             style={{ color: m.color }}
           >
             {m.title}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import type { Curriculum } from "@/tutorials/ccpp/content/types";
+import type { Curriculum } from "@/content/types";
 import { LessonSidebar } from "./LessonSidebar";
 
 export function MobileNav({ curriculum }: { curriculum: Curriculum }) {
@@ -23,7 +23,7 @@ export function MobileNav({ curriculum }: { curriculum: Curriculum }) {
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <Link to="/cpp-tutorial" className="flex items-center gap-2 text-sm font-semibold">
+        <Link to="/" className="flex items-center gap-2 text-sm font-semibold">
           <span
             className="grid h-7 w-7 place-items-center rounded-md text-white text-[11px]"
             style={{ background: curriculum.accent }}

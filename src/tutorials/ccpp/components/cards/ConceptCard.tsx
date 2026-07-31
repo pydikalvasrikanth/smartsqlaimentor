@@ -1,4 +1,4 @@
-import type { Card } from "@/tutorials/ccpp/content/types";
+import type { Card } from "@/content/types";
 import { CodeBlock } from "../CodeBlock";
 import { Diagram } from "./Diagram";
 import { QuizCard } from "./QuizCard";
@@ -20,7 +20,7 @@ function BeforeAfter({ before, after, note }: any) {
 function MiniTable({ title, headers, rows }: { title: string; headers?: string[]; rows: string[][] }) {
   return (
     <div className="flex-1 min-w-0">
-      <div className="font-mono mb-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+      <div className="mono mb-1 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
         {title}
       </div>
       <table className="w-full border-collapse text-[11px]">
@@ -38,7 +38,7 @@ function MiniTable({ title, headers, rows }: { title: string; headers?: string[]
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td className="font-mono border border-dashed border-border px-2 py-3 text-center text-muted-foreground" colSpan={headers?.length ?? 1}>
+              <td className="mono border border-dashed border-border px-2 py-3 text-center text-muted-foreground" colSpan={headers?.length ?? 1}>
                 (empty)
               </td>
             </tr>
@@ -46,7 +46,7 @@ function MiniTable({ title, headers, rows }: { title: string; headers?: string[]
             rows.map((row, i) => (
               <tr key={i}>
                 {row.map((cell, j) => (
-                  <td key={j} className="font-mono border border-border px-2 py-1">{cell}</td>
+                  <td key={j} className="mono border border-border px-2 py-1">{cell}</td>
                 ))}
               </tr>
             ))
@@ -69,7 +69,7 @@ function Callout({ tone, text }: { tone: "tip" | "warn" | "note"; text: string }
       className="rounded-lg border-l-4 p-3 text-xs"
       style={{ borderLeftColor: color, background: `color-mix(in oklab, ${color} 10%, transparent)` }}
     >
-      <div className="font-mono mb-1 text-[9px] font-bold uppercase tracking-widest" style={{ color }}>
+      <div className="mono mb-1 text-[9px] font-bold uppercase tracking-widest" style={{ color }}>
         {label}
       </div>
       <div className="text-foreground/90">{text}</div>
@@ -80,15 +80,15 @@ function Callout({ tone, text }: { tone: "tip" | "warn" | "note"; text: string }
 function Complexity({ rows }: { rows: { op: string; big_o: string; note?: string }[] }) {
   return (
     <div className="rounded-lg border border-border bg-[color:var(--surface2)] p-3">
-      <div className="font-mono mb-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--teal)]">
+      <div className="mono mb-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--teal)]">
         Complexity
       </div>
       <table className="w-full text-[12px]">
         <tbody>
           {rows.map((r, i) => (
             <tr key={i} className="border-t border-border/60 first:border-0">
-              <td className="font-mono py-1.5 pr-3 text-foreground">{r.op}</td>
-              <td className="font-mono py-1.5 pr-3 font-bold text-[color:var(--java-orange)]">{r.big_o}</td>
+              <td className="mono py-1.5 pr-3 text-foreground">{r.op}</td>
+              <td className="mono py-1.5 pr-3 font-bold text-[color:var(--java-orange)]">{r.big_o}</td>
               <td className="py-1.5 text-xs text-muted-foreground">{r.note}</td>
             </tr>
           ))}
@@ -104,7 +104,7 @@ function Pitfalls({ items }: { items: string[] }) {
       className="rounded-lg border-l-4 p-3 text-xs"
       style={{ borderLeftColor: "var(--destructive)", background: "color-mix(in oklab, var(--destructive) 8%, transparent)" }}
     >
-      <div className="font-mono mb-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--destructive)]">
+      <div className="mono mb-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--destructive)]">
         Common pitfalls
       </div>
       <ul className="space-y-1.5">
@@ -123,13 +123,13 @@ function Interview({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border border-[color:var(--purple)]/40 bg-[color:var(--surface2)] p-3">
-      <div className="font-mono mb-1 text-[9px] font-bold uppercase tracking-widest text-[color:var(--purple)]">
+      <div className="mono mb-1 text-[9px] font-bold uppercase tracking-widest text-[color:var(--purple)]">
         Interview question
       </div>
       <div className="text-sm font-semibold text-foreground">{q}</div>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="font-mono mt-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--purple)] hover:underline"
+        className="mono mt-2 text-[10px] font-bold uppercase tracking-widest text-[color:var(--purple)] hover:underline"
       >
         {open ? "− Hide answer" : "+ Show answer"}
       </button>
@@ -148,7 +148,7 @@ function TryIt({ code, lang, caption }: { code: string; lang?: "c" | "cpp"; capt
   )}`;
   return (
     <div className="rounded-lg border border-[color:var(--teal)]/40 bg-[color:var(--surface2)] p-3">
-      <div className="font-mono mb-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[color:var(--teal)]">
+      <div className="mono mb-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[color:var(--teal)]">
         <span>Try it live</span>
         <a href={url} target="_blank" rel="noreferrer" className="hover:underline">Open in Compiler Explorer ↗</a>
       </div>
@@ -178,7 +178,7 @@ export function ConceptCard({ card }: { card: Card }) {
 
       {card.syntax && (
         <div>
-          <div className="font-mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
+          <div className="mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
             Syntax
           </div>
           <CodeBlock code={card.syntax.code} caption={card.syntax.caption ?? "syntax"} />
@@ -186,7 +186,7 @@ export function ConceptCard({ card }: { card: Card }) {
       )}
       {card.example && (
         <div>
-          <div className="font-mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
+          <div className="mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
             Example
           </div>
           <CodeBlock code={card.example.code} caption={card.example.caption ?? "example"} />
@@ -194,10 +194,10 @@ export function ConceptCard({ card }: { card: Card }) {
       )}
       {card.output && (
         <div>
-          <div className="font-mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
+          <div className="mono mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: card.color }}>
             Output
           </div>
-          <pre className="font-mono overflow-x-auto rounded-lg border border-border bg-[color:var(--surface2)] p-3 text-[12px] text-[color:var(--teal)]">
+          <pre className="mono overflow-x-auto rounded-lg border border-border bg-[color:var(--surface2)] p-3 text-[12px] text-[color:var(--teal)]">
             {card.output}
           </pre>
         </div>

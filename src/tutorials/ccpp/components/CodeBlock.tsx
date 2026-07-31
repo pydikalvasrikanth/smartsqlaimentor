@@ -148,13 +148,13 @@ export function CodeBlock({ code, caption }: { code: string; caption?: string })
           <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--teal)]/60" />
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="mono text-[10px] uppercase tracking-widest text-muted-foreground">
             {caption ?? "C / C++"}
           </span>
           <button
             onClick={copy}
             aria-label="Copy code"
-            className="font-mono rounded-md border border-border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition hover:border-[color:var(--java-orange)] hover:text-[color:var(--java-orange)]"
+            className="mono rounded-md border border-border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition hover:border-[color:var(--java-orange)] hover:text-[color:var(--java-orange)]"
           >
             {copied ? "✓ copied" : "copy"}
           </button>
@@ -163,14 +163,14 @@ export function CodeBlock({ code, caption }: { code: string; caption?: string })
       <div className="flex overflow-x-auto text-[13px] leading-relaxed">
         <pre
           aria-hidden="true"
-          className="font-mono select-none border-r border-border/60 bg-[color:var(--surface3)]/40 px-2 py-3 text-right text-muted-foreground/60"
+          className="mono select-none border-r border-border/60 bg-[color:var(--surface3)]/40 px-2 py-3 text-right text-muted-foreground/60"
         >
           {Array.from({ length: lines }).map((_, i) => (
             <div key={i}>{i + 1}</div>
           ))}
         </pre>
         <pre className="flex-1 p-3">
-          <code className="font-mono">
+          <code className="mono">
             {tokens.map((t, idx) => (
               <span key={idx} className={COLOR[t.type]}>
                 {t.value}

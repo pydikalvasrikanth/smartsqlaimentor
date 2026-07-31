@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import type { Curriculum } from "@/tutorials/ccpp/content/types";
-import { flatLessons } from "@/tutorials/ccpp/content/types";
+import type { Curriculum } from "@/content/types";
+import { flatLessons } from "@/content/types";
 
 export function TrackIndex({ curriculum }: { curriculum: Curriculum }) {
   const total = flatLessons(curriculum).length;
-  const route = curriculum.track === "c" ? "/cpp-tutorial/c/$moduleId/$lessonId" : "/cpp-tutorial/cpp/$moduleId/$lessonId";
+  const route = curriculum.track === "c" ? "/c/$moduleId/$lessonId" : "/cpp/$moduleId/$lessonId";
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <div className="font-mono mb-3 text-xs uppercase tracking-widest" style={{ color: curriculum.accent }}>
+      <div className="mono mb-3 text-xs uppercase tracking-widest" style={{ color: curriculum.accent }}>
         {curriculum.name} · {curriculum.modules.length} modules · {total} lessons
       </div>
       <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
@@ -22,7 +22,7 @@ export function TrackIndex({ curriculum }: { curriculum: Curriculum }) {
             style={{ borderColor: `color-mix(in oklab, ${m.color} 35%, var(--border))`, background: "var(--card)" }}
           >
             <div
-              className="font-mono mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+              className="mono mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
               style={{ color: m.color }}
             >
               <span className="grid h-6 w-6 place-items-center rounded-full text-[10px] text-white" style={{ background: m.color }}>{i + 1}</span>
