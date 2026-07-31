@@ -16,7 +16,7 @@ export function QuizCard({
   const right = picked === correct;
   return (
     <div className="rounded-lg border border-[color:var(--pink)]/40 bg-[color:var(--surface2)] p-3">
-      <div className="font-mono mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--pink)]">
+      <div className="mono mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[color:var(--pink)]">
         <span>Quick check</span>
         {revealed && (
           <span className={right ? "text-[color:var(--teal)]" : "text-[color:var(--destructive)]"}>
@@ -35,7 +35,7 @@ export function QuizCard({
               key={i}
               onClick={() => setPicked(i)}
               disabled={revealed && right}
-              className={`font-mono flex items-start gap-2 rounded-md border px-3 py-2 text-left text-xs transition ${
+              className={`mono flex items-start gap-2 rounded-md border px-3 py-2 text-left text-xs transition ${
                 isRight
                   ? "border-[color:var(--teal)] bg-[color:var(--teal)]/10 text-foreground"
                   : isWrong
@@ -51,7 +51,7 @@ export function QuizCard({
       </div>
       {revealed && (
         <div className="mt-3 animate-fade-in rounded-md bg-[color:var(--surface3)] p-2 text-xs text-foreground/90">
-          <span className="font-mono font-bold text-[color:var(--pink)]">Why: </span>
+          <span className="mono font-bold text-[color:var(--pink)]">Why: </span>
           {explain}
         </div>
       )}

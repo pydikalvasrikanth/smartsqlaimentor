@@ -25,7 +25,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
         {curriculum.name} Explainer
       </Link>
       <div className="mx-6 mb-4">
-        <div className="font-mono mb-1 flex justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="mono mb-1 flex justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>Progress</span>
           <span>{done}/{total} · {pct}%</span>
         </div>
@@ -56,7 +56,7 @@ export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curricul
       {curriculum.modules.map((m) => (
         <div key={m.id} className="mb-5">
           <div
-            className="font-mono mb-2 px-6 text-[10px] font-bold uppercase tracking-widest"
+            className="mono mb-2 px-6 text-[10px] font-bold uppercase tracking-widest"
             style={{ color: m.color }}
           >
             {m.title}
