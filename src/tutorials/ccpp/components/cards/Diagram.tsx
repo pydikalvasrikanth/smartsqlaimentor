@@ -1,4 +1,4 @@
-import type { DiagramKind } from "@/content/types";
+import type { DiagramKind } from "@/tutorials/ccpp/content/types";
 
 const A = "var(--java-orange)";
 const B = "var(--java-blue)";

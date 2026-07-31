@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import type { Curriculum } from "@/content/types";
+import type { Curriculum } from "@/tutorials/ccpp/content/types";
 import { LessonSidebar } from "./LessonSidebar";
 
 export function MobileNav({ curriculum }: { curriculum: Curriculum }) {

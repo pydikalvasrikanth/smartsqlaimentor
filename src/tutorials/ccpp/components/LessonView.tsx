@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import type { Curriculum, Module, Lesson } from "@/content/types";
-import { neighbours } from "@/content/types";
+import type { Curriculum, Module, Lesson } from "@/tutorials/ccpp/content/types";
+import { neighbours } from "@/tutorials/ccpp/content/types";
 import { ConceptCard } from "./cards/ConceptCard";
-import { lessonKey, useProgress } from "@/hooks/useProgress";
+import { lessonKey, useProgress } from "@/tutorials/ccpp/hooks/useProgress";
 
 export function LessonView({
   curriculum,

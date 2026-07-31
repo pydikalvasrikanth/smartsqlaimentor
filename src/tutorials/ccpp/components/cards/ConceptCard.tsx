@@ -1,4 +1,4 @@
-import type { Card } from "@/content/types";
+import type { Card } from "@/tutorials/ccpp/content/types";
 import { CodeBlock } from "../CodeBlock";
 import { Diagram } from "./Diagram";
 import { QuizCard } from "./QuizCard";

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import type { Curriculum } from "@/content/types";
-import { flatLessons } from "@/content/types";
+import type { Curriculum } from "@/tutorials/ccpp/content/types";
+import { flatLessons } from "@/tutorials/ccpp/content/types";
 
 export function TrackIndex({ curriculum }: { curriculum: Curriculum }) {
   const total = flatLessons(curriculum).length;

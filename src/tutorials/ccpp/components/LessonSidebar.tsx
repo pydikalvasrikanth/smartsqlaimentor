@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { Curriculum } from "@/content/types";
-import { lessonKey, useProgress } from "@/hooks/useProgress";
-import { flatLessons } from "@/content/types";
+import type { Curriculum } from "@/tutorials/ccpp/content/types";
+import { lessonKey, useProgress } from "@/tutorials/ccpp/hooks/useProgress";
+import { flatLessons } from "@/tutorials/ccpp/content/types";
 
 export function LessonSidebar({ curriculum, onNavigate }: { curriculum: Curriculum; onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
