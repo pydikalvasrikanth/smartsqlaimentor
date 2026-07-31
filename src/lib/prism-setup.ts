@@ -4,10 +4,29 @@
 // during renderToReadableStream. Import as a namespace and fall back to it
 // so we always end up with a real Prism instance.
 import * as PrismNS from "prismjs";
-const Prism: any =
-  (PrismNS as any).default ?? (PrismNS as any).Prism ?? (PrismNS as any);
 
-if (typeof globalThis !== "undefined") {
+// Pick the candidate that actually looks like a Prism instance (has
+// `.languages` + `.highlight`). Under some SSR interop paths `default` is a
+// wrapper namespace, and using it leaves `globalThis.Prism` without those
+// members, so prism-* component modules throw "Prism is not defined".
+function resolvePrism(): any {
+  const candidates = [
+    (PrismNS as any).default,
+    (PrismNS as any).Prism,
+    (PrismNS as any).default?.default,
+    (PrismNS as any).default?.Prism,
+    PrismNS as any,
+    (globalThis as any).Prism,
+  ];
+  for (const c of candidates) {
+    if (c && c.languages && typeof c.highlight === "function") return c;
+  }
+  return undefined;
+}
+
+const Prism: any = resolvePrism();
+
+if (typeof globalThis !== "undefined" && Prism) {
   (globalThis as any).Prism = Prism;
 }
 
@@ -58,6 +77,9 @@ async function importPrismLanguage(language: string) {
 }
 
 export function loadPrismLanguage(language: string) {
+  // Grammar modules mutate the global Prism instance; only ever do that in the
+  // browser so SSR can never evaluate them.
+  if (typeof window === "undefined" || !Prism) return Promise.resolve();
   const normalized = language === "c++" ? "cpp" : language;
   if (loadedLanguages.has(normalized) || (Prism.languages as any)[normalized]) {
     loadedLanguages.add(normalized);
@@ -81,6 +103,7 @@ export function loadPrismLanguage(language: string) {
 
 export function highlightWithPrism(code: string, language: string) {
   const normalized = language === "c++" ? "cpp" : language;
+  if (!Prism) return escapeHtml(code);
   const grammar = (Prism.languages as any)[normalized] ?? (Prism.languages as any).clike;
   if (!grammar) return escapeHtml(code);
   return Prism.highlight(code, grammar, normalized);
