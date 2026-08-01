@@ -791,13 +791,13 @@ function CppWorkspace() {
               <Calendar className="h-3.5 w-3.5" /> Today
             </button>
             <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
+              <Library className="h-3.5 w-3.5" /> Topic-wise
             </button>
             <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Target className="h-3.5 w-3.5" /> Targeted
             </button>
             <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Boxes className="h-3.5 w-3.5" /> Data Engineering
+              <Boxes className="h-3.5 w-3.5" /> Systems & Projects
             </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
@@ -823,10 +823,10 @@ function CppWorkspace() {
                 <Library className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Topic-wise Python practice for Data Engineers</h2>
+                <h2 className="text-lg font-semibold">Topic-wise C &amp; C++ practice</h2>
                 <p className="text-sm text-muted-foreground">
-                  Pick any topic or library. AI generates a focused question and grades your solution.
-                  Covers core Python, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
+                  Pick any topic. AI generates a focused question in your selected language and grades your solution.
+                  Covers C fundamentals, pointers & memory, C++ OOP, STL &amp; templates, data structures, algorithms, concurrency and toolchain.
                 </p>
               </div>
             </div>
@@ -879,7 +879,7 @@ function CppWorkspace() {
               <div>
                 <h2 className="text-lg font-semibold">Tell me what to test you on</h2>
                 <p className="text-sm text-muted-foreground">
-                  Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
+                  Describe your goal in plain English. AI plans a focused set of C / C++ questions covering it end-to-end.
                 </p>
               </div>
             </div>
@@ -888,7 +888,7 @@ function CppWorkspace() {
                 value={focusGoal}
                 onChange={(e) => setFocusGoal(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
-                placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
+                placeholder='e.g. "Drill me on pointers and dynamic memory" or "Make me an STL pro"'
                 className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
                 disabled={loading === "init"}
               />
@@ -903,11 +903,12 @@ function CppWorkspace() {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
-                "Test my Python basics",
-                "Drill me on decorators and generators",
-                "Make me confident with pandas groupby & joins",
-                "I want to be a pro at recursion and DP",
-                "Practice asyncio like a pro",
+                "Test my C basics",
+                "Drill me on pointers and dynamic memory",
+                "Make me confident with STL containers and algorithms",
+                "I want to be a pro at recursion and DP in C++",
+                "Practice multithreading in modern C++",
+                "Grill me on virtual functions and vtables",
               ].map((ex) => (
                 <button
                   key={ex}
@@ -928,8 +929,8 @@ function CppWorkspace() {
                 <Boxes className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Data Engineering — Python on the job</h2>
-                <p className="text-sm text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
+                <h2 className="text-lg font-semibold">Systems &amp; Projects — C / C++ on the job</h2>
+                <p className="text-sm text-muted-foreground">Production-style C / C++ scenarios: memory management, systems programming, concurrency and performance. Pick a level, then a scenario.</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -944,26 +945,30 @@ function CppWorkspace() {
             </div>
             <div className="space-y-3">
               {[
-                { group: "Batch ETL / ELT", scenarios: [
-                  "Build a pandas pipeline that ingests CSVs, deduplicates, and writes partitioned Parquet",
-                  "Write a PySpark job that joins dimension and fact tables, then aggregates daily revenue",
-                  "Implement an incremental load using watermark columns and upserts",
+                { group: "Memory Management", scenarios: [
+                  "Implement a fixed-size memory pool allocator in C with alloc/free and no leaks",
+                  "Write a C++ class managing a raw buffer correctly (rule of five, no double free)",
+                  "Find and fix all leaks and dangling pointers in a linked-list implementation",
                 ]},
-                { group: "Streaming", scenarios: [
-                  "Process a Kafka stream of clickstream events with windowed aggregations",
-                  "Handle late-arriving events with watermarks and stateful processing",
+                { group: "Systems Programming (C)", scenarios: [
+                  "Read a large file in chunks and compute per-line statistics with fread and buffering",
+                  "Build a tiny command parser using fork/exec and pipes",
+                  "Implement a ring buffer for a producer/consumer device driver style workload",
                 ]},
-                { group: "Orchestration", scenarios: [
-                  "Design an Airflow DAG with retries, SLAs, and dynamic task mapping",
-                  "Backfill a partitioned table for a date range with idempotent tasks",
+                { group: "Concurrency (C++)", scenarios: [
+                  "Build a thread-safe queue with mutex and condition_variable",
+                  "Implement a thread pool that runs std::function tasks and joins cleanly",
+                  "Fix a data race using atomics and explain the memory ordering choice",
                 ]},
-                { group: "Warehousing & Modeling", scenarios: [
-                  "Implement SCD Type 2 logic in Python over a dimension table",
-                  "Generate a star schema loader with surrogate keys and referential checks",
+                { group: "STL & API Design", scenarios: [
+                  "Design a templated LRU cache using std::list and unordered_map",
+                  "Write a custom iterator so a hand-rolled container works with range-for and <algorithm>",
+                  "Refactor raw-pointer code to unique_ptr/shared_ptr without changing behaviour",
                 ]},
-                { group: "Data Quality & Reliability", scenarios: [
-                  "Write data-quality checks (null, uniqueness, range, freshness) with clear failure modes",
-                  "Detect and quarantine schema drift in incoming JSON events",
+                { group: "Performance & Debugging", scenarios: [
+                  "Optimize a matrix multiply for cache locality and measure the difference",
+                  "Diagnose undefined behavior in a snippet and rewrite it safely",
+                  "Reduce allocations in a hot loop by reserving and reusing buffers",
                 ]},
               ].map((g) => (
                 <div key={g.group} className="space-y-1.5">
@@ -992,7 +997,7 @@ function CppWorkspace() {
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Company-style Python interview</h2>
+                <h2 className="text-lg font-semibold">Company-style C / C++ interview</h2>
                 <p className="text-sm text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
               </div>
             </div>
