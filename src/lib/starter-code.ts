@@ -70,9 +70,10 @@ function countDelta(code: string): { open: number; close: number } {
 }
 
 /** Re-indent brace-based languages (C, C++, Java) with 4-space levels. */
-function reindentBraceLang(code: string): string {
+function reindentBraceLang(code: string, lang: CodeLang = "java"): string {
   const lines = code.split("\n");
   const out: string[] = [];
+  const needsSemicolon: boolean[] = [];
   let depth = 0;
   let inBlockComment = false;
 
@@ -107,6 +108,9 @@ function reindentBraceLang(code: string): string {
     out.push(INDENT.repeat(lineDepth) + trimmed);
 
     const { open, close } = countDelta(logical);
+    if (open > close && /\b(class|struct|union|enum)\b/.test(logical) && lang !== "java") {
+      needsSemicolon[depth] = true;
+    }
     depth += open - close;
     if (depth < 0) depth = 0;
 
@@ -117,7 +121,8 @@ function reindentBraceLang(code: string): string {
   let result = out.join("\n");
   if (depth > 0) {
     const closers: string[] = [];
-    for (let d = depth - 1; d >= 0; d--) closers.push(INDENT.repeat(d) + "}");
+    for (let d = depth - 1; d >= 0; d--)
+      closers.push(INDENT.repeat(d) + (needsSemicolon[d] ? "};" : "}"));
     result += "\n" + closers.join("\n");
   }
   return result;
@@ -196,9 +201,9 @@ export function normalizeStarterCode(raw: unknown, lang: CodeLang): string {
     return reindentPython(cleaned) + "\n";
   }
 
-  let code = reindentBraceLang(cleaned);
-  if (lang === "java") code = reindentBraceLang(ensureJavaShell(code));
-  else code = reindentBraceLang(ensureCMain(code, lang));
+  let code = reindentBraceLang(cleaned, lang);
+  if (lang === "java") code = reindentBraceLang(ensureJavaShell(code), lang);
+  else code = reindentBraceLang(ensureCMain(code, lang), lang);
   return code + "\n";
 }
 
@@ -207,5 +212,5 @@ export function normalizeSolutionCode(raw: unknown, lang: CodeLang): string {
   if (typeof raw !== "string" || !raw.trim()) return "";
   const cleaned = basicClean(raw);
   if (lang === "python" || lang === "pyspark") return reindentPython(cleaned) + "\n";
-  return reindentBraceLang(cleaned) + "\n";
+  return reindentBraceLang(cleaned, lang) + "\n";
 }
