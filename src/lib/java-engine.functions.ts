@@ -395,7 +395,7 @@ async function callJavaEngine(
   const body = {
     model: MODEL,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: SYSTEM_PROMPT_FULL },
       { role: "user", content: buildUserPrompt(command, payload) },
     ],
     tools: [{ type: "function", function: tool }],
@@ -454,6 +454,8 @@ export const runJavaEngine = createServerFn({ method: "POST" })
       if (!q || typeof q.task !== "string" || !q.task.trim()) {
         return { error: "AI returned an incomplete question. Try again." };
       }
+      q.starter_code = normalizeStarterCode(q.starter_code, "java");
+      q.expected_solution = normalizeSolutionCode(q.expected_solution, "java") || q.expected_solution;
       const difficulty =
         q.difficulty ?? payload.difficulty ?? payload.target_difficulty ?? "beginner";
       const { data: row, error } = await supabaseAdmin
