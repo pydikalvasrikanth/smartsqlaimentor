@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
+import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
@@ -16,6 +17,16 @@ Coding conventions: use public static methods on a class named Solution, standar
 Difficulty rules — beginner: single concept, ~10-15 lines; intermediate: multi-concept, 20-40 lines, edge cases; advanced: optimized algorithm, 40+ lines, time/space analysis required.
 
 When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
+
+const FORMAT_RULES = `
+Starter-code quality contract (NON-NEGOTIABLE):
+- starter_code MUST compile as-is under javac: no syntax errors, balanced braces/parens/quotes, semicolons present, correct types.
+- Include every needed import; declare a single top-level \`class Solution\` plus a \`public static void main(String[] args)\` that calls the method so the file runs immediately.
+- Indent with exactly 4 spaces per level, never tabs; standard Java brace style (opening brace on the same line).
+- No markdown fences, no backticks, no line numbers, no pseudo-code.
+- The only unfinished part is the method body: one TODO comment plus a compiling placeholder return.`;
+
+const SYSTEM_PROMPT_FULL = SYSTEM_PROMPT + "\n" + FORMAT_RULES;
 
 const TOOLS_BY_COMMAND: Record<string, any> = {
   INIT_JAVA_ENVIRONMENT: {
@@ -384,7 +395,7 @@ async function callJavaEngine(
   const body = {
     model: MODEL,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: SYSTEM_PROMPT_FULL },
       { role: "user", content: buildUserPrompt(command, payload) },
     ],
     tools: [{ type: "function", function: tool }],
@@ -443,6 +454,8 @@ export const runJavaEngine = createServerFn({ method: "POST" })
       if (!q || typeof q.task !== "string" || !q.task.trim()) {
         return { error: "AI returned an incomplete question. Try again." };
       }
+      q.starter_code = normalizeStarterCode(q.starter_code, "java");
+      q.expected_solution = normalizeSolutionCode(q.expected_solution, "java") || q.expected_solution;
       const difficulty =
         q.difficulty ?? payload.difficulty ?? payload.target_difficulty ?? "beginner";
       const { data: row, error } = await supabaseAdmin
