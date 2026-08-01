@@ -51,9 +51,9 @@ export const Route = createFileRoute("/cpp")({
 });
 
 const PY_CONCEPTS: Record<string, string[]> = {
-  beginner: ["lists", "dict", "set", "strings", "loops", "comprehensions", "tuple", "slicing", "basic-recursion", "sorting", "two-pointers-easy", "hashing-easy", "math-basic", "input-parsing", "file-io-basic"],
-  intermediate: ["sliding-window", "two-pointers", "binary-search", "stack", "queue", "deque", "heap", "hashmap-counting", "recursion", "backtracking-easy", "linked-list", "tree-traversal", "regex", "decorators", "generators"],
-  advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "segment-tree", "topological-sort", "kmp", "bit-manipulation", "system-design-mini", "concurrency-asyncio", "oop-design", "pandas-numpy"],
+  beginner: ["arrays-c", "c-strings", "pointers-basics", "loops-control-flow", "functions-c", "structs", "printf-scanf-io", "operators-precedence", "basic-recursion", "sorting-basics", "two-pointers-easy", "char-arrays", "math-basic", "enums-typedef", "file-io-c"],
+  intermediate: ["pointer-arithmetic", "dynamic-memory-malloc", "new-delete", "pointers-to-pointers", "function-pointers", "linked-list", "stack-queue", "classes-oop", "constructors-destructors", "operator-overloading", "references-vs-pointers", "stl-vector", "stl-map-set", "stl-algorithms", "binary-search"],
+  advanced: ["templates-generics", "smart-pointers-raii", "move-semantics", "stl-iterators-custom", "dp-1d", "dp-2d", "graph-bfs-dfs", "dijkstra", "union-find", "trie", "bit-manipulation", "multithreading-cpp", "memory-leak-debugging", "virtual-inheritance-vtable", "cache-friendly-code"],
 };
 
 const TOTAL = 50;
@@ -75,7 +75,7 @@ const PY_COMPANIES: string[] = [
   "Samsung","Sony","Huawei","Alibaba","Tencent","Baidu","Rakuten","LINE","Yandex","Mercado Libre",
 ];
 
-// Topic-wise practice catalog focused on what a Data Engineer must know.
+// Topic-wise practice catalog for C and C++.
 // Each topic = a target_concept passed to the AI engine.
 const DE_TOPIC_GROUPS: Array<{
   group: string;
@@ -83,180 +83,139 @@ const DE_TOPIC_GROUPS: Array<{
   topics: Array<{ slug: string; label: string; level: Level }>;
 }> = [
   {
-    group: "Core Python",
-    blurb: "Language fundamentals every DE writes daily.",
+    group: "C Fundamentals",
+    blurb: "The core language every C interview starts with.",
     topics: [
-      { slug: "lists", label: "Lists & slicing", level: "beginner" },
-      { slug: "dict", label: "Dictionaries", level: "beginner" },
-      { slug: "set", label: "Sets & dedup", level: "beginner" },
-      { slug: "tuple", label: "Tuples & unpacking", level: "beginner" },
-      { slug: "strings", label: "String manipulation", level: "beginner" },
-      { slug: "comprehensions", label: "List/dict comprehensions", level: "beginner" },
-      { slug: "loops", label: "Loops & control flow", level: "beginner" },
-      { slug: "functions-args", label: "Functions, *args, **kwargs", level: "beginner" },
-      { slug: "exception-handling", label: "Exceptions & try/except", level: "beginner" },
-      { slug: "oop-design", label: "Classes & OOP", level: "intermediate" },
-      { slug: "dataclasses", label: "Dataclasses & typing", level: "intermediate" },
-      { slug: "decorators", label: "Decorators", level: "intermediate" },
-      { slug: "generators", label: "Generators & yield", level: "intermediate" },
-      { slug: "iterators", label: "Iterators & __iter__", level: "intermediate" },
-      { slug: "context-managers", label: "Context managers (with)", level: "intermediate" },
-      { slug: "concurrency-asyncio", label: "asyncio & async/await", level: "advanced" },
-      { slug: "multiprocessing", label: "multiprocessing & threading", level: "advanced" },
-      { slug: "logging", label: "Logging best practices", level: "intermediate" },
+      { slug: "data-types-c", label: "Data types & sizeof", level: "beginner" },
+      { slug: "operators-precedence", label: "Operators & precedence", level: "beginner" },
+      { slug: "loops-control-flow", label: "Loops & control flow", level: "beginner" },
+      { slug: "functions-c", label: "Functions & scope", level: "beginner" },
+      { slug: "arrays-c", label: "Arrays & 2D arrays", level: "beginner" },
+      { slug: "c-strings", label: "C strings & <string.h>", level: "beginner" },
+      { slug: "printf-scanf-io", label: "printf / scanf formatting", level: "beginner" },
+      { slug: "structs", label: "Structs & unions", level: "beginner" },
+      { slug: "enums-typedef", label: "enum & typedef", level: "beginner" },
+      { slug: "storage-classes", label: "static, extern, const, volatile", level: "intermediate" },
+      { slug: "preprocessor-macros", label: "Preprocessor & macros", level: "intermediate" },
+      { slug: "bitfields", label: "Bit fields & packing", level: "advanced" },
     ],
   },
   {
-    group: "Std Library",
-    blurb: "Batteries-included modules pipelines rely on.",
+    group: "Pointers & Memory",
+    blurb: "The single most-tested area in C/C++ interviews.",
     topics: [
-      { slug: "collections", label: "collections (Counter, defaultdict, deque)", level: "intermediate" },
-      { slug: "itertools", label: "itertools", level: "intermediate" },
-      { slug: "functools", label: "functools (lru_cache, reduce)", level: "intermediate" },
-      { slug: "datetime", label: "datetime & timezones", level: "intermediate" },
-      { slug: "json", label: "json parsing", level: "beginner" },
-      { slug: "csv", label: "csv read/write", level: "beginner" },
-      { slug: "regex", label: "Regular expressions (re)", level: "intermediate" },
-      { slug: "pathlib", label: "pathlib & filesystem", level: "beginner" },
-      { slug: "os-sys", label: "os & sys", level: "beginner" },
-      { slug: "subprocess", label: "subprocess", level: "intermediate" },
-      { slug: "hashlib", label: "hashlib & hashing", level: "intermediate" },
-      { slug: "io-streams", label: "io streams & buffering", level: "intermediate" },
+      { slug: "pointers-basics", label: "Pointer basics & dereferencing", level: "beginner" },
+      { slug: "pointer-arithmetic", label: "Pointer arithmetic", level: "intermediate" },
+      { slug: "pointers-to-pointers", label: "Pointers to pointers", level: "intermediate" },
+      { slug: "array-pointer-decay", label: "Array ↔ pointer decay", level: "intermediate" },
+      { slug: "dynamic-memory-malloc", label: "malloc / calloc / realloc / free", level: "intermediate" },
+      { slug: "new-delete", label: "new / delete (C++)", level: "intermediate" },
+      { slug: "function-pointers", label: "Function pointers & callbacks", level: "intermediate" },
+      { slug: "memory-leak-debugging", label: "Leaks, dangling & double free", level: "advanced" },
+      { slug: "stack-vs-heap", label: "Stack vs heap layout", level: "intermediate" },
+      { slug: "alignment-padding", label: "Alignment & struct padding", level: "advanced" },
+      { slug: "smart-pointers-raii", label: "unique_ptr / shared_ptr & RAII", level: "advanced" },
+      { slug: "custom-allocator", label: "Custom allocators & memory pools", level: "advanced" },
     ],
   },
   {
-    group: "Pandas",
-    blurb: "Tabular data wrangling — the DE workhorse.",
+    group: "C++ OOP",
+    blurb: "Classes, inheritance, polymorphism, object lifetime.",
     topics: [
-      { slug: "pandas-io", label: "read_csv / read_parquet / to_sql", level: "beginner" },
-      { slug: "pandas-filtering", label: "Filtering & boolean masks", level: "beginner" },
-      { slug: "pandas-groupby", label: "groupby & aggregations", level: "intermediate" },
-      { slug: "pandas-merge", label: "merge / join / concat", level: "intermediate" },
-      { slug: "pandas-pivot", label: "pivot_table / melt / stack", level: "intermediate" },
-      { slug: "pandas-apply", label: "apply / map / vectorization", level: "intermediate" },
-      { slug: "pandas-window", label: "Rolling & expanding windows", level: "advanced" },
-      { slug: "pandas-timeseries", label: "Time series & resample", level: "advanced" },
-      { slug: "pandas-missing", label: "Missing data & fillna", level: "beginner" },
-      { slug: "pandas-perf", label: "Memory & performance tuning", level: "advanced" },
+      { slug: "classes-oop", label: "Classes & encapsulation", level: "intermediate" },
+      { slug: "constructors-destructors", label: "Constructors & destructors", level: "intermediate" },
+      { slug: "copy-vs-move", label: "Copy ctor vs move ctor", level: "advanced" },
+      { slug: "rule-of-five", label: "Rule of 0/3/5", level: "advanced" },
+      { slug: "inheritance", label: "Inheritance & access specifiers", level: "intermediate" },
+      { slug: "virtual-inheritance-vtable", label: "Virtual functions & vtable", level: "advanced" },
+      { slug: "abstract-interfaces", label: "Abstract classes & interfaces", level: "intermediate" },
+      { slug: "operator-overloading", label: "Operator overloading", level: "intermediate" },
+      { slug: "references-vs-pointers", label: "References vs pointers", level: "intermediate" },
+      { slug: "const-correctness", label: "const correctness & mutable", level: "intermediate" },
+      { slug: "exceptions-cpp", label: "Exceptions & stack unwinding", level: "advanced" },
+      { slug: "casting-cpp", label: "static_cast, dynamic_cast, RTTI", level: "advanced" },
     ],
   },
   {
-    group: "NumPy",
-    blurb: "Numerical arrays & vectorized math.",
+    group: "STL & Templates",
+    blurb: "Standard library containers, algorithms and generics.",
     topics: [
-      { slug: "numpy-arrays", label: "Arrays, dtypes, shape", level: "beginner" },
-      { slug: "numpy-indexing", label: "Indexing & slicing", level: "beginner" },
-      { slug: "numpy-broadcasting", label: "Broadcasting", level: "intermediate" },
-      { slug: "numpy-vectorization", label: "Vectorization vs loops", level: "intermediate" },
-      { slug: "numpy-linalg", label: "Linear algebra basics", level: "advanced" },
+      { slug: "stl-vector", label: "vector & capacity growth", level: "intermediate" },
+      { slug: "stl-string", label: "std::string & string_view", level: "intermediate" },
+      { slug: "stl-map-set", label: "map / set / unordered_*", level: "intermediate" },
+      { slug: "stl-deque-stack-queue", label: "deque, stack, queue", level: "intermediate" },
+      { slug: "stl-priority-queue", label: "priority_queue & heaps", level: "intermediate" },
+      { slug: "stl-algorithms", label: "<algorithm> (sort, find, accumulate)", level: "intermediate" },
+      { slug: "stl-iterators-custom", label: "Iterators & custom iterators", level: "advanced" },
+      { slug: "lambdas-functional", label: "Lambdas & std::function", level: "intermediate" },
+      { slug: "templates-generics", label: "Function & class templates", level: "advanced" },
+      { slug: "template-specialization", label: "Specialization & SFINAE", level: "advanced" },
+      { slug: "move-semantics", label: "Move semantics & perfect forwarding", level: "advanced" },
+      { slug: "modern-cpp-features", label: "auto, structured bindings, optional", level: "intermediate" },
     ],
   },
   {
-    group: "PySpark & Big Data",
-    blurb: "Distributed processing at TB scale.",
+    group: "Data Structures (hand-rolled)",
+    blurb: "Implement from scratch — classic C/C++ interview asks.",
     topics: [
-      { slug: "pyspark-dataframe", label: "DataFrame API basics", level: "intermediate" },
-      { slug: "pyspark-transformations", label: "Transformations vs actions", level: "intermediate" },
-      { slug: "pyspark-joins", label: "Joins & broadcast joins", level: "advanced" },
-      { slug: "pyspark-window", label: "Window functions", level: "advanced" },
-      { slug: "pyspark-udf", label: "UDFs & pandas UDFs", level: "advanced" },
-      { slug: "pyspark-partitioning", label: "Partitioning & shuffles", level: "advanced" },
-      { slug: "pyspark-optimization", label: "Catalyst & performance tuning", level: "advanced" },
-      { slug: "pyspark-streaming", label: "Structured streaming", level: "advanced" },
+      { slug: "linked-list", label: "Singly & doubly linked lists", level: "intermediate" },
+      { slug: "stack-queue", label: "Stack & queue from scratch", level: "intermediate" },
+      { slug: "dynamic-array", label: "Dynamic array (own vector)", level: "intermediate" },
+      { slug: "hash-table-impl", label: "Hash table with chaining", level: "advanced" },
+      { slug: "binary-tree", label: "Binary tree & traversals", level: "intermediate" },
+      { slug: "bst-balanced", label: "BST / AVL rotations", level: "advanced" },
+      { slug: "trie", label: "Trie", level: "advanced" },
+      { slug: "graph-representation", label: "Adjacency list & matrix", level: "intermediate" },
+      { slug: "union-find", label: "Union-Find (DSU)", level: "advanced" },
+      { slug: "lru-cache", label: "LRU cache (list + hash map)", level: "advanced" },
     ],
   },
   {
-    group: "SQL with Python",
-    blurb: "Bridging Python and warehouses.",
+    group: "Algorithms",
+    blurb: "DSA patterns interviewers reuse constantly.",
     topics: [
-      { slug: "sqlalchemy", label: "SQLAlchemy core & ORM", level: "intermediate" },
-      { slug: "psycopg2", label: "psycopg2 / Postgres client", level: "intermediate" },
-      { slug: "duckdb-python", label: "DuckDB in Python", level: "intermediate" },
-      { slug: "bigquery-client", label: "BigQuery Python client", level: "intermediate" },
-      { slug: "snowflake-connector", label: "Snowflake connector", level: "intermediate" },
-      { slug: "pandas-to-sql", label: "Pandas ↔ SQL round-tripping", level: "intermediate" },
+      { slug: "sorting-basics", label: "Sorting algorithms & stability", level: "beginner" },
+      { slug: "binary-search", label: "Binary search & variants", level: "intermediate" },
+      { slug: "two-pointers", label: "Two pointers", level: "intermediate" },
+      { slug: "sliding-window", label: "Sliding window", level: "intermediate" },
+      { slug: "recursion", label: "Recursion & call stack", level: "intermediate" },
+      { slug: "backtracking", label: "Backtracking", level: "advanced" },
+      { slug: "dp-1d", label: "DP — 1D", level: "advanced" },
+      { slug: "dp-2d", label: "DP — 2D / grids", level: "advanced" },
+      { slug: "graph-bfs-dfs", label: "BFS & DFS", level: "advanced" },
+      { slug: "dijkstra", label: "Dijkstra & shortest paths", level: "advanced" },
+      { slug: "greedy", label: "Greedy & interval problems", level: "intermediate" },
+      { slug: "bit-manipulation", label: "Bit manipulation tricks", level: "advanced" },
     ],
   },
   {
-    group: "Orchestration & Pipelines",
-    blurb: "Scheduling, DAGs, and workflow tooling.",
+    group: "Concurrency & Systems",
+    blurb: "Threads, locks, and OS-level C programming.",
     topics: [
-      { slug: "airflow-dag", label: "Airflow DAG authoring", level: "intermediate" },
-      { slug: "airflow-operators", label: "Airflow operators & XCom", level: "advanced" },
-      { slug: "airflow-sensors", label: "Sensors & deferrable tasks", level: "advanced" },
-      { slug: "prefect-flows", label: "Prefect flows & tasks", level: "intermediate" },
-      { slug: "dagster-assets", label: "Dagster software-defined assets", level: "advanced" },
-      { slug: "dbt-python", label: "dbt Python models", level: "intermediate" },
-      { slug: "luigi", label: "Luigi pipelines", level: "intermediate" },
+      { slug: "multithreading-cpp", label: "std::thread & join/detach", level: "advanced" },
+      { slug: "mutex-locks", label: "mutex, lock_guard, deadlock", level: "advanced" },
+      { slug: "condition-variables", label: "Condition variables & producer/consumer", level: "advanced" },
+      { slug: "atomics-memory-order", label: "Atomics & memory ordering", level: "advanced" },
+      { slug: "pthreads-c", label: "pthreads in C", level: "advanced" },
+      { slug: "file-io-c", label: "File I/O (fopen, fread, fseek)", level: "beginner" },
+      { slug: "syscalls-posix", label: "POSIX syscalls, fork & pipes", level: "advanced" },
+      { slug: "signals", label: "Signals & handlers", level: "advanced" },
+      { slug: "sockets-c", label: "Sockets & networking basics", level: "advanced" },
     ],
   },
   {
-    group: "Streaming & Messaging",
-    blurb: "Real-time event ingestion & processing.",
+    group: "Build, Debug & Performance",
+    blurb: "Toolchain questions that separate juniors from seniors.",
     topics: [
-      { slug: "kafka-python", label: "Kafka producer/consumer (confluent-kafka)", level: "advanced" },
-      { slug: "kafka-streams-py", label: "Faust / Kafka streams in Python", level: "advanced" },
-      { slug: "pubsub", label: "GCP Pub/Sub client", level: "intermediate" },
-      { slug: "kinesis", label: "AWS Kinesis client", level: "intermediate" },
-      { slug: "rabbitmq-pika", label: "RabbitMQ / pika", level: "intermediate" },
-    ],
-  },
-  {
-    group: "Cloud SDKs",
-    blurb: "Talking to S3, GCS, ADLS, and friends.",
-    topics: [
-      { slug: "boto3-s3", label: "boto3 S3 (upload/download/list)", level: "intermediate" },
-      { slug: "boto3-glue", label: "boto3 Glue & Athena", level: "advanced" },
-      { slug: "gcs-client", label: "google-cloud-storage", level: "intermediate" },
-      { slug: "azure-blob", label: "azure-storage-blob", level: "intermediate" },
-      { slug: "fsspec", label: "fsspec / s3fs / gcsfs", level: "intermediate" },
-    ],
-  },
-  {
-    group: "File Formats",
-    blurb: "Columnar, row, and serialization formats.",
-    topics: [
-      { slug: "parquet-pyarrow", label: "Parquet with pyarrow", level: "intermediate" },
-      { slug: "avro", label: "Avro (fastavro)", level: "intermediate" },
-      { slug: "orc", label: "ORC files", level: "intermediate" },
-      { slug: "json-lines", label: "JSON Lines / NDJSON", level: "beginner" },
-      { slug: "delta-lake", label: "Delta Lake (delta-rs / deltalake)", level: "advanced" },
-      { slug: "iceberg", label: "Apache Iceberg (pyiceberg)", level: "advanced" },
-      { slug: "protobuf", label: "Protobuf serialization", level: "advanced" },
-    ],
-  },
-  {
-    group: "Data Quality & Testing",
-    blurb: "Trustworthy pipelines need tests.",
-    topics: [
-      { slug: "pytest", label: "pytest fundamentals", level: "intermediate" },
-      { slug: "great-expectations", label: "Great Expectations", level: "advanced" },
-      { slug: "pandera", label: "Pandera schema validation", level: "intermediate" },
-      { slug: "pydantic", label: "Pydantic models & validation", level: "intermediate" },
-      { slug: "mocking", label: "unittest.mock & fixtures", level: "intermediate" },
-    ],
-  },
-  {
-    group: "APIs, Web & Scraping",
-    blurb: "Ingesting data from HTTP sources.",
-    topics: [
-      { slug: "requests", label: "requests / HTTP", level: "beginner" },
-      { slug: "httpx-async", label: "httpx & async clients", level: "intermediate" },
-      { slug: "rest-pagination", label: "REST pagination & retries", level: "intermediate" },
-      { slug: "fastapi", label: "FastAPI data services", level: "intermediate" },
-      { slug: "beautifulsoup", label: "BeautifulSoup scraping", level: "intermediate" },
-      { slug: "selenium", label: "Selenium / Playwright", level: "advanced" },
-    ],
-  },
-  {
-    group: "DevOps for DE",
-    blurb: "Ship and operate pipelines safely.",
-    topics: [
-      { slug: "docker-python", label: "Dockerizing Python jobs", level: "intermediate" },
-      { slug: "venv-poetry", label: "venv / poetry / uv", level: "beginner" },
-      { slug: "ci-cd", label: "CI/CD for data pipelines", level: "intermediate" },
-      { slug: "secrets-mgmt", label: "Secrets & config management", level: "intermediate" },
-      { slug: "observability", label: "Logging, metrics, tracing", level: "advanced" },
+      { slug: "compilation-stages", label: "Preprocess → compile → link", level: "intermediate" },
+      { slug: "makefile-cmake", label: "Makefile & CMake basics", level: "intermediate" },
+      { slug: "header-guards", label: "Headers, include guards, ODR", level: "intermediate" },
+      { slug: "gdb-debugging", label: "Debugging with gdb", level: "intermediate" },
+      { slug: "sanitizers-valgrind", label: "Valgrind & sanitizers", level: "advanced" },
+      { slug: "undefined-behavior", label: "Undefined behavior traps", level: "advanced" },
+      { slug: "cache-friendly-code", label: "Cache locality & false sharing", level: "advanced" },
+      { slug: "compiler-optimizations", label: "Inlining & -O flags", level: "advanced" },
+      { slug: "complexity-analysis", label: "Time & space complexity", level: "beginner" },
     ],
   },
 ];
@@ -832,13 +791,13 @@ function CppWorkspace() {
               <Calendar className="h-3.5 w-3.5" /> Today
             </button>
             <button onClick={() => setTab("topic")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "topic" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Library className="h-3.5 w-3.5" /> Topic-wise (DE)
+              <Library className="h-3.5 w-3.5" /> Topic-wise
             </button>
             <button onClick={() => setTab("targeted")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "targeted" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Target className="h-3.5 w-3.5" /> Targeted
             </button>
             <button onClick={() => setTab("data-eng")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "data-eng" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              <Boxes className="h-3.5 w-3.5" /> Data Engineering
+              <Boxes className="h-3.5 w-3.5" /> Systems & Projects
             </button>
             <button onClick={() => setTab("interview")} className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "interview" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               <Building2 className="h-3.5 w-3.5" /> Interview ({PY_COMPANIES.length} companies)
@@ -864,10 +823,10 @@ function CppWorkspace() {
                 <Library className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Topic-wise Python practice for Data Engineers</h2>
+                <h2 className="text-lg font-semibold">Topic-wise C &amp; C++ practice</h2>
                 <p className="text-sm text-muted-foreground">
-                  Pick any topic or library. AI generates a focused question and grades your solution.
-                  Covers core Python, pandas, PySpark, Airflow, Kafka, cloud SDKs, file formats & more.
+                  Pick any topic. AI generates a focused question in your selected language and grades your solution.
+                  Covers C fundamentals, pointers & memory, C++ OOP, STL &amp; templates, data structures, algorithms, concurrency and toolchain.
                 </p>
               </div>
             </div>
@@ -920,7 +879,7 @@ function CppWorkspace() {
               <div>
                 <h2 className="text-lg font-semibold">Tell me what to test you on</h2>
                 <p className="text-sm text-muted-foreground">
-                  Describe your goal in plain English. AI plans a focused set of Python questions covering it end-to-end.
+                  Describe your goal in plain English. AI plans a focused set of C / C++ questions covering it end-to-end.
                 </p>
               </div>
             </div>
@@ -929,7 +888,7 @@ function CppWorkspace() {
                 value={focusGoal}
                 onChange={(e) => setFocusGoal(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && loading !== "init") handleStartFocus(); }}
-                placeholder='e.g. "Drill me on decorators and generators" or "Make me a pandas pro"'
+                placeholder='e.g. "Drill me on pointers and dynamic memory" or "Make me an STL pro"'
                 className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-base"
                 disabled={loading === "init"}
               />
@@ -944,11 +903,12 @@ function CppWorkspace() {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
-                "Test my Python basics",
-                "Drill me on decorators and generators",
-                "Make me confident with pandas groupby & joins",
-                "I want to be a pro at recursion and DP",
-                "Practice asyncio like a pro",
+                "Test my C basics",
+                "Drill me on pointers and dynamic memory",
+                "Make me confident with STL containers and algorithms",
+                "I want to be a pro at recursion and DP in C++",
+                "Practice multithreading in modern C++",
+                "Grill me on virtual functions and vtables",
               ].map((ex) => (
                 <button
                   key={ex}
@@ -969,8 +929,8 @@ function CppWorkspace() {
                 <Boxes className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Data Engineering — Python on the job</h2>
-                <p className="text-sm text-muted-foreground">Production-style scenarios: ETL, streaming, orchestration, warehousing & quality. Pick a level, then a scenario.</p>
+                <h2 className="text-lg font-semibold">Systems &amp; Projects — C / C++ on the job</h2>
+                <p className="text-sm text-muted-foreground">Production-style C / C++ scenarios: memory management, systems programming, concurrency and performance. Pick a level, then a scenario.</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -985,26 +945,30 @@ function CppWorkspace() {
             </div>
             <div className="space-y-3">
               {[
-                { group: "Batch ETL / ELT", scenarios: [
-                  "Build a pandas pipeline that ingests CSVs, deduplicates, and writes partitioned Parquet",
-                  "Write a PySpark job that joins dimension and fact tables, then aggregates daily revenue",
-                  "Implement an incremental load using watermark columns and upserts",
+                { group: "Memory Management", scenarios: [
+                  "Implement a fixed-size memory pool allocator in C with alloc/free and no leaks",
+                  "Write a C++ class managing a raw buffer correctly (rule of five, no double free)",
+                  "Find and fix all leaks and dangling pointers in a linked-list implementation",
                 ]},
-                { group: "Streaming", scenarios: [
-                  "Process a Kafka stream of clickstream events with windowed aggregations",
-                  "Handle late-arriving events with watermarks and stateful processing",
+                { group: "Systems Programming (C)", scenarios: [
+                  "Read a large file in chunks and compute per-line statistics with fread and buffering",
+                  "Build a tiny command parser using fork/exec and pipes",
+                  "Implement a ring buffer for a producer/consumer device driver style workload",
                 ]},
-                { group: "Orchestration", scenarios: [
-                  "Design an Airflow DAG with retries, SLAs, and dynamic task mapping",
-                  "Backfill a partitioned table for a date range with idempotent tasks",
+                { group: "Concurrency (C++)", scenarios: [
+                  "Build a thread-safe queue with mutex and condition_variable",
+                  "Implement a thread pool that runs std::function tasks and joins cleanly",
+                  "Fix a data race using atomics and explain the memory ordering choice",
                 ]},
-                { group: "Warehousing & Modeling", scenarios: [
-                  "Implement SCD Type 2 logic in Python over a dimension table",
-                  "Generate a star schema loader with surrogate keys and referential checks",
+                { group: "STL & API Design", scenarios: [
+                  "Design a templated LRU cache using std::list and unordered_map",
+                  "Write a custom iterator so a hand-rolled container works with range-for and <algorithm>",
+                  "Refactor raw-pointer code to unique_ptr/shared_ptr without changing behaviour",
                 ]},
-                { group: "Data Quality & Reliability", scenarios: [
-                  "Write data-quality checks (null, uniqueness, range, freshness) with clear failure modes",
-                  "Detect and quarantine schema drift in incoming JSON events",
+                { group: "Performance & Debugging", scenarios: [
+                  "Optimize a matrix multiply for cache locality and measure the difference",
+                  "Diagnose undefined behavior in a snippet and rewrite it safely",
+                  "Reduce allocations in a hot loop by reserving and reusing buffers",
                 ]},
               ].map((g) => (
                 <div key={g.group} className="space-y-1.5">
@@ -1033,7 +997,7 @@ function CppWorkspace() {
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Company-style Python interview</h2>
+                <h2 className="text-lg font-semibold">Company-style C / C++ interview</h2>
                 <p className="text-sm text-muted-foreground">Pick a company + difficulty. AI generates a question in that company's typical style.</p>
               </div>
             </div>
