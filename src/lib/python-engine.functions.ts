@@ -407,7 +407,7 @@ async function callPythonEngine(
   const body = {
     model: MODEL,
     messages: [
-      { role: "system", content: systemPromptFor(lang) },
+      { role: "system", content: systemPromptWithFormat(lang) },
       { role: "user", content: buildUserPrompt(command, payload) },
     ],
     tools: [{ type: "function", function: tool }],
@@ -466,6 +466,9 @@ export const runPythonEngine = createServerFn({ method: "POST" })
       if (!q || typeof q.task !== "string" || !q.task.trim()) {
         return { error: "AI returned an incomplete question. Try again." };
       }
+      const qLang: CodeLang = (payload.lang as CodeLang) ?? "python";
+      q.starter_code = normalizeStarterCode(q.starter_code, qLang);
+      q.expected_solution = normalizeSolutionCode(q.expected_solution, qLang) || q.expected_solution;
       const difficulty =
         q.difficulty ?? payload.difficulty ?? payload.target_difficulty ?? "beginner";
       const { data: row, error } = await supabaseAdmin
