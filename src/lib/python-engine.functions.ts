@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { languageSpec, type CodeLang } from "@/lib/languages";
+import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
@@ -18,6 +19,19 @@ Cover the appropriate landscape for the chosen language: data structures, string
 Difficulty rules — beginner: single concept, ~5-10 lines; intermediate: multi-concept, 10-25 lines, edge cases; advanced: optimized algo, 20+ lines, time/space analysis required.
 
 When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
+}
+
+const FORMAT_RULES = `
+Starter-code quality contract (NON-NEGOTIABLE):
+- starter_code MUST compile/parse as-is: no syntax errors, no unbalanced braces/parens/quotes, no missing semicolons, no placeholder pseudo-code lines.
+- Include every import/#include/using the skeleton itself needs, nothing more.
+- Indent with exactly 4 spaces per level, never tabs, consistent throughout; align braces to the standard style of the language.
+- No markdown fences, no backticks, no line numbers, no leading/trailing blank noise.
+- The only unfinished part is the solution body, marked with a single TODO comment (and \`pass\` / \`return\` placeholder where the language requires a statement).
+- For compiled languages the skeleton must include a working main()/entry point that calls the function so the file builds and runs immediately.`;
+
+function systemPromptWithFormat(lang: CodeLang): string {
+  return systemPromptFor(lang) + "\n" + FORMAT_RULES;
 }
 
 const TOOLS_BY_COMMAND: Record<string, any> = {
