@@ -51,9 +51,9 @@ export const Route = createFileRoute("/cpp")({
 });
 
 const PY_CONCEPTS: Record<string, string[]> = {
-  beginner: ["lists", "dict", "set", "strings", "loops", "comprehensions", "tuple", "slicing", "basic-recursion", "sorting", "two-pointers-easy", "hashing-easy", "math-basic", "input-parsing", "file-io-basic"],
-  intermediate: ["sliding-window", "two-pointers", "binary-search", "stack", "queue", "deque", "heap", "hashmap-counting", "recursion", "backtracking-easy", "linked-list", "tree-traversal", "regex", "decorators", "generators"],
-  advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "segment-tree", "topological-sort", "kmp", "bit-manipulation", "system-design-mini", "concurrency-asyncio", "oop-design", "pandas-numpy"],
+  beginner: ["arrays-c", "c-strings", "pointers-basics", "loops-control-flow", "functions-c", "structs", "printf-scanf-io", "operators-precedence", "basic-recursion", "sorting-basics", "two-pointers-easy", "char-arrays", "math-basic", "enums-typedef", "file-io-c"],
+  intermediate: ["pointer-arithmetic", "dynamic-memory-malloc", "new-delete", "pointers-to-pointers", "function-pointers", "linked-list", "stack-queue", "classes-oop", "constructors-destructors", "operator-overloading", "references-vs-pointers", "stl-vector", "stl-map-set", "stl-algorithms", "binary-search"],
+  advanced: ["templates-generics", "smart-pointers-raii", "move-semantics", "stl-iterators-custom", "dp-1d", "dp-2d", "graph-bfs-dfs", "dijkstra", "union-find", "trie", "bit-manipulation", "multithreading-cpp", "memory-leak-debugging", "virtual-inheritance-vtable", "cache-friendly-code"],
 };
 
 const TOTAL = 50;
