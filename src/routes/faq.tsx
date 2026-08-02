@@ -55,7 +55,7 @@ export const Route = createFileRoute("/faq")({
       { title: `FAQ — ${APP_NAME}` },
       {
         name: "description",
-        content: `Answers to common questions about ${APP_NAME}: how AI grading works, supported SQL dialects and languages, pricing, saved progress, and reporting bugs.`,
+        content: `Common questions about ${APP_NAME}: how AI grading works, supported languages and SQL dialects, pricing, and saved progress.`,
       },
       { property: "og:title", content: `FAQ — ${APP_NAME}` },
       {
