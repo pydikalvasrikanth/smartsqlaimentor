@@ -10,7 +10,7 @@ const HeroScene = lazy(() => import("@/tutorials/pyspark/components/scenes/JvmSc
 export const Route = createFileRoute("/pyspark-tutorial/")({
   head: () => ({
     meta: [
-      { title: "PySpark Visual Explainer — Learn PySpark with 3D Visualizations" },
+      { title: "PySpark Visual Explainer — Learn Spark Visually" },
       { name: "description", content: "An interactive PySpark tutorial with 3D visualizations covering SparkSession, partitions, shuffles, Catalyst and structured streaming." },
       { property: "og:title", content: "PySpark Visual Explainer" },
       { property: "og:description", content: "Learn PySpark by watching it run — interactive 3D visualizations for every core concept." },
