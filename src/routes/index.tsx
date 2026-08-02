@@ -9,9 +9,9 @@ import { HeaderTimer } from "@/components/HeaderTimer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Smart AI Code Playground — SQL, Python, Java, PySpark, GCP" },
+      { title: "Smart AI Code Playground — AI-Graded Coding Practice" },
       { name: "description", content: "Smart AI Code Playground: AI-graded coding practice and mock interviews for SQL, Python, Java, PySpark and GCP Data Engineering roles at top MNCs." },
-      { property: "og:title", content: "Smart AI Code Playground" },
+      { property: "og:title", content: "Smart AI Code Playground — AI-Graded Coding Practice" },
       { property: "og:description", content: "AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/" },
     ],
@@ -172,13 +172,15 @@ function SubjectPicker() {
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             AI mentor · live grading
           </span>
-          <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight text-foreground">
+          <h1 className="text-4xl md:text-6xl leading-[1.05] tracking-tight text-foreground">
             Smart AI Code{" "}
             <em className="text-primary not-italic bg-linear-to-r from-primary to-primary-glow bg-clip-text text-transparent italic">
               Playground
-            </em>
+            </em>{" "}
+            <span className="block mt-2 text-2xl md:text-3xl font-semibold text-muted-foreground">
+              AI-graded coding practice for SQL, Python, Java, PySpark & GCP
+            </span>
           </h1>
-          <p className="sr-only">Smart AI Code Playground — AI-graded practice for SQL, Python, Java, PySpark, and GCP Data Engineering interview preparation.</p>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             Adaptive SQL, Python, and GCP tracks with an AI mentor that generates questions,
             grades your work, and tracks weak spots — personal to you.
