@@ -28,8 +28,11 @@ export const Route = createFileRoute("/interview")({
       { property: "og:title", content: "Live AI Interview — Data Engineer mock interview" },
       { property: "og:description", content: "Take a live AI-driven data engineering interview with voice + camera. The AI asks, you answer out loud — get scored at the end." },
       { property: "og:url", content: "https://smartsqlaimentor.live/interview" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/interview" }],
   }),
   component: InterviewPage,
 });

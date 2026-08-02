@@ -5,6 +5,7 @@ import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, BookOpen, ArrowRight, Layers } from "lucide-react";
 import { HeaderTimer } from "@/components/HeaderTimer";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/tutorial")({
   head: () => ({
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/tutorial")({
         content: "Interactive, animated MySQL tutorials covering every topic from basics to advanced.",
       },
       { property: "og:url", content: "https://smartsqlaimentor.live/tutorial" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/tutorial" }],
     scripts: [
@@ -106,11 +109,7 @@ function TutorialPage() {
   }, [loading, user, navigate]);
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">
-        Loading…
-      </div>
-    );
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.tutorial} />;
   }
 
   if (active) {

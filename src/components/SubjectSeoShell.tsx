@@ -135,6 +135,32 @@ export const SUBJECT_SEO_CONTENT: Record<string, SubjectSeoShellProps> = {
       { to: "/pyspark", label: "PySpark practice", description: "Build hands-on distributed processing and optimization skills." },
     ],
   },
+  engine: {
+    eyebrow: "Interactive MySQL lab",
+    title: "MySQL Intelligence Engine",
+    summary: "Explore a realistic relational dataset with an AI SQL compiler, data-quality checks, query-plan reasoning, and advanced MySQL labs. This workspace complements interview practice by showing how SQL decisions affect correctness, maintainability, and performance in a data-engineering environment.",
+    overview: ["The data preview introduces customers, orders, order items, and quality signals so every query has a clear business grain. Use the schema and ERD to reason about keys and relationships before moving into text-to-SQL prompts or advanced exercises.", "The lab covers execution plans, indexing, window functions, CTEs, data validation, and warehouse-oriented thinking. Signed-in learners can save the active tab and prompt, while the related resources below provide structured theory and interview drills."],
+    topics: ["Relational schemas, keys, grain, and ERD reasoning", "Text-to-SQL prompts and explainable query generation", "EXPLAIN plans, indexes, filters, joins, and performance", "Data-quality rules, nulls, duplicates, and validation", "Window functions, CTEs, subqueries, and advanced labs", "BigQuery comparisons and data-engineering trade-offs"],
+    workflow: sharedWorkflow,
+    links: [
+      { to: "/mysql", label: "MySQL practice", description: "Solve progressive interview questions with AI grading." },
+      { to: "/tutorial", label: "MySQL visual tutorial", description: "Review SQL concepts with animated explanations." },
+      { to: "/gcp", label: "GCP data engineering", description: "Extend SQL skills into warehouses and pipelines." },
+    ],
+  },
+  tutorial: {
+    eyebrow: "Interactive MySQL lessons",
+    title: "MySQL Visual Tutorial",
+    summary: "Learn MySQL from foundations to advanced interview topics through structured visual explanations. The tutorial covers database definition and manipulation, joins, grouping, transactions, functions, CTEs, window functions, indexing, and query behavior with clear examples.",
+    overview: ["Part one concentrates on the query engine: how rows are matched, filtered, grouped, ranked, and combined. Animated examples make it easier to follow intermediate result sets and understand why a query produces its final output.", "Part two builds the surrounding database knowledge needed for real projects and interviews, including data types, constraints, DDL, DML, permissions, transactions, isolation levels, upserts, and common functions. Continue into the practice engine to apply each concept to generated schemas."],
+    topics: ["SELECT, WHERE, GROUP BY, HAVING, and aggregate functions", "INNER, LEFT, RIGHT, self, and multi-table joins", "Window functions, CTEs, indexes, and subqueries", "DDL, DML, DCL, TCL, constraints, and data types", "Transactions, savepoints, isolation levels, and upserts", "Functions, permissions, query behavior, and visual quizzes"],
+    workflow: sharedWorkflow,
+    links: [
+      { to: "/mysql", label: "MySQL practice", description: "Apply tutorial concepts to generated interview questions." },
+      { to: "/sql-interview-questions", label: "SQL interview questions", description: "Understand the skills and reasoning assessed by interviewers." },
+      { to: "/gcp", label: "Data engineering interviews", description: "Connect SQL theory with warehousing and ETL/ELT design." },
+    ],
+  },
 };
 
 export function SubjectSeoShell({

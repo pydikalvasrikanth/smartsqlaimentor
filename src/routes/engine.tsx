@@ -12,6 +12,7 @@ import {
 
 import { runSqlEngine } from "@/lib/sql-engine.functions";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 import { ErdDiagram } from "@/components/sql/ErdDiagram";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import {
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/engine")({
       { property: "og:title", content: "MySQL Intelligence Engine — AI SQL Lab" },
       { property: "og:description", content: "Text-to-SQL with EXPLAIN, BigQuery shift, data quality checks, and advanced window/CTE/index labs on a realistic dataset." },
       { property: "og:url", content: "https://smartsqlaimentor.live/engine" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/engine" },
@@ -69,7 +72,7 @@ function EnginePage() {
     if (!resume.ready) return;
     resume.setState({ tab, aiPrompt });
   }, [tab, aiPrompt, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (loading || !user) return null;
+  if (loading || !user) return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.engine} />;
 
   return (
     <div className="min-h-screen bg-background">
