@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/hooks/use-theme";
 
 const NAV = [
   { to: "/", label: "Home" },
-  { to: "/practice", label: "Practice" },
+  { to: "/mysql", label: "Practice" },
   { to: "/interview", label: "Interview" },
   { to: "/about", label: "About" },
   { to: "/faq", label: "FAQ" },

@@ -1,10 +1,10 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, Terminal } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,6 +14,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Smart AI Code Playground — AI-Graded Coding Practice" },
       { property: "og:description", content: "AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/" },
@@ -24,7 +26,7 @@ export const Route = createFileRoute("/")({
 
 interface Subject {
   id: string;
-  to: "/practice" | "/python" | "/java" | "/gcp" | "/pyspark" | "/cpp";
+  to: "/mysql" | "/python" | "/java" | "/gcp" | "/pyspark" | "/cpp";
   title: string;
   tagline: string;
   description: string;
@@ -36,7 +38,7 @@ interface Subject {
 const SUBJECTS: Subject[] = [
   {
     id: "sql",
-    to: "/practice",
+    to: "/mysql",
     title: "SQL",
     tagline: "MySQL 8 · AI mentor",
     description: "Generated schemas, ERDs, semantic grading, hints, debug & query visualization across 50-question sessions.",
@@ -98,23 +100,8 @@ const SUBJECTS: Subject[] = [
 
 function SubjectPicker() {
   const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
-  useEffect(() => { if (!loading && !user) navigate({ to: "/auth" }); }, [loading, user, navigate]);
-
   if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-[1200px] mx-auto px-4 py-12 animate-pulse">
-          <div className="h-8 w-64 bg-muted rounded-md mx-auto mb-4" />
-          <div className="h-4 w-96 max-w-full bg-muted/70 rounded mx-auto mb-12" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-64 rounded-2xl border border-border bg-surface-1" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.home} />;
   }
 
   return (
@@ -259,7 +246,7 @@ function SubjectPicker() {
           <div>
             <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-3">Practice</h2>
             <ul className="space-y-2">
-              <li><Link to="/practice" className="hover:text-primary">SQL Practice</Link></li>
+              <li><Link to="/mysql" className="hover:text-primary">MySQL Practice</Link></li>
               <li><Link to="/python" className="hover:text-primary">Python Coding</Link></li>
               <li><Link to="/java" className="hover:text-primary">Java Coding</Link></li>
               <li><Link to="/pyspark" className="hover:text-primary">PySpark</Link></li>

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -19,6 +19,7 @@ import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 import { supabase } from "@/integrations/supabase/client";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 export const Route = createFileRoute("/cpp")({
   head: () => ({
     meta: [
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/cpp")({
       { property: "og:title", content: "C / C++ Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded C and C++ practice: language toggle, hints, complexity analysis, and progressive 50-question sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/cpp" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/cpp" },
@@ -295,7 +298,6 @@ function CppWorkspace() {
   const engine = useServerFn(runPythonEngine);
   const planFocusFn = useServerFn(planPythonFocus);
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
@@ -388,9 +390,6 @@ function CppWorkspace() {
     });
   }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, lang, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/auth" });
-  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     const p = loadPlan();
@@ -687,7 +686,7 @@ function CppWorkspace() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.cpp} />;
   }
 
   return (

@@ -48,7 +48,7 @@ function SqlLanding() {
           Practice 500+ SQL interview questions asked at Google, Amazon, Uber, Stripe and top Indian MNCs. Every question ships with a generated schema, seed data, hints, and semantic AI grading — not just answer matching.
         </p>
         <div className="flex flex-wrap gap-3 mb-12">
-          <Link to="/practice" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90">
+          <Link to="/mysql" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90">
             Start practicing <ArrowRight className="h-4 w-4" />
           </Link>
           <Link to="/tutorial" className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium hover:bg-accent">
@@ -88,7 +88,7 @@ function SqlLanding() {
         <div className="rounded-2xl border border-border bg-surface-2 p-8 text-center">
           <h2 className="mb-3">Ready to level up your SQL?</h2>
           <p className="text-muted-foreground mb-5">Start a 50-question adaptive session — free.</p>
-          <Link to="/practice" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-medium">
+          <Link to="/mysql" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-medium">
             Open SQL Playground <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

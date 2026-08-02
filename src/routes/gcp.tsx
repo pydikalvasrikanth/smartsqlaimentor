@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -11,6 +11,7 @@ import {
 import { GCP_BANK, type GcpDifficulty, type GcpQuestion } from "@/lib/gcp-bank";
 import { AiAssistant } from "@/components/AiAssistant";
 import { ThemeToggle } from "@/hooks/use-theme";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/gcp")({
   head: () => ({
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/gcp")({
       { property: "og:title", content: "GCP Data Engineer Interview Bank — 100+ MNC Questions" },
       { property: "og:description", content: "100+ curated GCP Data Engineer interview questions from top MNCs with answers and explanations." },
       { property: "og:url", content: "https://smartsqlaimentor.live/gcp" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/gcp" },
@@ -60,7 +63,6 @@ const TOPICS = ["All", ...FOCUS_TOPICS, ...OTHER_TOPICS];
 
 function GcpWorkspace() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [topic, setTopic] = useState<string>("BigQuery");
   const [level, setLevel] = useState<GcpDifficulty>("beginner");
@@ -95,7 +97,6 @@ function GcpWorkspace() {
     resume.setState({ topic, level, index, marks, covered });
   }, [topic, level, index, marks, covered, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [authLoading, user, navigate]);
 
   const coveredSet = useMemo(() => new Set(covered), [covered]);
 
@@ -152,7 +153,7 @@ function GcpWorkspace() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">Loading…</div>;
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.gcp} />;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -12,6 +12,7 @@ import {
 
 import { runSqlEngine } from "@/lib/sql-engine.functions";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 import { ErdDiagram } from "@/components/sql/ErdDiagram";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import {
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/engine")({
       { property: "og:title", content: "MySQL Intelligence Engine — AI SQL Lab" },
       { property: "og:description", content: "Text-to-SQL with EXPLAIN, BigQuery shift, data quality checks, and advanced window/CTE/index labs on a realistic dataset." },
       { property: "og:url", content: "https://smartsqlaimentor.live/engine" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/engine" },
@@ -53,11 +56,7 @@ type Tab = "preview" | "ai" | "quality" | "lab";
 
 function EnginePage() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const { theme } = useTheme();
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
   const [tab, setTab] = useState<Tab>("preview");
   const [aiPrompt, setAiPrompt] = useState<string | null>(null);
   const resume = useResumableState<{ tab: Tab; aiPrompt: string | null }>(
@@ -69,7 +68,7 @@ function EnginePage() {
     if (!resume.ready) return;
     resume.setState({ tab, aiPrompt });
   }, [tab, aiPrompt, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (loading || !user) return null;
+  if (loading || !user) return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.engine} />;
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,10 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, BookOpen, ArrowRight, Layers } from "lucide-react";
 import { HeaderTimer } from "@/components/HeaderTimer";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/tutorial")({
   head: () => ({
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/tutorial")({
         content: "Interactive, animated MySQL tutorials covering every topic from basics to advanced.",
       },
       { property: "og:url", content: "https://smartsqlaimentor.live/tutorial" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/tutorial" }],
     scripts: [
@@ -87,7 +90,6 @@ const MODULES: Module[] = [
 
 function TutorialPage() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const [active, setActive] = useState<Module | null>(null);
 
   const resume = useResumableState<{ moduleId: string | null }>(
@@ -101,16 +103,9 @@ function TutorialPage() {
     resume.setState({ moduleId: active?.id ?? null });
   }, [active, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen grid place-items-center text-sm text-muted-foreground">
-        Loading…
-      </div>
-    );
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.tutorial} />;
   }
 
   if (active) {
@@ -151,7 +146,7 @@ function TutorialPage() {
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
           <Link
-            to="/practice"
+            to="/mysql"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Back to SQL practice"
           >

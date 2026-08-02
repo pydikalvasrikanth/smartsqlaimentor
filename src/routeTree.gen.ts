@@ -22,6 +22,7 @@ import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as MysqlRouteImport } from './routes/mysql'
 import { Route as JavaTutorialRouteImport } from './routes/java-tutorial'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
@@ -123,6 +124,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PracticeRoute = PracticeRouteImport.update({
   id: '/practice',
   path: '/practice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MysqlRoute = MysqlRouteImport.update({
+  id: '/mysql',
+  path: '/mysql',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JavaTutorialRoute = JavaTutorialRouteImport.update({
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/java-tutorial': typeof JavaTutorialRouteWithChildren
+  '/mysql': typeof MysqlRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
+  '/mysql': typeof MysqlRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/java-tutorial': typeof JavaTutorialRouteWithChildren
+  '/mysql': typeof MysqlRoute
   '/practice': typeof PracticeRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/java-tutorial'
+    | '/mysql'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -538,6 +548,7 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
+    | '/mysql'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/java-tutorial'
+    | '/mysql'
     | '/practice'
     | '/privacy'
     | '/pyspark'
@@ -639,6 +651,7 @@ export interface RootRouteChildren {
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   JavaTutorialRoute: typeof JavaTutorialRouteWithChildren
+  MysqlRoute: typeof MysqlRoute
   PracticeRoute: typeof PracticeRoute
   PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
@@ -750,6 +763,13 @@ declare module '@tanstack/react-router' {
       path: '/practice'
       fullPath: '/practice'
       preLoaderRoute: typeof PracticeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mysql': {
+      id: '/mysql'
+      path: '/mysql'
+      fullPath: '/mysql'
+      preLoaderRoute: typeof MysqlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/java-tutorial': {
@@ -1143,6 +1163,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   JavaTutorialRoute: JavaTutorialRouteWithChildren,
+  MysqlRoute: MysqlRoute,
   PracticeRoute: PracticeRoute,
   PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
@@ -1165,13 +1186,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

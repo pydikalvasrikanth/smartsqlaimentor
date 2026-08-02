@@ -15,7 +15,7 @@ const HIDE_ON = [
   "/auth",
   "/reset-password",
   "/sitemap.xml",
-  "/practice",
+  "/mysql",
   "/python",
   "/java",
   "/gcp",
