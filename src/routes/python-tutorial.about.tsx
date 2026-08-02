@@ -4,7 +4,7 @@ import { resetProgress } from "@/tutorials/python/lib/progress";
 export const Route = createFileRoute("/python-tutorial/about")({
   head: () => ({
     meta: [
-      { title: "About the Python Visual Explainer — how the lessons work" },
+      { title: "About the Python Visual Explainer" },
       {
         name: "description",
         content:
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/python-tutorial/about")({
         content: "35 animated Python lessons with a live in-browser Python runtime and quizzes.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/python-tutorial/about" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/python-tutorial/about" }],
