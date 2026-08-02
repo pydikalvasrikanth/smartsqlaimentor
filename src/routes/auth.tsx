@@ -447,9 +447,29 @@ function AuthPage() {
           )}
           </div>
 
-          <p className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
+          <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
             <Link to="/" className="hover:text-foreground hover:underline">
-              Back to home
+              Home
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/practice" className="hover:text-foreground hover:underline">
+              SQL practice
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/python" className="hover:text-foreground hover:underline">
+              Code playground
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/faq" className="hover:text-foreground hover:underline">
+              FAQ
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/about" className="hover:text-foreground hover:underline">
+              About
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/contact" className="hover:text-foreground hover:underline">
+              Contact
             </Link>
             <span aria-hidden="true">·</span>
             <Link to="/privacy" className="hover:text-foreground hover:underline">
