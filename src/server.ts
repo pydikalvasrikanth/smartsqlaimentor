@@ -52,15 +52,25 @@ const CSP = [
 ].join("; ");
 
 function withSecurityHeaders(response: Response): Response {
-  const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.includes("text/html")) return response;
+  const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
+  const status = response.status;
+  
+  // Apply security headers to HTML responses and redirects.
+  // Static files and other assets are also covered by Nitro routeRules in vite.config.ts,
+  // but we apply them here as well for SSR-generated responses.
+  const isHtml = contentType.includes("text/html");
+  const isRedirect = status >= 300 && status < 400;
+
+  if (!isHtml && !isRedirect) return response;
 
   const headers = new Headers(response.headers);
-  headers.set("X-Frame-Options", "SAMEORIGIN");
-  headers.set("X-Content-Type-Options", "nosniff");
-  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("Permissions-Policy", "geolocation=(), camera=(), payment=()");
-  headers.set("Content-Security-Policy", CSP);
+  
+  // Set headers if not already present (to avoid duplication with Nitro routeRules)
+  if (!headers.has("X-Frame-Options")) headers.set("X-Frame-Options", "SAMEORIGIN");
+  if (!headers.has("X-Content-Type-Options")) headers.set("X-Content-Type-Options", "nosniff");
+  if (!headers.has("Referrer-Policy")) headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (!headers.has("Permissions-Policy")) headers.set("Permissions-Policy", "geolocation=(), camera=(), payment=()");
+  if (!headers.has("Content-Security-Policy")) headers.set("Content-Security-Policy", CSP);
 
   return new Response(response.body, {
     status: response.status,
