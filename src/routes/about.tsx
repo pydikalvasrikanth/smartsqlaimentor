@@ -84,7 +84,7 @@ function AboutPage() {
               The story behind {APP_NAME}
             </p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              About
+              About {APP_NAME}
             </h1>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
               A personal project turned learning companion, built to make coding practice feel less
