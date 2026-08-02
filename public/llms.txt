@@ -5,7 +5,7 @@
 ## Pages
 
 - [Home](/): Pick a subject — SQL, Python, or GCP — and start practicing with an AI mentor.
-- [SQL Practice](/practice): MySQL practice with AI-generated schemas, ERDs, and semantic evaluation across 50-question sessions.
+- [MySQL Practice](/mysql): MySQL practice with AI-generated schemas, ERDs, and semantic evaluation across 50-question sessions.
 - [Python Practice](/python): Coding interviews graded by an AI mentor — data structures, algorithms, OOP, system design.
 - [GCP Data Engineer](/gcp): 100+ curated MNC interview questions on BigQuery, Dataflow, Pub/Sub, Composer, IAM and cost optimization.
 - [SQL Engine](/engine): Run, evaluate, and visualize SQL queries with an AI feedback loop.

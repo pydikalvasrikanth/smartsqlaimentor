@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -196,7 +196,6 @@ function Workspace() {
   const planFocusFn = useServerFn(planFocus);
   const analyzeFocusFn = useServerFn(analyzeFocus);
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
   const { theme } = useTheme();
 
   const planQ = useQuery({
@@ -210,9 +209,6 @@ function Workspace() {
     enabled: !!user,
   });
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/auth" });
-  }, [authLoading, user, navigate]);
   const [tab, setTab] = useState<"today" | "free" | "topics" | "targeted" | "data-eng" | "solved">("today");
   const [showPlanner, setShowPlanner] = useState(false);
   const [topic, setTopic] = useState("E-commerce orders");

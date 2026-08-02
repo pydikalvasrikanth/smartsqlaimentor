@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -295,7 +295,6 @@ function JavaWorkspace() {
   const engine = useServerFn(runJavaEngine);
   const planFocusFn = useServerFn(planJavaFocus);
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
@@ -385,9 +384,6 @@ function JavaWorkspace() {
     });
   }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/auth" });
-  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     const p = loadPlan();

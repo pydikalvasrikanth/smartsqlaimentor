@@ -1,5 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, Terminal } from "lucide-react";
@@ -101,9 +100,6 @@ const SUBJECTS: Subject[] = [
 
 function SubjectPicker() {
   const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
-  useEffect(() => { if (!loading && !user) navigate({ to: "/auth" }); }, [loading, user, navigate]);
-
   if (loading || !user) {
     return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.home} />;
   }

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -233,7 +233,6 @@ function PySparkWorkspace() {
   const engine = useServerFn(runPythonEngine);
   const planFocusFn = useServerFn(planPythonFocus);
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [planDays, setPlanDays] = useState(30);
   const [planLevel, setPlanLevel] = useState<Level>("intermediate");
@@ -300,7 +299,6 @@ function PySparkWorkspace() {
     });
   }, [tab, topicLevel, deLevel, interviewCompany, interviewLevel, focusGoal, code, question, sessionQid, qIndex, pastIds, covered, interviewMode, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [authLoading, user, navigate]);
   useEffect(() => { const p = loadPlan(); if (p) { setPlan(p); setPlanDays(p.days); setPlanLevel(p.level); } }, []);
 
   const call = useCallback(async (command: string, payload: any) => {

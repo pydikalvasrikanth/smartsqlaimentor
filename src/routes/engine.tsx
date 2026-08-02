@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -56,11 +56,7 @@ type Tab = "preview" | "ai" | "quality" | "lab";
 
 function EnginePage() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const { theme } = useTheme();
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
   const [tab, setTab] = useState<Tab>("preview");
   const [aiPrompt, setAiPrompt] = useState<string | null>(null);
   const resume = useResumableState<{ tab: Tab; aiPrompt: string | null }>(

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -90,7 +90,6 @@ const MODULES: Module[] = [
 
 function TutorialPage() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const [active, setActive] = useState<Module | null>(null);
 
   const resume = useResumableState<{ moduleId: string | null }>(
@@ -104,9 +103,6 @@ function TutorialPage() {
     resume.setState({ moduleId: active?.id ?? null });
   }, [active, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   if (loading || !user) {
     return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.tutorial} />;
@@ -150,7 +146,7 @@ function TutorialPage() {
       <header className="border-b border-border bg-surface-2/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center gap-3">
           <Link
-            to="/practice"
+            to="/mysql"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Back to SQL practice"
           >

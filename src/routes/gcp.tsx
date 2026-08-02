@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -63,7 +63,6 @@ const TOPICS = ["All", ...FOCUS_TOPICS, ...OTHER_TOPICS];
 
 function GcpWorkspace() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [topic, setTopic] = useState<string>("BigQuery");
   const [level, setLevel] = useState<GcpDifficulty>("beginner");
@@ -98,7 +97,6 @@ function GcpWorkspace() {
     resume.setState({ topic, level, index, marks, covered });
   }, [topic, level, index, marks, covered, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (!authLoading && !user) navigate({ to: "/auth" }); }, [authLoading, user, navigate]);
 
   const coveredSet = useMemo(() => new Set(covered), [covered]);
 
