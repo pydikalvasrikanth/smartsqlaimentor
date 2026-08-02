@@ -25,17 +25,18 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-  },
-  // Nitro route rules to ensure static files and redirects also get security headers.
-  nitro: {
-    routeRules: {
-      "/**": {
-        headers: {
-          "X-Frame-Options": "SAMEORIGIN",
-          "X-Content-Type-Options": "nosniff",
-          "Referrer-Policy": "strict-origin-when-cross-origin",
-          "Permissions-Policy": "geolocation=(), camera=(), payment=()",
-          "Content-Security-Policy": CSP,
+    // Nitro route rules to ensure static files and redirects also get security headers.
+    // This applies to the production Nitro server.
+    nitro: {
+      routeRules: {
+        "/**": {
+          headers: {
+            "X-Frame-Options": "SAMEORIGIN",
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Permissions-Policy": "geolocation=(), camera=(), payment=()",
+            "Content-Security-Policy": CSP,
+          },
         },
       },
     },
