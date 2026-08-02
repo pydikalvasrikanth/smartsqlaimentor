@@ -27,14 +27,33 @@ export const Route = createFileRoute("/python-tutorial/$topicId")({
     }
     const { topic } = loaderData;
     const title = `${topic.title} — Python Visual Explainer`;
+    const url = `https://smartsqlaimentor.live/python-tutorial/${topic.id}`;
     return {
       meta: [
         { title },
         { name: "description", content: topic.tagline },
         { property: "og:title", content: title },
         { property: "og:description", content: topic.tagline },
-        { property: "og:type", content: "website" },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LearningResource",
+            name: topic.title,
+            description: topic.tagline,
+            teaches: topic.title,
+            url,
+            inLanguage: "en",
+            learningResourceType: "Tutorial",
+            about: { "@type": "Thing", name: "Python programming" },
+          }),
+        },
       ],
     };
   },
