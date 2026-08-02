@@ -19,6 +19,7 @@ export const Route = createFileRoute("/cpp-tutorial/")({
         content: "Infographic lessons: pointers, memory, RAII, templates, STL, concurrency.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/cpp-tutorial" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/cpp-tutorial" }],
