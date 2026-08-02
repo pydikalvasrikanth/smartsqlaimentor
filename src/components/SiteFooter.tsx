@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div>
           <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-3">Practice</h2>
           <ul className="space-y-2">
-            <li><Link to="/practice" className="hover:text-primary">SQL Practice</Link></li>
+            <li><Link to="/mysql" className="hover:text-primary">MySQL Practice</Link></li>
             <li><Link to="/python" className="hover:text-primary">Python Coding</Link></li>
             <li><Link to="/java" className="hover:text-primary">Java Coding</Link></li>
             <li><Link to="/pyspark" className="hover:text-primary">PySpark</Link></li>

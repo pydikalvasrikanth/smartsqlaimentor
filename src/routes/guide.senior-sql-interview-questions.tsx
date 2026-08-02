@@ -135,7 +135,7 @@ function SeniorSqlGuide() {
           collects the questions that actually separate senior candidates, with the answer a
           Senior Data Engineer interviewer is listening for — the same reasoning the AI mentor in
           the{" "}
-          <Link to="/practice" className="text-primary hover:underline">
+          <Link to="/mysql" className="text-primary hover:underline">
             SQL playground
           </Link>{" "}
           gives on every submission.
@@ -143,7 +143,7 @@ function SeniorSqlGuide() {
 
         <div className="mb-12 flex flex-wrap gap-3">
           <Link
-            to="/practice"
+            to="/mysql"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
             Practice these live <ArrowRight className="h-4 w-4" />
@@ -211,7 +211,7 @@ function SeniorSqlGuide() {
         <div className="rounded-2xl border border-border bg-surface-2 p-8 text-center">
           <h2 className="mb-3 text-xl font-semibold text-foreground">Ready for the senior round?</h2>
           <Link
-            to="/practice"
+            to="/mysql"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground"
           >
             Open the SQL Playground <ArrowRight className="h-4 w-4" />

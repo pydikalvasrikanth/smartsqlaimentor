@@ -68,6 +68,7 @@ export const Route = createFileRoute("/auth")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://smartsqlaimentor.live/auth" },
+      { name: "robots", content: "noindex, follow" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/auth" }],
   }),
@@ -452,7 +453,7 @@ function AuthPage() {
               Home
             </Link>
             <span aria-hidden="true">·</span>
-            <Link to="/practice" className="hover:text-foreground hover:underline">
+            <Link to="/mysql" className="hover:text-foreground hover:underline">
               SQL practice
             </Link>
             <span aria-hidden="true">·</span>

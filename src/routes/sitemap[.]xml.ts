@@ -15,13 +15,12 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: Entry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
-          { path: "/practice", changefreq: "weekly", priority: "0.9" },
+          { path: "/mysql", changefreq: "weekly", priority: "0.9" },
           { path: "/python", changefreq: "weekly", priority: "0.9" },
           { path: "/java", changefreq: "weekly", priority: "0.8" },
           { path: "/pyspark", changefreq: "weekly", priority: "0.8" },
           { path: "/cpp", changefreq: "weekly", priority: "0.85" },
           { path: "/gcp", changefreq: "weekly", priority: "0.9" },
-          { path: "/interview", changefreq: "weekly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.6" },
           { path: "/contact", changefreq: "monthly", priority: "0.5" },
           { path: "/faq", changefreq: "monthly", priority: "0.7" },
@@ -36,7 +35,6 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/pyspark-tutorial", changefreq: "monthly", priority: "0.7" },
           { path: "/chat", changefreq: "monthly", priority: "0.5" },
           { path: "/feedback", changefreq: "monthly", priority: "0.3" },
-          { path: "/auth", changefreq: "monthly", priority: "0.3" },
           { path: "/sql-interview-questions", changefreq: "weekly", priority: "0.85" },
           { path: "/python-coding-practice", changefreq: "weekly", priority: "0.85" },
           { path: "/pyspark-practice", changefreq: "weekly", priority: "0.8" },
