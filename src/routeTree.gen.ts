@@ -21,7 +21,7 @@ import { Route as PysparkTutorialRouteImport } from './routes/pyspark-tutorial'
 import { Route as PysparkPracticeRouteImport } from './routes/pyspark-practice'
 import { Route as PysparkRouteImport } from './routes/pyspark'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as MysqlRouteImport } from './routes/mysql'
 import { Route as JavaTutorialRouteImport } from './routes/java-tutorial'
 import { Route as JavaRouteImport } from './routes/java'
 import { Route as InterviewRouteImport } from './routes/interview'
@@ -120,9 +120,9 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PracticeRoute = PracticeRouteImport.update({
-  id: '/practice',
-  path: '/practice',
+const MysqlRoute = MysqlRouteImport.update({
+  id: '/mysql',
+  path: '/mysql',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JavaTutorialRoute = JavaTutorialRouteImport.update({
@@ -335,7 +335,7 @@ export interface FileRoutesByFullPath {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/java-tutorial': typeof JavaTutorialRouteWithChildren
-  '/practice': typeof PracticeRoute
+  '/mysql': typeof MysqlRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
@@ -385,7 +385,7 @@ export interface FileRoutesByTo {
   '/gcp-data-engineer-interview': typeof GcpDataEngineerInterviewRoute
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
-  '/practice': typeof PracticeRoute
+  '/mysql': typeof MysqlRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
@@ -434,7 +434,7 @@ export interface FileRoutesById {
   '/interview': typeof InterviewRoute
   '/java': typeof JavaRoute
   '/java-tutorial': typeof JavaTutorialRouteWithChildren
-  '/practice': typeof PracticeRoute
+  '/mysql': typeof MysqlRoute
   '/privacy': typeof PrivacyRoute
   '/pyspark': typeof PysparkRoute
   '/pyspark-practice': typeof PysparkPracticeRoute
@@ -488,7 +488,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/java-tutorial'
-    | '/practice'
+    | '/mysql'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
@@ -538,7 +538,7 @@ export interface FileRouteTypes {
     | '/gcp-data-engineer-interview'
     | '/interview'
     | '/java'
-    | '/practice'
+    | '/mysql'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
@@ -586,7 +586,7 @@ export interface FileRouteTypes {
     | '/interview'
     | '/java'
     | '/java-tutorial'
-    | '/practice'
+    | '/mysql'
     | '/privacy'
     | '/pyspark'
     | '/pyspark-practice'
@@ -639,7 +639,7 @@ export interface RootRouteChildren {
   InterviewRoute: typeof InterviewRoute
   JavaRoute: typeof JavaRoute
   JavaTutorialRoute: typeof JavaTutorialRouteWithChildren
-  PracticeRoute: typeof PracticeRoute
+  MysqlRoute: typeof MysqlRoute
   PrivacyRoute: typeof PrivacyRoute
   PysparkRoute: typeof PysparkRoute
   PysparkPracticeRoute: typeof PysparkPracticeRoute
@@ -745,11 +745,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/practice': {
-      id: '/practice'
-      path: '/practice'
-      fullPath: '/practice'
-      preLoaderRoute: typeof PracticeRouteImport
+    '/mysql': {
+      id: '/mysql'
+      path: '/mysql'
+      fullPath: '/mysql'
+      preLoaderRoute: typeof MysqlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/java-tutorial': {
@@ -1143,7 +1143,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewRoute: InterviewRoute,
   JavaRoute: JavaRoute,
   JavaTutorialRoute: JavaTutorialRouteWithChildren,
-  PracticeRoute: PracticeRoute,
+  MysqlRoute: MysqlRoute,
   PrivacyRoute: PrivacyRoute,
   PysparkRoute: PysparkRoute,
   PysparkPracticeRoute: PysparkPracticeRoute,

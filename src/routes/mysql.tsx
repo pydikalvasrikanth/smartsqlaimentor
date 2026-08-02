@@ -54,7 +54,7 @@ import {
 } from "@/lib/data-engineering";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 
-export const Route = createFileRoute("/practice")({
+export const Route = createFileRoute("/mysql")({
   head: () => ({
     meta: [
       { title: "SQL Intelligence Engine — Practice with an AI mentor" },
