@@ -70,6 +70,7 @@ function withSecurityHeaders(response: Response): Response {
 }
 
 export default {
+    console.log("SERVER FETCH", request.url);
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
