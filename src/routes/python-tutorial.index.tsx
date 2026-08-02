@@ -8,18 +8,19 @@ import { getProgress } from "@/tutorials/python/lib/progress";
 export const Route = createFileRoute("/python-tutorial/")({
   head: () => ({
     meta: [
-      { title: "Python Visual Explainer — Interactive lessons from basics to expert" },
+      { title: "Python Visual Explainer — Interactive Python Lessons" },
       {
         name: "description",
         content:
           "Learn Python interactively: 35+ animated topics with live in-browser Python, step-through visualizations, and quizzes. From variables to metaclasses.",
       },
-      { property: "og:title", content: "Python Visual Explainer — Interactive lessons from basics to expert" },
+      { property: "og:title", content: "Python Visual Explainer — Interactive Python Lessons" },
       {
         property: "og:description",
         content: "Interactive, animated Python lessons — basics to expert. Live Python in your browser.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/python-tutorial" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/python-tutorial" }],

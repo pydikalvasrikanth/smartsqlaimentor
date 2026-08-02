@@ -14,14 +14,33 @@ export const Route = createFileRoute("/cpp-tutorial/c/$moduleId/$lessonId")({
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Lesson not found — C Explainer" }] };
     const t = `${loaderData.lesson.title} — C Explainer`;
+    const url = `https://smartsqlaimentor.live/cpp-tutorial/c/${loaderData.module.id}/${loaderData.lesson.id}`;
     return {
       meta: [
         { title: t },
         { name: "description", content: loaderData.lesson.tagline },
         { property: "og:title", content: t },
         { property: "og:description", content: loaderData.lesson.tagline },
-        { property: "og:type", content: "website" },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LearningResource",
+            name: loaderData.lesson.title,
+            description: loaderData.lesson.tagline,
+            teaches: loaderData.lesson.title,
+            url,
+            inLanguage: "en",
+            learningResourceType: "Tutorial",
+            about: { "@type": "Thing", name: "C programming" },
+          }),
+        },
       ],
     };
   },
