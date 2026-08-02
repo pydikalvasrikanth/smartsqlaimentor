@@ -22,6 +22,7 @@ import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 import { supabase } from "@/integrations/supabase/client";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/pyspark")({
   head: () => ({
@@ -506,7 +507,7 @@ function PySparkWorkspace() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.pyspark} />;
   }
 
   return (

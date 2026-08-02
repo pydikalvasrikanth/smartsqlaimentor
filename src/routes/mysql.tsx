@@ -53,6 +53,7 @@ import {
   buildDePrompt,
 } from "@/lib/data-engineering";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/mysql")({
   head: () => ({
@@ -68,10 +69,12 @@ export const Route = createFileRoute("/mysql")({
         property: "og:description",
         content: "Practice MySQL with realistic schemas and AI mentor feedback.",
       },
-      { property: "og:url", content: "https://smartsqlaimentor.live/practice" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/mysql" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.live/practice" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/mysql" },
     ],
     scripts: [
       {
@@ -81,7 +84,7 @@ export const Route = createFileRoute("/mysql")({
           "@type": "LearningResource",
           name: "SQL Intelligence Engine — Practice",
           description: "Interactive MySQL practice with AI-generated schemas, ERDs, semantic evaluation, hints, and debugging.",
-          url: "https://smartsqlaimentor.live/practice",
+          url: "https://smartsqlaimentor.live/mysql",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
           teaches: "MySQL, joins, window functions, query optimization",
@@ -1060,7 +1063,7 @@ function Workspace() {
   const coverageInLevel = pool.filter((c) => coveredConcepts.includes(c)).length;
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.mysql} />;
   }
 
   return (

@@ -19,6 +19,7 @@ import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
 import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
 import { supabase } from "@/integrations/supabase/client";
+import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/python")({
       { property: "og:title", content: "Python Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 50-question sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/python" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://smartsqlaimentor.live/python" },
@@ -728,7 +731,7 @@ function PythonWorkspace() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen grid place-items-center text-base text-muted-foreground">Loading…</div>;
+    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.python} />;
   }
 
   return (
