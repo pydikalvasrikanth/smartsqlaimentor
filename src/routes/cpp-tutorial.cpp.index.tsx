@@ -10,8 +10,10 @@ export const Route = createFileRoute("/cpp-tutorial/cpp/")({
       { property: "og:title", content: "Learn C++ — Visual Explainer" },
       { property: "og:description", content: "Infographic-style modern C++ lessons from Hello World to job-ready." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/cpp-tutorial/cpp" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/cpp-tutorial/cpp" }],
   }),
   component: () => (
     <div className="tut-dark min-h-screen">
