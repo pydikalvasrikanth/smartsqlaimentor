@@ -19,6 +19,7 @@ export const Route = createFileRoute("/java-tutorial/learn/$moduleId/$lessonId")
       };
     }
     const t = `${loaderData.lesson.title} — Java Visual Explainer`;
+    const url = `https://smartsqlaimentor.live/java-tutorial/learn/${loaderData.module.id}/${loaderData.lesson.id}`;
     return {
       meta: [
         { title: t },
@@ -26,7 +27,25 @@ export const Route = createFileRoute("/java-tutorial/learn/$moduleId/$lessonId")
         { property: "og:title", content: t },
         { property: "og:description", content: loaderData.lesson.tagline },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LearningResource",
+            name: loaderData.lesson.title,
+            description: loaderData.lesson.tagline,
+            teaches: loaderData.lesson.title,
+            url,
+            inLanguage: "en",
+            learningResourceType: "Tutorial",
+            about: { "@type": "Thing", name: "Java programming" },
+          }),
+        },
       ],
     };
   },
