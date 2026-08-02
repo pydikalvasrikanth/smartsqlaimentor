@@ -21,7 +21,7 @@ const PROFILE = {
 };
 
 const APP_NAME = "Smart AI Code Playground";
-const SITE = "https://smartsqlaimentor.lovable.app";
+const SITE = "https://smartsqlaimentor.live";
 
 export const Route = createFileRoute("/about")({
   head: () => ({

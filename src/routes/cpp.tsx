@@ -26,10 +26,10 @@ export const Route = createFileRoute("/cpp")({
       { name: "description", content: "C and C++ coding interview practice with AI-graded feedback, hints, and complexity analysis for both languages." },
       { property: "og:title", content: "C / C++ Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded C and C++ practice: language toggle, hints, complexity analysis, and progressive 50-question sessions." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/cpp" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/cpp" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/cpp" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/cpp" },
     ],
     scripts: [
       {
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/cpp")({
           "@type": "LearningResource",
           name: "C / C++ Interview Engine",
           description: "AI-graded C and C++ interview coding practice with hints, complexity analysis, and language toggle.",
-          url: "https://smartsqlaimentor.lovable.app/cpp",
+          url: "https://smartsqlaimentor.live/cpp",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
           teaches: "C, C++, pointers, memory, STL, data structures, algorithms, systems programming",

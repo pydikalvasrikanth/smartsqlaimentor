@@ -30,11 +30,11 @@ export const Route = createFileRoute("/pyspark")({
       { name: "description", content: "PySpark coding interview practice: DataFrame API, joins, windows, UDFs, partitioning & streaming, all AI-graded." },
       { property: "og:title", content: "PySpark Interview Engine — AI-Graded Spark Practice" },
       { property: "og:description", content: "AI-graded PySpark practice — DataFrame API, joins, window functions, structured streaming and more." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/pyspark" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/pyspark" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/pyspark" }],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/pyspark" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/pyspark")({
             "Structured Streaming",
             "Delta Lake",
           ],
-          url: "https://smartsqlaimentor.lovable.app/pyspark",
+          url: "https://smartsqlaimentor.live/pyspark",
           inLanguage: "en",
           learningResourceType: "Interactive practice",
         }),

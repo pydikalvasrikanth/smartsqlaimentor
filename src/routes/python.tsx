@@ -26,10 +26,10 @@ export const Route = createFileRoute("/python")({
       { name: "description", content: "Python coding interview practice with AI-graded feedback, hints, and complexity analysis." },
       { property: "og:title", content: "Python Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 50-question sessions." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/python" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/python" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/python" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/python" },
     ],
     scripts: [
       {
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/python")({
           "@type": "LearningResource",
           name: "Python Interview Engine",
           description: "AI-graded Python coding interview practice with hints, complexity analysis, and difficulty ramping.",
-          url: "https://smartsqlaimentor.lovable.app/python",
+          url: "https://smartsqlaimentor.live/python",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
           teaches: "Python, data structures, algorithms, OOP, system design",

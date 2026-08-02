@@ -42,7 +42,7 @@ function GoogleMark({ className = "h-4 w-4" }: { className?: string }) {
 }
 
 function getAuthOrigin() {
-  if (typeof window === "undefined") return "https://smartsqlaimentor.lovable.app";
+  if (typeof window === "undefined") return "https://smartsqlaimentor.live";
   return window.location.origin;
 }
 
@@ -67,9 +67,9 @@ export const Route = createFileRoute("/auth")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/auth" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/auth" },
     ],
-    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/auth" }],
   }),
   component: AuthPage,
 });

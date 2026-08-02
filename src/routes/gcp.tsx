@@ -19,10 +19,10 @@ export const Route = createFileRoute("/gcp")({
       { name: "description", content: "Curated GCP Data Engineer interview questions from top MNCs with answers, explanations, and follow-ups." },
       { property: "og:title", content: "GCP Data Engineer Interview Bank — 100+ MNC Questions" },
       { property: "og:description", content: "100+ curated GCP Data Engineer interview questions from top MNCs with answers and explanations." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/gcp" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/gcp" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/gcp" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/gcp" },
     ],
     scripts: [
       {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/gcp")({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           name: "GCP Data Engineer Interview Bank",
-          url: "https://smartsqlaimentor.lovable.app/gcp",
+          url: "https://smartsqlaimentor.live/gcp",
           mainEntity: GCP_BANK.slice(0, 20).map((q) => ({
             "@type": "Question",
             name: q.question,

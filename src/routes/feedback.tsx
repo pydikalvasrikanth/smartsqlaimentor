@@ -18,7 +18,7 @@ export const Route = createFileRoute("/feedback")({
       { name: "description", content: "Tell us how SmartAiSQLMentor is working for you. Rate the AI, report bugs, and suggest improvements." },
       { property: "og:title", content: "Share Feedback — SmartAiSQLMentor" },
       { property: "og:description", content: "Tell us how SmartAiSQLMentor is working for you. Rate the AI, report bugs, and suggest improvements." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/feedback" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/feedback" },
       { name: "robots", content: "noindex" },
     ],
   }),
