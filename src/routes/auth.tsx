@@ -42,7 +42,7 @@ function GoogleMark({ className = "h-4 w-4" }: { className?: string }) {
 }
 
 function getAuthOrigin() {
-  if (typeof window === "undefined") return "https://smartsqlaimentor.lovable.app";
+  if (typeof window === "undefined") return "https://smartsqlaimentor.live";
   return window.location.origin;
 }
 
@@ -67,9 +67,9 @@ export const Route = createFileRoute("/auth")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/auth" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/auth" },
     ],
-    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/auth" }],
   }),
   component: AuthPage,
 });
@@ -447,9 +447,29 @@ function AuthPage() {
           )}
           </div>
 
-          <p className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
+          <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
             <Link to="/" className="hover:text-foreground hover:underline">
-              Back to home
+              Home
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/practice" className="hover:text-foreground hover:underline">
+              SQL practice
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/python" className="hover:text-foreground hover:underline">
+              Code playground
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/faq" className="hover:text-foreground hover:underline">
+              FAQ
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/about" className="hover:text-foreground hover:underline">
+              About
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/contact" className="hover:text-foreground hover:underline">
+              Contact
             </Link>
             <span aria-hidden="true">·</span>
             <Link to="/privacy" className="hover:text-foreground hover:underline">

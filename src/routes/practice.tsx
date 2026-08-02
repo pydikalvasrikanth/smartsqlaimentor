@@ -68,10 +68,10 @@ export const Route = createFileRoute("/practice")({
         property: "og:description",
         content: "Practice MySQL with realistic schemas and AI mentor feedback.",
       },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/practice" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/practice" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/practice" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/practice" },
     ],
     scripts: [
       {
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/practice")({
           "@type": "LearningResource",
           name: "SQL Intelligence Engine — Practice",
           description: "Interactive MySQL practice with AI-generated schemas, ERDs, semantic evaluation, hints, and debugging.",
-          url: "https://smartsqlaimentor.lovable.app/practice",
+          url: "https://smartsqlaimentor.live/practice",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
           teaches: "MySQL, joins, window functions, query optimization",

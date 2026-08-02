@@ -27,9 +27,9 @@ export const Route = createFileRoute("/reset-password")({
       },
       { property: "og:title", content: "Reset password — SQL Intelligence Engine" },
       { property: "og:description", content: "Securely reset your SQL practice account password." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/reset-password" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/reset-password" },
     ],
-    links: [{ rel: "canonical", href: "https://smartsqlaimentor.lovable.app/reset-password" }],
+    links: [{ rel: "canonical", href: "https://smartsqlaimentor.live/reset-password" }],
   }),
   component: ResetPasswordPage,
 });

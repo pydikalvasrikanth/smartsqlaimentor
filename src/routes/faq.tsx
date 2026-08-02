@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 const APP_NAME = "Smart AI Code Playground";
-const SITE = "https://smartsqlaimentor.lovable.app";
+const SITE = "https://smartsqlaimentor.live";
 const EMAIL = "pydikalvasrikanth@gmail.com";
 
 const FAQS: { q: string; a: string }[] = [

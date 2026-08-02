@@ -25,10 +25,10 @@ export const Route = createFileRoute("/java")({
       { name: "description", content: "Java coding interview practice with AI-graded feedback, hints, and complexity analysis." },
       { property: "og:title", content: "Java Interview Engine — AI Mentor Practice" },
       { property: "og:description", content: "AI-graded Java coding practice: hints, complexity analysis, and progressive 50-question sessions." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/java" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/java" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/java" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/java" },
     ],
     scripts: [
       {
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/java")({
           "@type": "LearningResource",
           name: "Java Interview Engine",
           description: "AI-graded Java coding interview practice with hints, complexity analysis, and difficulty ramping.",
-          url: "https://smartsqlaimentor.lovable.app/java",
+          url: "https://smartsqlaimentor.live/java",
           learningResourceType: "Interactive practice",
           educationalLevel: "Beginner to Advanced",
           teaches: "Java, data structures, algorithms, OOP, system design",

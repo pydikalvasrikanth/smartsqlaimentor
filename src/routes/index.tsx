@@ -13,10 +13,10 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Smart AI Code Playground: AI-graded coding practice and mock interviews for SQL, Python, Java, PySpark and GCP Data Engineering roles at top MNCs." },
       { property: "og:title", content: "Smart AI Code Playground" },
       { property: "og:description", content: "AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
-      { property: "og:url", content: "https://smartsqlaimentor.lovable.app/" },
+      { property: "og:url", content: "https://smartsqlaimentor.live/" },
     ],
     links: [
-      { rel: "canonical", href: "https://smartsqlaimentor.lovable.app/" },
+      { rel: "canonical", href: "https://smartsqlaimentor.live/" },
     ],
   }),
   component: SubjectPicker,
