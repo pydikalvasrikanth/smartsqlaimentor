@@ -71,6 +71,9 @@ async function importPrismLanguage(language: string) {
       await loadPrismLanguage("clike");
       await import("prismjs/components/prism-java");
       return;
+    case "sql":
+      await import("prismjs/components/prism-sql");
+      return;
     default:
       return;
   }
