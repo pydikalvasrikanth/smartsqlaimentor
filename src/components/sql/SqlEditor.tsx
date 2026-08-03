@@ -1,4 +1,6 @@
-import Editor, { type Monaco } from "@monaco-editor/react";
+import { useEffect, useRef, useState } from "react";
+import Editor, { loader, type Monaco } from "@monaco-editor/react";
+import { PlainSqlEditor } from "./PlainSqlEditor";
 
 interface Props {
   value: string;
@@ -7,6 +9,30 @@ interface Props {
 }
 
 export function SqlEditor({ value, onChange, height = "260px" }: Props) {
+  // Monaco is fetched from a CDN. If that fetch is blocked/slow (offline, strict
+  // network, CSP), fall back to a lightweight highlighted editor instead of
+  // leaving the user stuck on "Loading editor…".
+  const [fallback, setFallback] = useState(false);
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loader.init().catch(() => {
+      if (!cancelled) setFallback(true);
+    });
+    const t = setTimeout(() => {
+      if (!cancelled && !mountedRef.current) setFallback(true);
+    }, 6000);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, []);
+
+  if (fallback) {
+    return <PlainSqlEditor value={value} onChange={onChange} height={height} />;
+  }
+
   return (
     <div
       className="rounded-md border border-border overflow-hidden bg-[#1d2238]"
@@ -17,6 +43,9 @@ export function SqlEditor({ value, onChange, height = "260px" }: Props) {
         defaultLanguage="sql"
         value={value}
         onChange={(v: string | undefined) => onChange(v ?? "")}
+        onMount={() => {
+          mountedRef.current = true;
+        }}
         beforeMount={(monaco: Monaco) => {
           monaco.editor.defineTheme("sql-ide", {
             base: "vs-dark",
