@@ -63,8 +63,8 @@ export function JavaTheoryPanel({ sessionQuestionId, concept }: Props) {
   }, [sessionQuestionId]);
 
   return (
-    <div className="rounded-lg border border-border bg-surface-1 overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-surface-2">
+    <div className="w-full min-w-0 rounded-lg border border-border bg-surface-1 overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-border bg-surface-2">
         <Sparkles className="h-3.5 w-3.5 text-primary-glow" />
         <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
           Theory & worked example
@@ -84,7 +84,7 @@ export function JavaTheoryPanel({ sessionQuestionId, concept }: Props) {
           Regenerate
         </button>
       </div>
-      <div className="p-4 min-h-[120px]">
+      <div className="p-4 min-h-[120px] min-w-0 overflow-x-auto">
         {loading && !content && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Generating an in-depth explanation for this question…
