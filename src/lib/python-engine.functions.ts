@@ -6,9 +6,12 @@ import { languageSpec, type CodeLang } from "@/lib/languages";
 import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
 import {
   callGatewayTool,
+  cacheKey,
+  getCached,
   modelForCommand,
   preCheckSubmission,
   reconcileVerdict,
+  setCached,
 } from "@/lib/ai-gateway.server";
 
 function systemPromptFor(lang: CodeLang): string {
@@ -516,7 +519,20 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         if (pre) return { data: pre };
       }
 
-      return callPythonEngine(command, enriched);
+      // Identical resubmits and repeat theory opens are served from cache.
+      const key = cacheKey([
+        "python",
+        command,
+        userId,
+        payload.session_question_id,
+        (payload.user_code ?? "").trim(),
+      ]);
+      const cached = getCached(key);
+      if (cached) return { data: cached };
+
+      const res = await callPythonEngine(command, enriched);
+      if (res.data && !res.error) setCached(key, res.data);
+      return res;
     }
 
     // Non-sensitive commands (hint, debug, visualize) carry no answer key.
