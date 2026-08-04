@@ -256,3 +256,44 @@ export function preCheckSubmission(
 
   return null;
 }
+
+/**
+ * SQL variant of the pre-check. The SQL verdict has its own shape (no
+ * per-test rows), so it gets its own local fail object.
+ */
+export function preCheckSql(sql: string): Record<string, any> | null {
+  const src = (sql ?? "").trim();
+  const stripped = src
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|\s)--[^\n]*/g, "$1")
+    .trim();
+
+  const fail = (title: string, message: string) => ({
+    is_correct: false,
+    is_syntax_error: true,
+    status_title: title,
+    feedback_message: message,
+    performance_note: "",
+    best_practice_tip: "",
+    mistake_tag: "empty-submission",
+    user_result_preview: "Could not run: no query to execute.",
+    expected_result_preview: "",
+  });
+
+  if (!src) return fail("Nothing to run", "You haven't written a query yet. Write your SQL and run it again.");
+  if (!stripped) return fail("Nothing to run", "Your submission only contains comments — no SQL statement yet.");
+
+  const noStrings = stripped.replace(/'(?:''|[^'])*'/g, "''");
+  const open = noStrings.split("(").length - 1;
+  const close = noStrings.split(")").length - 1;
+  if (open !== close) {
+    return {
+      ...fail(
+        "Syntax error",
+        `Unbalanced parentheses: ${open} "(" vs ${close} ")". Fix the brackets before running.`,
+      ),
+      mistake_tag: "syntax-error",
+    };
+  }
+  return null;
+}
