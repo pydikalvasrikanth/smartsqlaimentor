@@ -258,6 +258,48 @@ export function preCheckSubmission(
 }
 
 /**
+ * Short-lived in-process result cache. A user resubmitting byte-identical code
+ * (or reopening the theory panel for the same question) gets the previous
+ * answer instantly instead of paying for another generation.
+ */
+const CACHE_TTL_MS = 15 * 60_000;
+const CACHE_MAX = 300;
+const resultCache = new Map<string, { at: number; value: any }>();
+
+function hashString(input: string): string {
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
+  for (let i = 0; i < input.length; i++) {
+    const c = input.charCodeAt(i);
+    h1 = (h1 ^ c) * 16777619 >>> 0;
+    h2 = (h2 + c * (i + 1)) >>> 0;
+  }
+  return h1.toString(36) + h2.toString(36) + "-" + input.length.toString(36);
+}
+
+export function cacheKey(parts: Array<string | undefined>): string {
+  return hashString(parts.map((p) => p ?? "").join("\u0000"));
+}
+
+export function getCached<T = any>(key: string): T | undefined {
+  const hit = resultCache.get(key);
+  if (!hit) return undefined;
+  if (Date.now() - hit.at > CACHE_TTL_MS) {
+    resultCache.delete(key);
+    return undefined;
+  }
+  return hit.value as T;
+}
+
+export function setCached(key: string, value: any): void {
+  if (resultCache.size >= CACHE_MAX) {
+    const oldest = resultCache.keys().next().value;
+    if (oldest) resultCache.delete(oldest);
+  }
+  resultCache.set(key, { at: Date.now(), value });
+}
+
+/**
  * SQL variant of the pre-check. The SQL verdict has its own shape (no
  * per-test rows), so it gets its own local fail object.
  */
