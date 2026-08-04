@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Editor from "@monaco-editor/react";
+import { CodeEditor } from "@/components/code/CodeEditor";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -203,22 +203,7 @@ export function PythonModePanel({
           <span className="text-[10px] font-mono text-muted-foreground">pandas as pd · numpy as np</span>
         </div>
         <div className="rounded-md border border-border overflow-hidden bg-[#1d2238]">
-          <Editor
-            height="320px"
-            defaultLanguage="python"
-            value={userPy}
-            onChange={(v) => setUserPy(v ?? "")}
-            theme="vs-dark"
-            options={{
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
-              fontSize: 13,
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              wordWrap: "on",
-              automaticLayout: true,
-              padding: { top: 12, bottom: 12 },
-            }}
-          />
+          <CodeEditor value={userPy} onChange={setUserPy} lang="python" minHeight={320} />
         </div>
 
         <div className="flex flex-wrap gap-2 items-center">
