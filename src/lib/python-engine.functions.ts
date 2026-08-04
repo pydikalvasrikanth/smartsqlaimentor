@@ -133,7 +133,7 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
         explanation: { type: "string" },
         improvements: { type: "array", items: { type: "string" } },
       },
-      required: ["is_correct", "passed", "total", "explanation"],
+      required: ["is_correct", "passed", "total", "per_test", "explanation"],
     },
   },
   PYTHON_HINT: {
@@ -253,7 +253,7 @@ function buildUserPrompt(command: string, payload: any): string {
     case "NEXT_PYTHON_QUESTION":
       return `Generate the next ${payload.lang || "python"} question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_PYTHON":
-      return `Language: ${payload.lang || "python"}.\nQuestion task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code (in the stated language) against each test case. Compare actual vs expected. Grade fairly.`;
+      return `Language: ${payload.lang || "python"}.\nQuestion task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nGrading procedure (follow exactly):\n1. Trace the user's code line by line for EVERY test case above — one per_test row per test case, in the same order, none skipped or invented.\n2. For each row set actual_repr to the value the user's code actually produces. If it would not compile/parse or would raise, put that error message there and mark passed=false.\n3. In "note", state the one-line reason the row passed or failed.\n4. passed = count of rows with passed=true; total = number of test cases; is_correct = true only when every row passed.\n5. Judge observable output, not style. Different but correct approaches pass; never fail a correct solution for formatting, naming, or differing from the reference.\n6. If ordering is not specified by the task, any valid ordering is correct.`;
     case "PYTHON_HINT":
       return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint appropriate for the language.`;
     case "REVEAL_PYTHON_SOLUTION":
