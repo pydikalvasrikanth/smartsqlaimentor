@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+import { callGatewayTool, modelForCommand, preCheckSql } from "@/lib/ai-gateway.server";
 
 const SYSTEM_PROMPT = `You are a Senior Data Engineer + SQL mentor for a MySQL 8.0 practice app.
 Generate schemas, seed data, ERDs, and questions, and semantically grade user SQL (no real DB — mentally execute against the seed). Be terse but precise. Always reply by calling the supplied tool with valid arguments — never plain text.
@@ -559,48 +558,20 @@ export async function callEngineCommand(
   const tool = TOOLS_BY_COMMAND[command];
   const userPrompt = buildUserPrompt(command, payload);
 
-  const body = {
-    model: MODEL,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userPrompt },
-    ],
-    tools: [{ type: "function", function: tool }],
-    tool_choice: { type: "function", function: { name: tool.name } },
-  };
-
-  let resp: Response;
-  try {
-    resp = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    console.error("AI gateway fetch failed", e);
-    return { error: "Could not reach the AI gateway. Please try again." };
+  // A blank / comment-only / bracket-broken query is graded locally: no paid
+  // model call, no guessed verdict.
+  if (command === "EVALUATE_SUBMISSION") {
+    const pre = preCheckSql(payload?.user_sql ?? "");
+    if (pre) return { data: pre };
   }
 
-  if (resp.status === 429) return { error: "Rate limit reached. Please wait a moment and try again." };
-  if (resp.status === 402) return { error: "AI credits exhausted. Add credits in Workspace → Usage." };
-  if (!resp.ok) {
-    const text = await resp.text().catch(() => "");
-    console.error("AI gateway error", resp.status, text);
-    return { error: `AI gateway error (${resp.status}).` };
-  }
-
-  const json: any = await resp.json();
-  const argsStr = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (!argsStr) {
-    console.error("No tool call in response", JSON.stringify(json).slice(0, 800));
-    return { error: "AI did not return structured output. Try again." };
-  }
-  try {
-    return { data: JSON.parse(argsStr) };
-  } catch {
-    console.error("Failed to parse tool args", argsStr.slice(0, 500));
-    return { error: "AI returned malformed JSON. Try again." };
-  }
+  return callGatewayTool({
+    apiKey,
+    model: modelForCommand(command),
+    system: SYSTEM_PROMPT,
+    user: userPrompt,
+    tool,
+  });
 }
 
 export const runSqlEngine = createServerFn({ method: "POST" })

@@ -4,9 +4,15 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { languageSpec, type CodeLang } from "@/lib/languages";
 import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
-
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+import {
+  callGatewayTool,
+  cacheKey,
+  getCached,
+  modelForCommand,
+  preCheckSubmission,
+  reconcileVerdict,
+  setCached,
+} from "@/lib/ai-gateway.server";
 
 function systemPromptFor(lang: CodeLang): string {
   return `You are a Senior Software Engineer + interview mentor.
@@ -127,7 +133,7 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
         explanation: { type: "string" },
         improvements: { type: "array", items: { type: "string" } },
       },
-      required: ["is_correct", "passed", "total", "explanation"],
+      required: ["is_correct", "passed", "total", "per_test", "explanation"],
     },
   },
   PYTHON_HINT: {
@@ -247,7 +253,7 @@ function buildUserPrompt(command: string, payload: any): string {
     case "NEXT_PYTHON_QUESTION":
       return `Generate the next ${payload.lang || "python"} question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_PYTHON":
-      return `Language: ${payload.lang || "python"}.\nQuestion task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code (in the stated language) against each test case. Compare actual vs expected. Grade fairly.`;
+      return `Language: ${payload.lang || "python"}.\nQuestion task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nGrading procedure (follow exactly):\n1. Trace the user's code line by line for EVERY test case above — one per_test row per test case, in the same order, none skipped or invented.\n2. For each row set actual_repr to the value the user's code actually produces. If it would not compile/parse or would raise, put that error message there and mark passed=false.\n3. In "note", state the one-line reason the row passed or failed.\n4. passed = count of rows with passed=true; total = number of test cases; is_correct = true only when every row passed.\n5. Judge observable output, not style. Different but correct approaches pass; never fail a correct solution for formatting, naming, or differing from the reference.\n6. If ordering is not specified by the task, any valid ordering is correct.`;
     case "PYTHON_HINT":
       return `Language: ${payload.lang || "python"}.\nTask:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint appropriate for the language.`;
     case "REVEAL_PYTHON_SOLUTION":
@@ -404,42 +410,19 @@ async function callPythonEngine(
 
   const tool = TOOLS_BY_COMMAND[command];
   const lang: CodeLang = (payload?.lang as CodeLang) || "python";
-  const body = {
-    model: MODEL,
-    messages: [
-      { role: "system", content: systemPromptWithFormat(lang) },
-      { role: "user", content: buildUserPrompt(command, payload) },
-    ],
-    tools: [{ type: "function", function: tool }],
-    tool_choice: { type: "function", function: { name: tool.name } },
-  };
+  const res = await callGatewayTool({
+    apiKey,
+    model: modelForCommand(command),
+    system: systemPromptWithFormat(lang),
+    user: buildUserPrompt(command, payload),
+    tool,
+  });
 
-  let resp: Response;
-  try {
-    resp = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    console.error("AI gateway fetch failed", e);
-    return { error: "Could not reach the AI gateway. Please try again." };
+  // Grading: trust the per-test rows over the model's own counters.
+  if (command === "EVALUATE_PYTHON" && res.data) {
+    res.data = reconcileVerdict(res.data, (payload?.test_cases ?? []).length);
   }
-  if (resp.status === 429) return { error: "Rate limit reached. Please wait and try again." };
-  if (resp.status === 402) return { error: "AI credits exhausted. Add credits in Workspace → Usage." };
-  if (!resp.ok) {
-    const t = await resp.text().catch(() => "");
-    console.error("AI gateway error", resp.status, t);
-    return { error: `AI gateway error (${resp.status}).` };
-  }
-  const json: any = await resp.json();
-  const argsStr = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (!argsStr) return { error: "AI did not return structured output. Try again." };
-  try {
-    return { data: JSON.parse(argsStr) };
-  } catch {
-    return { error: "AI returned malformed JSON. Try again." };
-  }
+  return res;
 }
 
 // Remove the reference solution before anything is returned to the browser.
@@ -525,7 +508,31 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         function_signature: stored.function_signature ?? "",
         lang: stored.lang ?? "python",
       };
-      return callPythonEngine(command, enriched);
+
+      // Deterministic pre-check before any paid model call.
+      if (command === "EVALUATE_PYTHON") {
+        const pre = preCheckSubmission(
+          payload.user_code,
+          stored.lang ?? "python",
+          (stored.test_cases ?? []).length,
+        );
+        if (pre) return { data: pre };
+      }
+
+      // Identical resubmits and repeat theory opens are served from cache.
+      const key = cacheKey([
+        "python",
+        command,
+        userId,
+        payload.session_question_id,
+        (payload.user_code ?? "").trim(),
+      ]);
+      const cached = getCached(key);
+      if (cached) return { data: cached };
+
+      const res = await callPythonEngine(command, enriched);
+      if (res.data && !res.error) setCached(key, res.data);
+      return res;
     }
 
     // Non-sensitive commands (hint, debug, visualize) carry no answer key.

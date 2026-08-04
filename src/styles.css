@@ -425,3 +425,10 @@
     animation: none;
   }
 }
+
+/* Skip layout/paint work for long below-the-fold sections until they scroll
+   into view. Big win on the long practice / tutorial pages. */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
