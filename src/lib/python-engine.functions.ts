@@ -4,9 +4,12 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { languageSpec, type CodeLang } from "@/lib/languages";
 import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
-
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+import {
+  callGatewayTool,
+  modelForCommand,
+  preCheckSubmission,
+  reconcileVerdict,
+} from "@/lib/ai-gateway.server";
 
 function systemPromptFor(lang: CodeLang): string {
   return `You are a Senior Software Engineer + interview mentor.
@@ -404,42 +407,19 @@ async function callPythonEngine(
 
   const tool = TOOLS_BY_COMMAND[command];
   const lang: CodeLang = (payload?.lang as CodeLang) || "python";
-  const body = {
-    model: MODEL,
-    messages: [
-      { role: "system", content: systemPromptWithFormat(lang) },
-      { role: "user", content: buildUserPrompt(command, payload) },
-    ],
-    tools: [{ type: "function", function: tool }],
-    tool_choice: { type: "function", function: { name: tool.name } },
-  };
+  const res = await callGatewayTool({
+    apiKey,
+    model: modelForCommand(command),
+    system: systemPromptWithFormat(lang),
+    user: buildUserPrompt(command, payload),
+    tool,
+  });
 
-  let resp: Response;
-  try {
-    resp = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    console.error("AI gateway fetch failed", e);
-    return { error: "Could not reach the AI gateway. Please try again." };
+  // Grading: trust the per-test rows over the model's own counters.
+  if (command === "EVALUATE_PYTHON" && res.data) {
+    res.data = reconcileVerdict(res.data, (payload?.test_cases ?? []).length);
   }
-  if (resp.status === 429) return { error: "Rate limit reached. Please wait and try again." };
-  if (resp.status === 402) return { error: "AI credits exhausted. Add credits in Workspace → Usage." };
-  if (!resp.ok) {
-    const t = await resp.text().catch(() => "");
-    console.error("AI gateway error", resp.status, t);
-    return { error: `AI gateway error (${resp.status}).` };
-  }
-  const json: any = await resp.json();
-  const argsStr = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (!argsStr) return { error: "AI did not return structured output. Try again." };
-  try {
-    return { data: JSON.parse(argsStr) };
-  } catch {
-    return { error: "AI returned malformed JSON. Try again." };
-  }
+  return res;
 }
 
 // Remove the reference solution before anything is returned to the browser.
@@ -525,6 +505,17 @@ export const runPythonEngine = createServerFn({ method: "POST" })
         function_signature: stored.function_signature ?? "",
         lang: stored.lang ?? "python",
       };
+
+      // Deterministic pre-check before any paid model call.
+      if (command === "EVALUATE_PYTHON") {
+        const pre = preCheckSubmission(
+          payload.user_code,
+          stored.lang ?? "python",
+          (stored.test_cases ?? []).length,
+        );
+        if (pre) return { data: pre };
+      }
+
       return callPythonEngine(command, enriched);
     }
 
