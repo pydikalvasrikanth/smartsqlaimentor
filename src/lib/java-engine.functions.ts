@@ -491,6 +491,18 @@ export const runJavaEngine = createServerFn({ method: "POST" })
         test_cases: stored.test_cases ?? [],
         function_signature: stored.function_signature ?? "",
       };
+
+      // Deterministic pre-check: an empty / unchanged / syntactically broken
+      // submission is graded locally, with no paid model call and no guessing.
+      if (command === "EVALUATE_JAVA") {
+        const pre = preCheckSubmission(
+          payload.user_code,
+          "java",
+          (stored.test_cases ?? []).length,
+        );
+        if (pre) return { data: pre };
+      }
+
       return callJavaEngine(command, enriched);
     }
 
