@@ -127,7 +127,7 @@ const TOOLS_BY_COMMAND: Record<string, any> = {
         explanation: { type: "string" },
         improvements: { type: "array", items: { type: "string" } },
       },
-      required: ["is_correct", "passed", "total", "explanation"],
+        required: ["is_correct", "passed", "total", "per_test", "explanation"],
     },
   },
   JAVA_HINT: {
@@ -247,7 +247,7 @@ function buildUserPrompt(command: string, payload: any): string {
     case "NEXT_JAVA_QUESTION":
       return `Generate the next Java question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
     case "EVALUATE_JAVA":
-      return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nMentally execute the user's code against each test case. Compare actual vs expected. Grade fairly.`;
+      return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nGrading procedure (follow exactly):\n1. Trace the user's code line by line for EVERY test case above — one per_test row per test case, in the same order, none skipped or invented.\n2. For each row set actual_repr to the value the user's code actually produces (as a Java literal). If it would not compile or would throw, put the compiler/exception message there and mark passed=false.\n3. In "note", state the one-line reason the row passed or failed (which computation produced actual_repr).\n4. passed = the count of rows with passed=true; total = the number of test cases; is_correct = true only when every row passed.\n5. Judge on observable output, not style. Different but correct approaches pass. Do not fail a correct solution for formatting, naming, or not matching the reference solution.\n6. If output ordering is not specified by the task, treat any valid ordering as correct.`;
     case "JAVA_HINT":
       return `Task:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint.`;
     case "REVEAL_JAVA_SOLUTION":
