@@ -395,42 +395,20 @@ async function callJavaEngine(
   if (!apiKey) return { error: "LOVABLE_API_KEY is not configured." };
 
   const tool = TOOLS_BY_COMMAND[command];
-  const body = {
-    model: MODEL,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT_FULL },
-      { role: "user", content: buildUserPrompt(command, payload) },
-    ],
-    tools: [{ type: "function", function: tool }],
-    tool_choice: { type: "function", function: { name: tool.name } },
-  };
+  const res = await callGatewayTool({
+    apiKey,
+    model: modelForCommand(command),
+    system: SYSTEM_PROMPT_FULL,
+    user: buildUserPrompt(command, payload),
+    tool,
+  });
 
-  let resp: Response;
-  try {
-    resp = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    console.error("AI gateway fetch failed", e);
-    return { error: "Could not reach the AI gateway. Please try again." };
+  // Grading: the per-test rows are the source of truth, not the model's
+  // self-reported counters.
+  if (command === "EVALUATE_JAVA" && res.data) {
+    res.data = reconcileVerdict(res.data, (payload?.test_cases ?? []).length);
   }
-  if (resp.status === 429) return { error: "Rate limit reached. Please wait and try again." };
-  if (resp.status === 402) return { error: "AI credits exhausted. Add credits in Workspace → Usage." };
-  if (!resp.ok) {
-    const t = await resp.text().catch(() => "");
-    console.error("AI gateway error", resp.status, t);
-    return { error: `AI gateway error (${resp.status}).` };
-  }
-  const json: any = await resp.json();
-  const argsStr = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-  if (!argsStr) return { error: "AI did not return structured output. Try again." };
-  try {
-    return { data: JSON.parse(argsStr) };
-  } catch {
-    return { error: "AI returned malformed JSON. Try again." };
-  }
+  return res;
 }
 
 // Remove the reference solution before anything is returned to the browser.
