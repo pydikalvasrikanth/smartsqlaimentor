@@ -196,7 +196,7 @@ export function SubjectSeoShell({
           </div>
         </section>
 
-        <section className="mt-14 border-t border-border pt-10">
+        <section className="mt-14 border-t border-border pt-10 cv-auto">
           <h2 className="text-2xl font-semibold text-foreground">What you will practice</h2>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-muted-foreground">
             {overview.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -211,7 +211,7 @@ export function SubjectSeoShell({
           </ul>
         </section>
 
-        <section className="mt-14 border-t border-border pt-10">
+        <section className="mt-14 border-t border-border pt-10 cv-auto">
           <h2 className="text-2xl font-semibold text-foreground">How a practice session works</h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-3">
             {workflow.map((step, index) => (
@@ -223,7 +223,7 @@ export function SubjectSeoShell({
           </ol>
         </section>
 
-        <section className="mt-14 border-t border-border pt-10">
+        <section className="mt-14 border-t border-border pt-10 cv-auto">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-2xl font-semibold text-foreground">Continue learning</h2>
