@@ -3,9 +3,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
-
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+import {
+  callGatewayTool,
+  modelForCommand,
+  preCheckSubmission,
+  reconcileVerdict,
+} from "@/lib/ai-gateway.server";
 
 const SYSTEM_PROMPT = `You are a Senior Java Engineer + interview mentor.
 You generate realistic Modern Java (17/21) coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
