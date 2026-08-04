@@ -5,9 +5,12 @@ import { z } from "zod";
 import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
 import {
   callGatewayTool,
+  cacheKey,
+  getCached,
   modelForCommand,
   preCheckSubmission,
   reconcileVerdict,
+  setCached,
 } from "@/lib/ai-gateway.server";
 
 const SYSTEM_PROMPT = `You are a Senior Java Engineer + interview mentor.
@@ -503,7 +506,20 @@ export const runJavaEngine = createServerFn({ method: "POST" })
         if (pre) return { data: pre };
       }
 
-      return callJavaEngine(command, enriched);
+      // Identical resubmits and repeat theory opens are served from cache.
+      const key = cacheKey([
+        "java",
+        command,
+        userId,
+        payload.session_question_id,
+        (payload.user_code ?? "").trim(),
+      ]);
+      const cached = getCached(key);
+      if (cached) return { data: cached };
+
+      const res = await callJavaEngine(command, enriched);
+      if (res.data && !res.error) setCached(key, res.data);
+      return res;
     }
 
     // Non-sensitive commands (hint, debug, visualize) carry no answer key.
