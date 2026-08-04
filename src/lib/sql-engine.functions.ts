@@ -2,12 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-import {
-  callGatewayTool,
-  modelForCommand,
-  preCheckSubmission,
-  reconcileVerdict,
-} from "@/lib/ai-gateway.server";
+import { callGatewayTool, modelForCommand, preCheckSql } from "@/lib/ai-gateway.server";
 
 const SYSTEM_PROMPT = `You are a Senior Data Engineer + SQL mentor for a MySQL 8.0 practice app.
 Generate schemas, seed data, ERDs, and questions, and semantically grade user SQL (no real DB — mentally execute against the seed). Be terse but precise. Always reply by calling the supplied tool with valid arguments — never plain text.
@@ -566,22 +561,17 @@ export async function callEngineCommand(
   // A blank / comment-only / bracket-broken query is graded locally: no paid
   // model call, no guessed verdict.
   if (command === "EVALUATE_SUBMISSION") {
-    const pre = preCheckSubmission(payload?.user_sql ?? "", "sql", 0);
+    const pre = preCheckSql(payload?.user_sql ?? "");
     if (pre) return { data: pre };
   }
 
-  const res = await callGatewayTool({
+  return callGatewayTool({
     apiKey,
     model: modelForCommand(command),
     system: SYSTEM_PROMPT,
     user: userPrompt,
     tool,
   });
-
-  if (command === "EVALUATE_SUBMISSION" && res.data) {
-    res.data = reconcileVerdict(res.data);
-  }
-  return res;
 }
 
 export const runSqlEngine = createServerFn({ method: "POST" })
