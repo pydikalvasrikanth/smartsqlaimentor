@@ -275,7 +275,7 @@ Write an IN-DEPTH ${payload.lang || "Python"} theory guide in Markdown, directly
 What the concept is, why it exists, and the one-sentence mental model to hold while coding. Add a short analogy and name the invariant that must stay true at every step.
 
 ### 2. Syntax & Optimal Design Patterns
-Canonical ${payload.lang || "Python"} syntax in a \`\`\`python fenced block, plus the 2-3 patterns that fit this class of problem (e.g. hash map counting vs. sorting, two pointers vs. nested loops), each with a one-line "use when" and its time/space cost.
+Canonical ${payload.lang || "Python"} syntax in a \`\`\`${payload.lang || "python"} fenced block, plus the 2-3 patterns that fit this class of problem (e.g. hash map counting vs. sorting, two pointers vs. nested loops), each with a one-line "use when" and its time/space cost.
 
 ### 3. Data Structures & Traversal Strategy
 Which data structures the task pushes you toward, the shape/grain of the input, how to traverse it (single pass, two pointers, recursion, sliding window), and how state is stored and updated. Justify the choice over the obvious brute force.
@@ -284,7 +284,7 @@ Which data structures the task pushes you toward, the shape/grain of the input, 
 Translate the wording of the task into precise formulas or rules (counts, ratios, index arithmetic, boundary conditions), then map each to the native ${payload.lang || "Python"} function or construct that implements it. Present it as a markdown table: Requirement | Formula / rule | ${payload.lang || "Python"} construct.
 
 ### 5. End-to-End Trace (Input -> Steps -> Output)
-Use a TINY invented input (3-6 items, NOT the real test cases) and show the full trace: 1. **Input**, 2. **State after each step/iteration** as a markdown table (variables, accumulators, pointers), 3. **Final output**. One sentence of narration per stage explaining exactly what changed and why. Include a small \`\`\`python snippet illustrating the key step on this toy scenario only.
+Use a TINY invented input (3-6 items, NOT the real test cases) and show the full trace: 1. **Input**, 2. **State after each step/iteration** as a markdown table (variables, accumulators, pointers), 3. **Final output**. One sentence of narration per stage explaining exactly what changed and why. Include a small \`\`\`${payload.lang || "python"} snippet illustrating the key step on this toy scenario only.
 Then emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how data moves for THIS task. 5-8 nodes max, short labels: "STEP\\nwhat it does". Example shape (do NOT copy verbatim):
 \`\`\`mermaid
 flowchart LR
@@ -302,7 +302,7 @@ Bullets: empty / single-element input, duplicates, ties, negative or zero values
 A numbered plan (5-8 steps) the student can follow to build the solution themselves - each step naming the state it produces - WITHOUT writing the final answer code. End with a checklist (dry-run one example by hand, check the invariant, verify edge cases, confirm return type/shape, state the complexity).
 
 Rules:
-- Dense but readable: short paragraphs, bullets, small \`\`\`python snippets wherever they help.
+- Dense but readable: short paragraphs, bullets, small \`\`\`${payload.lang || "python"} snippets wherever they help.
 - Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
 - Never reveal the full solution code. Snippets and the trace must use a DIFFERENT toy scenario.`;
     case "PYTHON_TO_SQL":
