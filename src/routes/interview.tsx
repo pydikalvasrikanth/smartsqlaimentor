@@ -475,6 +475,7 @@ function InterviewPage() {
           level,
           experienceYears: years,
           competencies,
+          jobDescription,
           history: history.map((t) => ({ role: t.role, text: t.text })),
           action,
           sessionLength,
@@ -509,6 +510,7 @@ function InterviewPage() {
               level,
               experienceYears: years,
               competencies,
+              jobDescription,
               history: next.map((t) => ({ role: t.role, text: t.text })),
             },
           });
@@ -519,7 +521,7 @@ function InterviewPage() {
           try {
             const corr: any = await buildCorrections({
               data: {
-                role, level, experienceYears: years, competencies,
+                role, level, experienceYears: years, competencies, jobDescription,
                 history: next.map((t) => ({ role: t.role, text: t.text })),
               },
             });
@@ -647,6 +649,8 @@ function InterviewPage() {
           setYears={setYears}
           competencies={competencies}
           setCompetencies={setCompetencies}
+          jobDescription={jobDescription}
+          setJobDescription={setJobDescription}
           voice={voice}
           setVoice={setVoice}
           sessionLength={sessionLength}
@@ -856,12 +860,13 @@ function InterviewPage() {
 // Pre-interview form
 // ---------------------------------------------------------------------------
 function PreInterviewForm({
-  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, voice, setVoice, sessionLength, setSessionLength, onBegin,
+  role, setRole, level, setLevel, years, setYears, competencies, setCompetencies, jobDescription, setJobDescription, voice, setVoice, sessionLength, setSessionLength, onBegin,
 }: {
   role: string; setRole: (v: string) => void;
   level: "junior" | "mid" | "senior"; setLevel: (v: "junior" | "mid" | "senior") => void;
   years: number; setYears: (v: number) => void;
   competencies: string; setCompetencies: (v: string) => void;
+  jobDescription: string; setJobDescription: (v: string) => void;
   voice: string; setVoice: (v: any) => void;
   sessionLength: "short" | "standard" | "full"; setSessionLength: (v: "short" | "standard" | "full") => void;
   onBegin: () => void;
@@ -952,6 +957,26 @@ function PreInterviewForm({
             <p className="text-[11px] text-muted-foreground mt-1">
               Aria will bias technical questions toward these. Leave defaults to cover the full data-engineering surface.
             </p>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="text-xs font-medium text-muted-foreground">
+              Job description <span className="text-muted-foreground/70">(optional — paste the posting)</span>
+            </label>
+            <textarea
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value.slice(0, 6000))}
+              rows={6}
+              placeholder={"Paste the full job description here — responsibilities, required stack, scale, nice-to-haves.\n\nAria will analyse it and ground the technical, coding, design and behavioural questions in exactly what this role demands, then score you against the JD in the final report."}
+              className="mt-1 w-full bg-background border border-input rounded-md px-3 py-2 text-sm resize-y font-mono text-[12px] leading-relaxed"
+            />
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-[11px] text-muted-foreground">
+                {jobDescription.trim()
+                  ? "Aria will interview against this JD and flag JD-specific gaps in your report."
+                  : "No JD? Aria falls back to your target role and competencies."}
+              </p>
+              <span className="text-[10px] font-mono text-muted-foreground/70">{jobDescription.length}/6000</span>
+            </div>
           </div>
         </div>
 
