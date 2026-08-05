@@ -208,7 +208,7 @@ export function ResizableSplit({
   return (
     <div className="flex flex-col lg:flex-row gap-4 min-w-0">
       <aside
-        className={`w-full lg:shrink-0 min-w-0 ${asideClass}`}
+        className={`w-full lg:shrink-0 min-w-0 lg:sticky lg:top-[72px] lg:max-h-[calc(100vh-92px)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1 lg:self-start ${asideClass}`}
         style={isDesktop ? { width } : undefined}
       >
         {left}
