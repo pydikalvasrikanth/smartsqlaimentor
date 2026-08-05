@@ -119,6 +119,7 @@ function InterviewPage() {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("mid");
   const [years, setYears] = useState(3);
   const [competencies, setCompetencies] = useState("Python, SQL, Spark, Airflow, BigQuery, Kafka");
+  const [jobDescription, setJobDescription] = useState("");
   const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable">("alloy");
   const [sessionLength, setSessionLength] = useState<"short" | "standard" | "full">("full");
   const [started, setStarted] = useState(false);
@@ -147,6 +148,7 @@ function InterviewPage() {
     level: "junior" | "mid" | "senior";
     years: number;
     competencies: string;
+    jobDescription?: string;
     voice: "alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable";
     sessionLength: "short" | "standard" | "full";
     started: boolean;
@@ -160,6 +162,7 @@ function InterviewPage() {
       level: "mid",
       years: 3,
       competencies: "Python, SQL, Spark, Airflow, BigQuery, Kafka",
+      jobDescription: "",
       voice: "alloy",
       sessionLength: "full",
       started: false,
@@ -170,8 +173,8 @@ function InterviewPage() {
   );
   useEffect(() => {
     if (!resume.ready) return;
-    resume.setState({ role, level, years, competencies, voice, sessionLength, started, ended, turns });
-  }, [role, level, years, competencies, voice, sessionLength, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    resume.setState({ role, level, years, competencies, jobDescription, voice, sessionLength, started, ended, turns });
+  }, [role, level, years, competencies, jobDescription, voice, sessionLength, started, ended, turns, resume.ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<MediaStream | null>(null);
@@ -274,6 +277,24 @@ function InterviewPage() {
       } catch {}
     };
   }, [setupMedia]);
+
+  // The <video> element only mounts once the interview starts, so the stream
+  // acquired at page load has nothing to attach to yet. Re-attach whenever the
+  // element appears (or the stream/camera state changes) — otherwise the PIP
+  // stays a black rectangle.
+  useEffect(() => {
+    const el = videoRef.current;
+    const stream = mediaRef.current;
+    if (!el || !stream) return;
+    if (el.srcObject !== stream) el.srcObject = stream;
+    el.muted = true;
+    const tryPlay = () => el.play().catch(() => {});
+    tryPlay();
+    el.onloadedmetadata = tryPlay;
+    return () => {
+      el.onloadedmetadata = null;
+    };
+  }, [started, camOn, mediaReady]);
 
   // Toggle camera
   useEffect(() => {
@@ -600,6 +621,7 @@ function InterviewPage() {
                 setLevel(s.level);
                 setYears(s.years);
                 setCompetencies(s.competencies);
+                if (s.jobDescription !== undefined) setJobDescription(s.jobDescription);
                 setVoice(s.voice);
                 if (s.sessionLength) setSessionLength(s.sessionLength);
                 setTurns(s.turns ?? []);
