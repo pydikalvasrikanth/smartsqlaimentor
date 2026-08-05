@@ -5,18 +5,19 @@ import { lazy, Suspense, type ComponentType } from "react";
  * Suspense boundary, so it no longer ships with the route's first paint.
  * Props and types are preserved, so call sites stay unchanged.
  */
-export function lazyPanel<P extends object>(
-  loader: () => Promise<{ default: ComponentType<P> }>,
+export function lazyPanel<T extends ComponentType<any>>(
+  loader: () => Promise<{ default: T }>,
   fallback: React.ReactNode = null,
-): ComponentType<P> {
+): T {
   const Lazy = lazy(loader);
-  return function LazyPanel(props: P) {
+  function LazyPanel(props: any) {
     return (
       <Suspense fallback={fallback}>
-        <Lazy {...(props as any)} />
+        <Lazy {...props} />
       </Suspense>
     );
-  };
+  }
+  return LazyPanel as unknown as T;
 }
 
 /** Neutral skeleton for panels that occupy visible layout space. */
