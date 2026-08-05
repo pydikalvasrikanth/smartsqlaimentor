@@ -90,7 +90,7 @@ export function SchemaPanel({ schemaSql, seedSql, erdMermaid, description, quest
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-3 py-2 transition-colors ${
+            className={`shrink-0 whitespace-nowrap px-3 py-2 transition-colors ${
               tab === t.id
                 ? "text-foreground border-b-2 border-primary-glow"
                 : "text-muted-foreground hover:text-foreground"
