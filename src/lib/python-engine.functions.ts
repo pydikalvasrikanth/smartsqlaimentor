@@ -269,48 +269,42 @@ function buildUserPrompt(command: string, payload: any): string {
 Primary concept: ${payload.concept || "auto — infer the dominant Python concept from the task"}
 Difficulty: ${payload.difficulty || "n/a"}
 
-Write an IN-DEPTH Python theory guide in Markdown that is directly relevant to the question above. Structure:
+Write an IN-DEPTH ${payload.lang || "Python"} theory guide in Markdown, directly relevant to the question above. A student must be able to solve the problem from this guide plus its examples alone (without being handed the answer). Use EXACTLY these 7 sections, with these headings:
 
-### 1. Concept overview
-What the concept is, why Python offers it, and when engineers reach for it.
+### 1. Core Concept & Mental Model
+What the concept is, why it exists, and the one-sentence mental model to hold while coding. Add a short analogy and name the invariant that must stay true at every step.
 
-### 2. Python syntax
-Canonical Python 3 syntax with a small illustrative snippet inside a \`\`\`python fenced block.
+### 2. Syntax & Optimal Design Patterns
+Canonical ${payload.lang || "Python"} syntax in a \`\`\`${payload.lang || "python"} fenced block, plus the 2-3 patterns that fit this class of problem (e.g. hash map counting vs. sorting, two pointers vs. nested loops), each with a one-line "use when" and its time/space cost.
 
-### 3. How this question uses it
-Relate the concept to the SPECIFIC task above. Explain which part of the problem forces this pattern.
+### 3. Data Structures & Traversal Strategy
+Which data structures the task pushes you toward, the shape/grain of the input, how to traverse it (single pass, two pointers, recursion, sliding window), and how state is stored and updated. Justify the choice over the obvious brute force.
 
-### 4. Step-by-step approach
-Numbered mental model for solving THIS question — describe the algorithm as prose/pseudocode WITHOUT writing the final answer.
+### 4. Problem Formulas vs. Native Library Functions
+Translate the wording of the task into precise formulas or rules (counts, ratios, index arithmetic, boundary conditions), then map each to the native ${payload.lang || "Python"} function or construct that implements it. Present it as a markdown table: Requirement | Formula / rule | ${payload.lang || "Python"} construct.
 
-### 5. Visual flow (animated)
-Emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how data moves through the algorithm for THIS task. 5–8 nodes max. Each node label is short: "STEP\\nwhat it does". Example shape (do NOT copy verbatim):
+### 5. End-to-End Trace (Input -> Steps -> Output)
+Use a TINY invented input (3-6 items, NOT the real test cases) and show the full trace: 1. **Input**, 2. **State after each step/iteration** as a markdown table (variables, accumulators, pointers), 3. **Final output**. One sentence of narration per stage explaining exactly what changed and why. Include a small \`\`\`${payload.lang || "python"} snippet illustrating the key step on this toy scenario only.
+Then emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how data moves for THIS task. 5-8 nodes max, short labels: "STEP\\nwhat it does". Example shape (do NOT copy verbatim):
 \`\`\`mermaid
 flowchart LR
-  A[Input] --> B[Init state\\ndict / pointers]
+  A[Input] --> B[Init state\\nmap / pointers]
   B --> C[Iterate\\nprocess element]
   C --> D[Update\\nstate]
   D --> E[Return result]
 \`\`\`
 The renderer animates arrows so the flow becomes intuitive.
 
-### 6. Worked mini-example
-Use a TINY toy input (3–6 items — invented, NOT the exact test cases) to demonstrate the concept end-to-end. Show as GitHub-flavored markdown tables or short trace:
-1. **Input** — small.
-2. **After the key step** — intermediate state (e.g. hashmap contents, window bounds, stack).
-3. **Final output**.
-Add 1–2 sentences of narration between the steps. Must be a DIFFERENT toy scenario, never the exact answer.
+### 6. Edge Cases & Anti-Pattern Warnings
+Bullets: empty / single-element input, duplicates, ties, negative or zero values, overflow, off-by-one and boundary indices, mutation-while-iterating, recursion depth. Then a short "Anti-pattern -> Do this instead" list specific to this task.
 
-### 7. Common pitfalls
-Bullet list of traps students hit on this pattern (off-by-one, mutable default args, shallow copy, integer overflow-ish, recursion depth, etc.).
-
-### 8. Related concepts
-2–4 adjacent Python concepts worth knowing next.
+### 7. Step-by-Step Algorithm & Sanity Checklist
+A numbered plan (5-8 steps) the student can follow to build the solution themselves - each step naming the state it produces - WITHOUT writing the final answer code. End with a checklist (dry-run one example by hand, check the invariant, verify edge cases, confirm return type/shape, state the complexity).
 
 Rules:
-- Keep it dense but readable. Short paragraphs, bullets, small \`python\` snippets.
+- Dense but readable: short paragraphs, bullets, small \`\`\`${payload.lang || "python"} snippets wherever they help.
 - Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
-- Never reveal the full solution code.`;
+- Never reveal the full solution code. Snippets and the trace must use a DIFFERENT toy scenario.`;
     case "PYTHON_TO_SQL":
       return `The user just finished a ${payload.lang || "python"} problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
 

@@ -405,22 +405,23 @@ Difficulty: ${payload.difficulty || "n/a"}
 Schema (may be empty):
 ${payload.schema_sql || "(no schema provided)"}
 
-Write an IN-DEPTH SQL theory guide in Markdown that is directly relevant to the question above. Structure:
+Write an IN-DEPTH SQL theory guide in Markdown, directly relevant to the question above. A student must be able to solve the task from this guide alone (without being handed the answer). Use EXACTLY these 7 sections, with these headings:
 
-### 1. Concept overview
-What the concept is, why it exists, and when a data engineer reaches for it.
+### 1. Core Concept & Mental Model
+What the concept is, why it exists, and the one-sentence mental model to hold while writing the query. Add a short analogy and state what set of rows conceptually exists at each stage.
 
-### 2. MySQL syntax
-The canonical MySQL 8 syntax with a small illustrative snippet inside a \`\`\`sql fenced block.
+### 2. Syntax & Optimal Design Patterns
+Canonical MySQL 8 syntax in a \`\`\`sql fenced block, plus the 2-3 preferred design patterns for this class of problem (e.g. CTE + window vs. correlated subquery), each with a one-line "use when".
 
-### 3. How this question uses it
-Relate the concept to the ACTUAL tables/columns in the schema and the specific task. Explain what part of the problem forces this concept.
+### 3. Schema & Join Strategy
+Name the ACTUAL tables/columns from the schema above. State the grain of each table, the keys to join on, join type and direction, and where filters must go (ON vs WHERE) so the result is not silently changed. If no schema was given, say so and reason generically.
 
-### 4. Step-by-step approach
-Numbered mental model for solving THIS question. Describe the pipeline (which clause runs, what set it produces) WITHOUT writing the final answer SQL.
+### 4. Business Formulas vs. SQL Native Functions
+Translate the business wording of the task into precise formulas (e.g. retention = returning/active, growth = (cur - prev)/prev), then map each formula to the SQL construct that implements it (SUM, COUNT DISTINCT, LAG/LEAD, RANK vs DENSE_RANK, DATEDIFF, NULLIF for divide-by-zero, ROUND). Present it as a markdown table: Business metric | Formula | SQL construct.
 
-### 5. Visual flow (animated)
-Emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how rows travel through the query pipeline for THIS task. 5–8 nodes max. Each node label is short: "CLAUSE\\nwhat it does". Example shape (do NOT copy verbatim):
+### 5. End-to-End Trace (Input -> CTE -> Output)
+Use a TINY invented toy dataset (3-5 rows, NOT the real answer) and show, as GitHub-flavored markdown tables: 1. **Input** rows, 2. **After each CTE / key step** (join result, aggregation, window values), 3. **Final output** (2-4 rows). One sentence of narration between tables explaining exactly what changed and why.
+Then emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how rows travel through the pipeline for THIS task. 5-8 nodes max, short labels: "CLAUSE\\nwhat it does". Example shape (do NOT copy verbatim):
 \`\`\`mermaid
 flowchart LR
   A[Source tables] --> B[JOIN\\nmatch keys]
@@ -430,23 +431,16 @@ flowchart LR
 \`\`\`
 The renderer animates the arrows, so the flow becomes visually intuitive.
 
-### 6. Worked mini-example
-Use a TINY toy dataset (3–5 rows, invented — NOT the real schema) to demonstrate the concept end-to-end. Show it as GitHub-flavored markdown tables:
-1. **Input** table(s) — small.
-2. **After the key step** (e.g. after JOIN / after GROUP BY / after window function) — the intermediate rows.
-3. **Final output** — 2–4 rows.
-Add 1–2 sentences of narration between the tables explaining what changed. This must be a DIFFERENT toy scenario, never the exact answer to the practice task.
+### 6. Edge Cases & Anti-Pattern Warnings
+Bullets covering NULL handling, duplicates / join fan-out, ties, empty groups, divide-by-zero, date boundaries and window frame defaults for THIS task. Then a short "Anti-pattern -> Do this instead" list.
 
-### 7. Common pitfalls
-Bullet list of the traps students hit on this pattern (NULLs, duplicates, join direction, group scope, window frame, etc.).
-
-### 8. Related concepts
-2–4 adjacent concepts worth knowing next.
+### 7. Step-by-Step Algorithm & Sanity Checklist
+A numbered plan (5-8 steps) the student can follow clause-by-clause to build the query themselves - each step naming the set of rows it produces - WITHOUT writing the final answer SQL. End with a checklist (expected row count, grain check, hand-verify one value, NULL check, ordering).
 
 Rules:
-- Keep it dense but readable. Short paragraphs, bullets, small \`sql\` snippets.
-- Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block, nothing else fancy.
-- Never reveal the full solution SQL. Illustrative snippets and the worked example must use a DIFFERENT toy scenario, not the exact answer.`;
+- Dense but readable: short paragraphs, bullets, small \`sql\` snippets wherever they help.
+- Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
+- Never reveal the full solution SQL. Snippets and the trace must use a DIFFERENT toy scenario.`;
     default:
       throw new Error(`Unknown command: ${command}`);
   }
