@@ -273,7 +273,7 @@ export const interviewReport = createServerFn({ method: "POST" })
       { role: "system", content: REPORT_SYSTEM },
       {
         role: "user",
-        content: `TARGET_ROLE: ${data.role}\nLEVEL: ${data.level}\nEXPERIENCE_YEARS: ${data.experienceYears}\nCORE_COMPETENCIES: ${data.competencies || "(unspecified)"}\n\n--- TRANSCRIPT ---\n${transcript}\n--- END ---\n\nProduce the JSON evaluation now.`,
+        content: `TARGET_ROLE: ${data.role}\nLEVEL: ${data.level}\nEXPERIENCE_YEARS: ${data.experienceYears}\nCORE_COMPETENCIES: ${data.competencies || "(unspecified)"}\nJOB_DESCRIPTION: ${data.jobDescription ? `\n"""\n${data.jobDescription.slice(0, 6000)}\n"""` : "(none)"}\n\n--- TRANSCRIPT ---\n${transcript}\n--- END ---\n\nScore against the JOB_DESCRIPTION's requirements when one is provided, and call out JD-specific gaps explicitly. Produce the JSON evaluation now.`,
       },
     ];
     const resp = await fetch(`${GATEWAY}/chat/completions`, {
