@@ -120,6 +120,7 @@ function InterviewPage() {
   const [years, setYears] = useState(3);
   const [competencies, setCompetencies] = useState("Python, SQL, Spark, Airflow, BigQuery, Kafka");
   const [jobDescription, setJobDescription] = useState("");
+  const [mediaReady, setMediaReady] = useState(false);
   const [voice, setVoice] = useState<"alloy" | "verse" | "shimmer" | "sage" | "nova" | "echo" | "onyx" | "fable">("alloy");
   const [sessionLength, setSessionLength] = useState<"short" | "standard" | "full">("full");
   const [started, setStarted] = useState(false);
@@ -212,6 +213,7 @@ function InterviewPage() {
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       });
       mediaRef.current = stream;
+      setMediaReady(true);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play().catch(() => {});
