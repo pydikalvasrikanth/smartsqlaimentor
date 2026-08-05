@@ -382,7 +382,28 @@ function InterviewPage() {
       // iOS/Android often leave the AudioContext suspended until a user
       // gesture even after getUserMedia — resume it before playback.
       try { await audioCtxRef.current?.resume(); } catch {}
-      await audio.play();
+      try {
+        await audio.play();
+      } catch (playErr) {
+        // Element playback can be blocked (autoplay policy / blob restrictions).
+        // Fall back to decoding the bytes and playing through Web Audio.
+        const ctx2 = audioCtxRef.current ?? new AudioContext();
+        audioCtxRef.current = ctx2;
+        try { await ctx2.resume(); } catch {}
+        const buf = await blob.arrayBuffer();
+        const decoded = await ctx2.decodeAudioData(buf.slice(0));
+        const node = ctx2.createBufferSource();
+        node.buffer = decoded;
+        node.connect(ctx2.destination);
+        node.onended = () => {
+          URL.revokeObjectURL(url);
+          stopTts(false);
+          if (!endedRef.current && micOn && !isMobileRef.current) {
+            setTimeout(() => { if (!endedRef.current) startListening(); }, 650);
+          }
+        };
+        node.start();
+      }
     } catch (e: any) {
       console.error(e);
       setSpeaking(false);
