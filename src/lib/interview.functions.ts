@@ -12,6 +12,7 @@ const TurnInput = z.object({
   level: z.enum(["junior", "mid", "senior"]).default("mid"),
   experienceYears: z.number().int().min(0).max(40).default(3),
   competencies: z.string().max(800).default(""),
+  jobDescription: z.string().max(6000).default(""),
   history: z
     .array(
       z.object({
@@ -56,6 +57,9 @@ Once the candidate submits code, their next turn will begin with "[SUBMITTED COD
 # One Question at a Time
 Never dump multiple questions in one turn. Ask one, wait, then follow up or transition.
 
+# Job Description Grounding
+When a JOB_DESCRIPTION is supplied, treat it as the hiring bar. Silently extract the required tech stack, responsibilities, scale hints and seniority signals, then ground the majority of your technical, coding and scenario questions in those exact items — use the JD's own vocabulary (tool names, domain terms) so it feels like a real loop for that posting. Probe the responsibilities the JD emphasises most, and reserve a couple of questions for gaps between the JD and the candidate's stated competencies. Never read the JD aloud or mention that you were given one.
+
 # Conversational Style
 - Speak like an articulate human peer, not a machine. Avoid robotic openings ("Excellent answer. Question two is…").
 - Stay neutral mid-interview — "Understood." / "Got it — let's pivot to…" / "Makes sense." Never confirm right/wrong.
@@ -82,6 +86,7 @@ TARGET_ROLE: ${data.role}
 LEVEL: ${data.level}
 EXPERIENCE_YEARS: ${data.experienceYears}
 CORE_COMPETENCIES: ${data.competencies || "(infer from role)"}
+JOB_DESCRIPTION: ${data.jobDescription ? `\n"""\n${data.jobDescription.slice(0, 6000)}\n"""` : "(none provided — use TARGET_ROLE and CORE_COMPETENCIES)"}
 SESSION_LENGTH: ${data.sessionLength} (~${targetTurns} interviewer turns total; ~${remaining} remaining)
 CODING_TASK_ALREADY_GIVEN: ${codingAsked ? "yes" : "no"}
 
@@ -227,6 +232,7 @@ const ReportInput = z.object({
   level: z.enum(["junior", "mid", "senior"]).default("mid"),
   experienceYears: z.number().int().min(0).max(40).default(3),
   competencies: z.string().max(800).default(""),
+  jobDescription: z.string().max(6000).default(""),
   history: z
     .array(
       z.object({
@@ -267,7 +273,7 @@ export const interviewReport = createServerFn({ method: "POST" })
       { role: "system", content: REPORT_SYSTEM },
       {
         role: "user",
-        content: `TARGET_ROLE: ${data.role}\nLEVEL: ${data.level}\nEXPERIENCE_YEARS: ${data.experienceYears}\nCORE_COMPETENCIES: ${data.competencies || "(unspecified)"}\n\n--- TRANSCRIPT ---\n${transcript}\n--- END ---\n\nProduce the JSON evaluation now.`,
+        content: `TARGET_ROLE: ${data.role}\nLEVEL: ${data.level}\nEXPERIENCE_YEARS: ${data.experienceYears}\nCORE_COMPETENCIES: ${data.competencies || "(unspecified)"}\nJOB_DESCRIPTION: ${data.jobDescription ? `\n"""\n${data.jobDescription.slice(0, 6000)}\n"""` : "(none)"}\n\n--- TRANSCRIPT ---\n${transcript}\n--- END ---\n\nScore against the JOB_DESCRIPTION's requirements when one is provided, and call out JD-specific gaps explicitly. Produce the JSON evaluation now.`,
       },
     ];
     const resp = await fetch(`${GATEWAY}/chat/completions`, {

@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { lazyPanel, PanelSkeleton } from "@/lib/lazy-panel";
 import { useCallback, useEffect, useState } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
-import { ProductTour } from "@/components/ProductTour";
+const ProductTour = lazyPanel(() => import("@/components/ProductTour").then((m) => ({ default: m.ProductTour })));
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -20,16 +21,16 @@ import {
   planFocus,
   analyzeFocus,
 } from "@/lib/plan.functions";
-import { PlannerModal } from "@/components/PlannerModal";
-import { PlanDashboard } from "@/components/PlanDashboard";
+const PlannerModal = lazyPanel(() => import("@/components/PlannerModal").then((m) => ({ default: m.PlannerModal })));
+const PlanDashboard = lazyPanel(() => import("@/components/PlanDashboard").then((m) => ({ default: m.PlanDashboard })), PanelSkeleton);
 import { Toolbar, INTERVIEW_TOPIC } from "@/components/sql/Toolbar";
 import { SchemaPanel } from "@/components/sql/SchemaPanel";
 import { ResizableAside, LeftPanelResizeHandle } from "@/components/sql/ResizableSplit";
 import { QuestionCard } from "@/components/sql/QuestionCard";
 import { SqlEditor } from "@/components/sql/SqlEditor";
 import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel";
-import { AiAssistant } from "@/components/AiAssistant";
-import { PythonModePanel } from "@/components/sql/PythonModePanel";
+const AiAssistant = lazyPanel(() => import("@/components/AiAssistant").then((m) => ({ default: m.AiAssistant })));
+const PythonModePanel = lazyPanel(() => import("@/components/sql/PythonModePanel").then((m) => ({ default: m.PythonModePanel })), PanelSkeleton);
 import { PythonToggle } from "@/components/sql/PythonToggle";
 import { ThemeToggle, useTheme } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
@@ -52,7 +53,7 @@ import {
   pickDeConcept,
   buildDePrompt,
 } from "@/lib/data-engineering";
-import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+const SolvedLibrary = lazyPanel(() => import("@/components/sql/SolvedLibrary").then((m) => ({ default: m.SolvedLibrary })), PanelSkeleton);
 import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 
 export const Route = createFileRoute("/mysql")({

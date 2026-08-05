@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { lazyPanel, PanelSkeleton } from "@/lib/lazy-panel";
 import { useEffect, useState, useCallback } from "react";
 import { useResumableState } from "@/lib/resume";
 import { ResumePrompt } from "@/components/ResumePrompt";
@@ -8,16 +9,16 @@ import { toast, Toaster } from "sonner";
 import { Loader2, Play, Lightbulb, Eye, ArrowRight, Code2, LogOut, ArrowLeft, CheckCircle2, XCircle, Bug, Workflow, Zap, Target, Calendar, Flame, AlertTriangle, Building2, Library, Sparkles, Square, Boxes, Database, HelpCircle, BookOpen } from "lucide-react";
 import { runPythonEngine } from "@/lib/python-engine.functions";
 import { planPythonFocus } from "@/lib/python-plan.functions";
-import { AnimatedTrace } from "@/components/python/AnimatedTrace";
+const AnimatedTrace = lazyPanel(() => import("@/components/python/AnimatedTrace").then((m) => ({ default: m.AnimatedTrace })));
 import { CodeEditor } from "@/components/code/CodeEditor";
 import { LANG_META, LANG_OPTIONS, type CodeLang } from "@/lib/languages";
-import { PythonTheoryPanel } from "@/components/python/PythonTheoryPanel";
+const PythonTheoryPanel = lazyPanel(() => import("@/components/python/PythonTheoryPanel").then((m) => ({ default: m.PythonTheoryPanel })), PanelSkeleton);
 import { ResizableSplit } from "@/components/sql/ResizableSplit";
-import { AiAssistant } from "@/components/AiAssistant";
-import { ProductTour } from "@/components/ProductTour";
+const AiAssistant = lazyPanel(() => import("@/components/AiAssistant").then((m) => ({ default: m.AiAssistant })));
+const ProductTour = lazyPanel(() => import("@/components/ProductTour").then((m) => ({ default: m.ProductTour })));
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
-import { SolvedLibrary } from "@/components/sql/SolvedLibrary";
+const SolvedLibrary = lazyPanel(() => import("@/components/sql/SolvedLibrary").then((m) => ({ default: m.SolvedLibrary })), PanelSkeleton);
 import { supabase } from "@/integrations/supabase/client";
 import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
 export const Route = createFileRoute("/python")({
