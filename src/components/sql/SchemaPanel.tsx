@@ -84,8 +84,8 @@ export function SchemaPanel({ schemaSql, seedSql, erdMermaid, description, quest
   ];
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden flex flex-col h-full min-h-0">
-      <div className="flex border-b border-border bg-surface-2 text-xs font-mono">
+    <div className="rounded-lg border border-border bg-card overflow-hidden flex flex-col h-[65vh] lg:h-full min-h-0">
+      <div className="flex shrink-0 overflow-x-auto border-b border-border bg-surface-2 text-xs font-mono">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -106,7 +106,7 @@ export function SchemaPanel({ schemaSql, seedSql, erdMermaid, description, quest
           </button>
         ))}
       </div>
-      <div className="flex-1 overflow-auto p-3 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto overscroll-contain p-3 [-webkit-overflow-scrolling:touch]">
         {tab === "erd" && (
           erdMermaid ? (
             <Suspense fallback={<div className="text-xs text-muted-foreground p-3 font-mono">Loading ERD…</div>}>
