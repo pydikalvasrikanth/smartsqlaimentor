@@ -69,7 +69,7 @@ function withSecurityHeaders(response: Response): Response {
   if (!headers.has("X-Frame-Options")) headers.set("X-Frame-Options", "SAMEORIGIN");
   if (!headers.has("X-Content-Type-Options")) headers.set("X-Content-Type-Options", "nosniff");
   if (!headers.has("Referrer-Policy")) headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  if (!headers.has("Permissions-Policy")) headers.set("Permissions-Policy", "geolocation=(), camera=(), payment=()");
+  if (!headers.has("Permissions-Policy")) headers.set("Permissions-Policy", "geolocation=(), camera=(self), microphone=(self), payment=()");
   if (!headers.has("Content-Security-Policy")) headers.set("Content-Security-Policy", CSP);
 
   return new Response(response.body, {
