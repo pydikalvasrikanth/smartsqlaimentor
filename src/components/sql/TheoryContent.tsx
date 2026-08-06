@@ -15,7 +15,7 @@ interface Props {
 export function TheoryContent({ content }: Props) {
   return (
     <div
-      className="prose prose-sm prose-invert w-full min-w-0 max-w-none overflow-hidden text-left leading-relaxed
+      className="prose prose-sm dark:prose-invert w-full min-w-0 max-w-none overflow-hidden text-left leading-relaxed
         [overflow-wrap:anywhere] [word-break:break-word]
         prose-p:my-2 prose-p:text-left
         prose-headings:text-left prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-foreground
@@ -25,8 +25,9 @@ export function TheoryContent({ content }: Props) {
         prose-strong:text-foreground
         prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-li:marker:text-primary
         prose-hr:my-3 prose-hr:border-border
-        prose-pre:bg-background prose-pre:border prose-pre:border-border prose-pre:rounded-md prose-pre:p-3 prose-pre:my-2 prose-pre:overflow-x-auto prose-pre:max-w-full prose-pre:text-xs prose-pre:whitespace-pre
-        prose-code:text-primary-glow prose-code:before:hidden prose-code:after:hidden prose-code:bg-surface-2 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+        prose-pre:bg-surface-2 prose-pre:text-foreground prose-pre:border prose-pre:border-border prose-pre:rounded-md prose-pre:p-3 prose-pre:my-2 prose-pre:overflow-x-auto prose-pre:max-w-full prose-pre:text-xs prose-pre:whitespace-pre
+        prose-pre:prose-code:text-foreground
+        prose-code:text-primary prose-code:font-semibold dark:prose-code:text-primary-glow prose-code:before:hidden prose-code:after:hidden prose-code:bg-surface-2 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
         prose-table:text-xs prose-table:my-2 prose-th:bg-surface-2 prose-th:px-2 prose-th:py-1 prose-th:text-left prose-td:px-2 prose-td:py-1 prose-td:border-t prose-td:border-border"
     >
       <ReactMarkdown
