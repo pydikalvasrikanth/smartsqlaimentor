@@ -227,7 +227,7 @@ function ChatPage() {
         )}
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${m.role === "user" ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-surface-2 border border-border text-left"}`}>
+            <div className={`max-w-[80%] min-w-0 overflow-hidden rounded-lg px-3 py-2 text-sm ${m.role === "user" ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-surface-2 border border-border text-left"}`}>
               {m.attachments && m.attachments.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {m.attachments.map((a) => (

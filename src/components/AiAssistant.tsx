@@ -182,7 +182,7 @@ export function AiAssistant({ context, suggestions = [] }: Props) {
             {msgs.map((m) => (
               <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 <div
-                  className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+                  className={`max-w-[85%] min-w-0 overflow-hidden rounded-xl px-3 py-2 text-sm ${
                     m.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-surface-2 border border-border"
