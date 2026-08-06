@@ -37,7 +37,8 @@ export function AiMessage({ content, className = "" }: Props) {
       >
         {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
       </button>
-      <div className="prose prose-sm prose-invert max-w-none text-left break-words leading-relaxed pr-7
+      <div className="prose prose-sm dark:prose-invert w-full min-w-0 max-w-none overflow-hidden text-left break-words leading-relaxed pr-7
+        [overflow-wrap:anywhere] [word-break:break-word]
         prose-p:my-2 prose-p:text-left
         prose-headings:text-left prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-foreground
         prose-h1:text-base prose-h1:mt-3 prose-h1:mb-2
@@ -48,10 +49,25 @@ export function AiMessage({ content, className = "" }: Props) {
         prose-blockquote:border-l-2 prose-blockquote:border-primary/50 prose-blockquote:pl-3 prose-blockquote:text-muted-foreground prose-blockquote:not-italic
         prose-hr:my-3 prose-hr:border-border
         prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-        prose-pre:bg-background prose-pre:border prose-pre:border-border prose-pre:rounded-md prose-pre:p-3 prose-pre:my-2 prose-pre:overflow-x-auto prose-pre:text-xs
-        prose-code:text-primary-glow prose-code:break-words prose-code:before:hidden prose-code:after:hidden prose-code:bg-surface-2 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+        prose-pre:bg-surface-2 prose-pre:text-foreground prose-pre:border prose-pre:border-border prose-pre:rounded-md prose-pre:p-3 prose-pre:my-2 prose-pre:max-w-full prose-pre:overflow-x-auto prose-pre:text-xs
+        prose-pre:prose-code:text-foreground
+        prose-code:text-primary prose-code:font-semibold dark:prose-code:text-primary-glow prose-code:break-words prose-code:before:hidden prose-code:after:hidden prose-code:bg-surface-2 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
         prose-table:text-xs prose-th:bg-surface-2 prose-th:px-2 prose-th:py-1 prose-th:text-left prose-td:px-2 prose-td:py-1 prose-td:border-t prose-td:border-border">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            pre: ({ children }: any) => (
+              <pre className="max-w-full overflow-x-auto">{children}</pre>
+            ),
+            table: ({ children }: any) => (
+              <div className="my-2 w-full max-w-full overflow-x-auto">
+                <table className="w-full">{children}</table>
+              </div>
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
       </div>
     </div>
   );
