@@ -10,9 +10,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Smart AI Code Playground — AI-Graded Coding Practice" },
-      { name: "description", content: "Smart AI Code Playground: AI-graded coding practice and mock interviews for SQL, Python, Java, PySpark and GCP Data Engineering roles at top MNCs." },
+      { name: "description", content: "Smart AI Code Playground: AI-graded coding practice and mock interviews for SQL, Python, Java, C/C++, PySpark and GCP Data Engineering roles at top MNCs." },
       { property: "og:title", content: "Smart AI Code Playground — AI-Graded Coding Practice" },
-      { property: "og:description", content: "AI-graded practice for SQL, Python, Java, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
+      { property: "og:description", content: "AI-graded practice for SQL, Python, Java, C/C++, PySpark and GCP Data Engineering interviews — with live voice interviews and resumable sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
