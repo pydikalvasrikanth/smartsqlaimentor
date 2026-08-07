@@ -11,7 +11,8 @@ export function CopyProtection() {
     if (import.meta.env.DEV) return; // keep DevTools available locally
 
     const blockKey = (e: KeyboardEvent) => {
-      const k = e.key.toLowerCase();
+      const k = (e.key ?? "").toLowerCase();
+      if (!k) return;
       // F12
       if (k === "f12") {
         e.preventDefault();
