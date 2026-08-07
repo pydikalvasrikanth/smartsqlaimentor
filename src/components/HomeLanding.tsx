@@ -101,15 +101,15 @@ export function HomeLanding() {
         <div className="relative mx-auto max-w-5xl px-4 py-16 sm:py-24">
           <p className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            AI mentor · live grading · voice interviews
+            All-in-one AI playground · 6 subjects
           </p>
           <h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
-            Smart AI Code Playground — practice coding interviews with a mentor that actually reads your code
+            One AI playground for{" "}
+            <span className="text-primary">SQL, Python, Java, C/C++, PySpark &amp; GCP</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Adaptive practice for SQL, Python, Java, C/C++, PySpark and GCP data engineering. You get generated questions,
-            in-depth theory, honest AI feedback on your real answer, and a live voice mock interview built from the job
-            description you're targeting.
+            Practice every coding interview subject in one place. The AI generates questions, grades your real code,
+            explains the theory, and resumes exactly where you left off — across every language and device.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -119,12 +119,33 @@ export function HomeLanding() {
               Create your free account <ArrowRight className="h-4 w-4" />
             </Link>
             <a
-              href="#tabs"
+              href="#tracks"
               className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent"
             >
-              See how it works
+              See all tracks
             </a>
           </div>
+
+          {/* Quick track chips */}
+          <div className="mt-8 flex flex-wrap gap-2">
+            {[
+              { to: "/mysql", label: "SQL" },
+              { to: "/python", label: "Python" },
+              { to: "/java", label: "Java" },
+              { to: "/cpp", label: "C / C++" },
+              { to: "/pyspark", label: "PySpark" },
+              { to: "/gcp", label: "GCP" },
+            ].map((t) => (
+              <Link
+                key={t.to}
+                to={t.to}
+                className="inline-flex items-center rounded-full border border-border bg-surface-1/70 px-3 py-1 text-xs font-medium text-muted-foreground hover:border-primary/50 hover:text-primary"
+              >
+                {t.label}
+              </Link>
+            ))}
+          </div>
+
           <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {["6 subjects", "6 practice modes per subject", "Live AI voice interview", "Progress saved across devices"].map((t) => (
               <li key={t} className="flex items-center gap-2">
