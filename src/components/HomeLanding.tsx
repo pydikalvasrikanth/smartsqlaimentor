@@ -226,11 +226,11 @@ export function HomeLanding() {
         </section>
 
         {/* Subjects */}
-        <section className="border-b border-border py-14 sm:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Six tracks to choose from</h2>
+        <section id="tracks" className="scroll-mt-20 border-b border-border py-14 sm:py-20">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Six tracks. One account. Zero switching cost.</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Each track has its own question engine, its own visual tutorial, and its own saved progress — switching subjects
-            never overwrites another one.
+            Every track has its own AI question engine, visual tutorials, solved library, and progress state — switching
+            between SQL, Python, Java, C/C++, PySpark or GCP never overwrites another one.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SUBJECTS.map((s) => {
