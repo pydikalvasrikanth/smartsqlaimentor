@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, Terminal } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
 import { HeaderTimer } from "@/components/HeaderTimer";
-import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
+import { HomeLanding } from "@/components/HomeLanding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -101,7 +101,7 @@ const SUBJECTS: Subject[] = [
 function SubjectPicker() {
   const { user, loading, signOut } = useAuth();
   if (loading || !user) {
-    return <SubjectSeoShell {...SUBJECT_SEO_CONTENT.home} />;
+    return <HomeLanding />;
   }
 
   return (
