@@ -15,8 +15,10 @@
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-/** Fast + cheap: question generation, hints, debug, visualize, theory. */
-export const FAST_MODEL = "google/gemini-3-flash-preview";
+/** Fast + cheap: question generation, theory, solutions. */
+export const FAST_MODEL = "google/gemini-3.6-flash";
+/** Fastest tier: short, low-risk generations (hints, debug notes, visuals). */
+export const LITE_MODEL = "google/gemini-3.1-flash-lite";
 /** Stronger reasoning: grading verdicts and senior-engineer code review. */
 export const REASONING_MODEL = "google/gemini-3.1-pro-preview";
 
@@ -24,8 +26,23 @@ export const REASONING_MODEL = "google/gemini-3.1-pro-preview";
 const REASONING_COMMAND_RE =
   /^(EVALUATE|GRADE|CHECK|ANALYZE|ANALYSE|OPTIMIZE)/i;
 
+/**
+ * Short, low-stakes generations run on the fastest tier — these are the calls
+ * the user waits on most often, and lite latency is roughly half of flash.
+ */
+const LITE_COMMAND_RE = /^(GET_HINT|HINT|DEBUG|VISUALIZE)/i;
+
 export function modelForCommand(command: string): string {
-  return REASONING_COMMAND_RE.test(command) ? REASONING_MODEL : FAST_MODEL;
+  if (REASONING_COMMAND_RE.test(command)) return REASONING_MODEL;
+  if (LITE_COMMAND_RE.test(command)) return LITE_MODEL;
+  return FAST_MODEL;
+}
+
+/** Per-tier timeouts: a fast call should fail fast and retry, not hang 90s. */
+export function timeoutForModel(model: string): number {
+  if (model === REASONING_MODEL) return 90_000;
+  if (model === LITE_MODEL) return 35_000;
+  return 55_000;
 }
 
 const DEFAULT_TIMEOUT_MS = 90_000;
@@ -61,7 +78,7 @@ export async function callGatewayTool<T = any>(
   opts: GatewayToolCallOptions,
 ): Promise<GatewayResult<T>> {
   const { apiKey, model, system, user, tool } = opts;
-  const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const timeoutMs = opts.timeoutMs ?? timeoutForModel(model) ?? DEFAULT_TIMEOUT_MS;
   const attempts = (opts.retries ?? 1) + 1;
 
   const body = JSON.stringify({
