@@ -147,17 +147,19 @@ async function callWithRetry(
 
   try {
     const primary = attempt();
-    const hedge = new Promise<{ data?: any; error?: string }>((resolve, reject) => {
-      const t = setTimeout(() => attempt().then(resolve, reject), HEDGE_MS);
-      // If the primary settles first, Promise.any resolves and this timer is
-      // harmless; clearing it on primary success keeps the extra call away.
+    // Trigger the hedge after HEDGE_MS, or immediately if the primary came
+    // back invalid. If the primary succeeds, the trigger never fires.
+    const trigger = new Promise<void>((resolve) => {
+      const t = setTimeout(resolve, HEDGE_MS);
       primary.then(
         () => clearTimeout(t),
         () => {
-          /* primary failed — let the hedge (or the retry loop) proceed */
+          clearTimeout(t);
+          resolve();
         },
       );
     });
+    const hedge = trigger.then(() => attempt());
     return await Promise.any([primary, hedge]);
   } catch {
     /* fall through to sequential retries */
