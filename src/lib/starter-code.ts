@@ -164,6 +164,60 @@ function reindentPython(code: string): string {
   return out.join("\n");
 }
 
+/**
+ * Strip the restated question out of the starter code.
+ *
+ * Models like to paste the whole task description as a comment banner (or a
+ * long docstring) at the top of the template. The task already lives in the
+ * question card, so the editor should open with code only — short `TODO`
+ * markers are kept.
+ */
+function stripQuestionText(code: string): string {
+  const lines = code.split("\n");
+  const isComment = (l: string) =>
+    /^\s*(\/\/|#|\*|\/\*|--)/.test(l) && !/^\s*#\s*include/.test(l);
+  const keep = (l: string) => /\bTODO\b|\bFIXME\b/i.test(l);
+
+  // 1. Leading comment/blank banner before the first line of real code.
+  let start = 0;
+  while (start < lines.length) {
+    const l = lines[start];
+    if (!l.trim()) { start++; continue; }
+    if (isComment(l) && !keep(l)) { start++; continue; }
+    break;
+  }
+  let out = lines.slice(start);
+
+  // 2. Leading triple-quoted docstring banner (Python).
+  const joined = out.join("\n");
+  const lead = joined.match(/^\s*("""|''')[\s\S]*?\1\s*\n?/);
+  if (lead) out = joined.slice(lead[0].length).split("\n");
+
+  // 3. Long prose comment lines anywhere (question text spilled into the body).
+  out = out.filter((l) => !(isComment(l) && !keep(l) && l.trim().length > 80));
+
+  // 4. Docstrings directly under a def/class that just restate the task.
+  const res: string[] = [];
+  for (let i = 0; i < out.length; i++) {
+    const line = out[i];
+    const m = line.match(/^(\s*)("""|''')/);
+    const prev = res.length ? res[res.length - 1] : "";
+    if (m && /:\s*$/.test(prev.trim()) && /^\s*(def|class)\b/.test(prev)) {
+      const quote = m[2];
+      const single = line.trim().length > quote.length * 2 && line.trim().endsWith(quote);
+      let j = i;
+      if (!single) {
+        j = i + 1;
+        while (j < out.length && !out[j].includes(quote)) j++;
+      }
+      const body = out.slice(i, j + 1).join(" ");
+      if (body.length > 100) { i = j; continue; }
+    }
+    res.push(line);
+  }
+  return res.join("\n").replace(/^\n+/, "");
+}
+
 function ensureCMain(code: string, lang: "c" | "cpp"): string {
   if (/\bint\s+main\s*\(/.test(code)) return code;
   const main =
@@ -195,7 +249,8 @@ function ensureJavaShell(code: string): string {
  */
 export function normalizeStarterCode(raw: unknown, lang: CodeLang): string {
   if (typeof raw !== "string" || !raw.trim()) return "";
-  const cleaned = basicClean(raw);
+  const cleaned = basicClean(stripQuestionText(basicClean(raw)));
+  if (!cleaned.trim()) return "";
 
   if (lang === "python" || lang === "pyspark") {
     return reindentPython(cleaned) + "\n";

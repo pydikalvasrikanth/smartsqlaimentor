@@ -27,6 +27,7 @@ When target_concept is provided, the question MUST exercise that concept as its 
 const FORMAT_RULES = `
 Starter-code quality contract (NON-NEGOTIABLE):
 - starter_code MUST compile as-is under javac: no syntax errors, balanced braces/parens/quotes, semicolons present, correct types.
+- starter_code MUST NOT restate the question: no comment banner, no description comments, no docstring copying the task. Code + a single short TODO only.
 - Include every needed import; declare a single top-level \`class Solution\` plus a \`public static void main(String[] args)\` that calls the method so the file runs immediately.
 - Indent with exactly 4 spaces per level, never tabs; standard Java brace style (opening brace on the same line).
 - No markdown fences, no backticks, no line numbers, no pseudo-code.
