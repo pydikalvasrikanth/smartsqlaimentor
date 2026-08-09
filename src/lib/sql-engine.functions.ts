@@ -2,7 +2,30 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-import { callGatewayTool, modelForCommand, preCheckSql } from "@/lib/ai-gateway.server";
+import {
+  callGatewayTool,
+  modelForCommand,
+  preCheckSql,
+  cacheKey,
+  getCached,
+  setCached,
+} from "@/lib/ai-gateway.server";
+
+/**
+ * Deterministic-enough commands: the same inputs should give the same answer,
+ * so a repeat (reopening the theory tab, resubmitting identical SQL, asking
+ * for the solution twice) is served instantly from the short-lived cache
+ * instead of paying for another generation.
+ */
+const CACHEABLE_COMMANDS = new Set([
+  "EXPLAIN_THEORY",
+  "REVEAL_SOLUTION",
+  "VISUALIZE_QUERY",
+  "OPTIMIZE_QUERY",
+  "EVALUATE_SUBMISSION",
+  "DEBUG_QUERY",
+  "TEXT_TO_SQL",
+]);
 
 const SYSTEM_PROMPT = `You are a Senior Data Engineer + SQL mentor for a MySQL 8.0 practice app.
 Generate schemas, seed data, ERDs, and questions, and semantically grade user SQL (no real DB — mentally execute against the seed). Be terse but precise. Always reply by calling the supplied tool with valid arguments — never plain text.
