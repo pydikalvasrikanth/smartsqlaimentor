@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { Database, Code2, Cloud, Coffee, ArrowRight, LogOut, Sparkles, Mic, Terminal } from "lucide-react";
 import { ThemeToggle } from "@/hooks/use-theme";
@@ -149,12 +148,7 @@ function SubjectPicker() {
       </header>
 
       <main className="max-w-[1200px] mx-auto px-4 pt-14 pb-16 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center max-w-3xl mx-auto space-y-5 mb-14"
-        >
+        <div className="fade-up text-center max-w-3xl mx-auto space-y-5 mb-14">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             AI mentor · live grading
@@ -172,18 +166,17 @@ function SubjectPicker() {
             Adaptive SQL, Python, and GCP tracks with an AI mentor that generates questions,
             grades your work, and tracks weak spots — personal to you.
           </p>
-        </motion.div>
+        </div>
 
         <h2 className="sr-only">Practice tracks</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative">
           {SUBJECTS.map((s, i) => {
             const Icon = s.icon;
             return (
-              <motion.div
+              <div
                 key={s.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.1 + i * 0.08, ease: "easeOut" }}
+                className="fade-up"
+                style={{ animationDelay: `${100 + i * 80}ms` }}
               >
                 <Link
                   to={s.to}
@@ -213,16 +206,14 @@ function SubjectPicker() {
                     Start practicing <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.42 }}
-          className="mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4"
+        <div
+          className="fade-up mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4"
+          style={{ animationDelay: "420ms" }}
         >
           <Link
             to="/interview"
@@ -238,7 +229,7 @@ function SubjectPicker() {
             </div>
             <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-0.5 transition-all" />
           </Link>
-        </motion.div>
+        </div>
       </main>
 
       <footer className="border-t border-border bg-surface-2/40 mt-8">

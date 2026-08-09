@@ -131,10 +131,44 @@ async function callWithRetry(
   validate: (data: any) => boolean,
   maxAttempts = 3,
 ) {
+  // Hedged request: question generation latency is very long-tailed, so if the
+  // first call hasn't come back in HEDGE_MS we fire a second one in parallel
+  // and use whichever valid answer lands first. This cuts the worst-case wait
+  // roughly in half without changing the result contract.
+  const HEDGE_MS = 5_000;
   let last: { data?: any; error?: string } = { error: "No response." };
-  for (let i = 0; i < maxAttempts; i++) {
-    last = await callEngineCommand(command, payload);
-    if (!last.error && last.data && validate(last.data)) return last;
+
+  const attempt = () =>
+    callEngineCommand(command, payload).then((r) => {
+      if (!r.error && r.data && validate(r.data)) return r;
+      last = r;
+      throw new Error("invalid");
+    });
+
+  try {
+    const primary = attempt();
+    // Trigger the hedge after HEDGE_MS, or immediately if the primary came
+    // back invalid. If the primary succeeds, the trigger never fires.
+    const trigger = new Promise<void>((resolve) => {
+      const t = setTimeout(resolve, HEDGE_MS);
+      primary.then(
+        () => clearTimeout(t),
+        () => {
+          clearTimeout(t);
+          resolve();
+        },
+      );
+    });
+    const hedge = trigger.then(() => attempt());
+    return await Promise.any([primary, hedge]);
+  } catch {
+    /* fall through to sequential retries */
+  }
+
+  for (let i = 1; i < maxAttempts; i++) {
+    const r = await callEngineCommand(command, payload);
+    last = r;
+    if (!r.error && r.data && validate(r.data)) return r;
   }
   return last;
 }
