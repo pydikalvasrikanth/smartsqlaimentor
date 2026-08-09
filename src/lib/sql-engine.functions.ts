@@ -582,13 +582,23 @@ export async function callEngineCommand(
     if (pre) return { data: pre };
   }
 
-  return callGatewayTool({
+  const key = CACHEABLE_COMMANDS.has(command as string)
+    ? cacheKey(["sql", command as string, userPrompt])
+    : null;
+  if (key) {
+    const hit = getCached(key);
+    if (hit !== undefined) return { data: hit };
+  }
+
+  const res = await callGatewayTool({
     apiKey,
     model: modelForCommand(command),
     system: SYSTEM_PROMPT,
     user: userPrompt,
     tool,
   });
+  if (key && res.data && !res.error) setCached(key, res.data);
+  return res;
 }
 
 export const runSqlEngine = createServerFn({ method: "POST" })
