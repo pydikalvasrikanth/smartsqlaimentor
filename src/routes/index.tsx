@@ -40,7 +40,7 @@ const SUBJECTS: Subject[] = [
     to: "/mysql",
     title: "SQL",
     tagline: "MySQL 8 · AI mentor",
-    description: "Generated schemas, ERDs, semantic grading, hints, debug & query visualization across 50-question sessions.",
+    description: "Generated schemas, ERDs, semantic grading, hints, debug & query visualization across 15-question sessions.",
     icon: Database,
     accent: "from-blue-500 to-cyan-500",
     highlights: ["Schema + seed generated per question", "Semantic AI evaluation", "Interview mode (FAANG-style)"],
@@ -53,7 +53,7 @@ const SUBJECTS: Subject[] = [
     description: "Data structures, algorithms, OOP & system design micros. AI mentally executes your code against hidden tests.",
     icon: Code2,
     accent: "from-yellow-500 to-emerald-500",
-    highlights: ["50-question progressive session", "AI hints + complexity analysis", "Beginner → Advanced ramp"],
+    highlights: ["15-question progressive session", "AI hints + complexity analysis", "Beginner → Advanced ramp"],
   },
   {
     id: "java",

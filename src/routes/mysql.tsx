@@ -142,11 +142,11 @@ function pickConcept(difficulty: string, covered: string[]): string {
 // 15-question curriculum: difficulty ramps every 5 questions, concepts rotate across topics.
 const TOTAL_QUESTIONS = 15;
 function difficultyForIndex(i: number): string {
-  // i = 1..50. Stages of 5 each → 10 stages mapped to beginner/intermediate/advanced.
-  const stage = Math.floor((i - 1) / 5); // 0..9
-  if (stage <= 0) return "beginner";       // Q 1-10
-  if (stage <= 1) return "intermediate";    // Q 11-30
-  return "advanced";                        // Q 31-50
+  // i = 1..15. Stages of 5 each → 3 stages covering all levels of the topic.
+  const stage = Math.floor((i - 1) / 5); // 0..2
+  if (stage <= 0) return "beginner";       // Q 1-5
+  if (stage <= 1) return "intermediate";    // Q 6-10
+  return "advanced";                        // Q 11-15
 }
 function pickMixedConcept(i: number, covered: string[]): string {
   // Always offer concepts from the current tier, but rotate across the WHOLE pool for variety.
