@@ -80,18 +80,18 @@ interface Session {
   tables_description: string;
 }
 
-const TOTAL_QUESTIONS = 50;
+const TOTAL_QUESTIONS = 15;
 const ENGINE_DIFFICULTIES = ["beginner", "intermediate", "advanced"] as const;
 
 function difficultyForQuestion(index: number): "beginner" | "intermediate" | "advanced" {
   const stage = Math.floor((index - 1) / 5);
-  if (stage <= 1) return "beginner";
-  if (stage <= 5) return "intermediate";
+  if (stage <= 0) return "beginner";
+  if (stage <= 1) return "intermediate";
   return "advanced";
 }
 
 function complexityStage(index: number) {
-  return Math.min(10, Math.floor((index - 1) / 5) + 1);
+  return Math.min(10, Math.ceil((index / TOTAL_QUESTIONS) * 10));
 }
 
 function conceptsForEngineDifficulty(difficulty: "beginner" | "intermediate" | "advanced") {
@@ -278,7 +278,7 @@ function TopicPage() {
     const res: any = await initFn({
       data: {
         topic_slug: slug,
-        topic_prompt: `Mixed SQL curriculum starting from ${topic.name}. Use one realistic business schema, but questions must cover varied SQL topics and concepts across the 50-question session.`,
+        topic_prompt: `Mixed SQL curriculum starting from ${topic.name}. Use one realistic business schema, but questions must cover varied SQL topics and concepts across the 15-question session.`,
         difficulty: firstDifficulty,
         target_concept: `Complexity stage ${complexityStage(1)}/10. Primary concept: ${conceptLabel(firstConcept)}`,
       },

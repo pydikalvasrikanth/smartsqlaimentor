@@ -139,13 +139,13 @@ function pickConcept(difficulty: string, covered: string[]): string {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// 50-question curriculum: difficulty ramps every 5 questions, concepts rotate across topics.
-const TOTAL_QUESTIONS = 50;
+// 15-question curriculum: difficulty ramps every 5 questions, concepts rotate across topics.
+const TOTAL_QUESTIONS = 15;
 function difficultyForIndex(i: number): string {
   // i = 1..50. Stages of 5 each → 10 stages mapped to beginner/intermediate/advanced.
   const stage = Math.floor((i - 1) / 5); // 0..9
-  if (stage <= 1) return "beginner";       // Q 1-10
-  if (stage <= 5) return "intermediate";    // Q 11-30
+  if (stage <= 0) return "beginner";       // Q 1-10
+  if (stage <= 1) return "intermediate";    // Q 11-30
   return "advanced";                        // Q 31-50
 }
 function pickMixedConcept(i: number, covered: string[]): string {
@@ -613,7 +613,7 @@ function Workspace() {
       return;
     }
 
-    // Cap free-practice sessions at 50 questions and ramp difficulty every 5.
+    // Cap free-practice sessions at 15 questions and ramp difficulty every 5.
     const nextIndex = questionCount + 1;
     if (nextIndex > TOTAL_QUESTIONS) {
       setLoading(null);
