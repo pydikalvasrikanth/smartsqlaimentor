@@ -27,7 +27,7 @@ export const Route = createFileRoute("/python")({
       { title: "Python Interview Engine — AI mentor practice" },
       { name: "description", content: "Python coding interview practice with AI-graded feedback, hints, and complexity analysis." },
       { property: "og:title", content: "Python Interview Engine — AI Mentor Practice" },
-      { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 50-question sessions." },
+      { property: "og:description", content: "AI-graded Python coding practice: hints, complexity analysis, and progressive 15-question sessions." },
       { property: "og:url", content: "https://smartsqlaimentor.live/python" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -60,7 +60,7 @@ const PY_CONCEPTS: Record<string, string[]> = {
   advanced: ["dp-1d", "dp-2d", "graph-bfs", "graph-dfs", "dijkstra", "union-find", "trie", "segment-tree", "topological-sort", "kmp", "bit-manipulation", "system-design-mini", "concurrency-asyncio", "oop-design", "pandas-numpy"],
 };
 
-const TOTAL = 50;
+const TOTAL = 15;
 type Level = "beginner" | "intermediate" | "advanced";
 const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
 
@@ -309,8 +309,8 @@ function diffForIndex(i: number, target: Level = "advanced"): string {
   const cap = LEVEL_ORDER.indexOf(target);
   const stage = Math.floor((i - 1) / 5);
   let tier: number;
-  if (stage <= 1) tier = 0;
-  else if (stage <= 5) tier = 1;
+  if (stage <= 0) tier = 0;
+  else if (stage <= 1) tier = 1;
   else tier = 2;
   return LEVEL_ORDER[Math.min(tier, cap)];
 }
@@ -1074,7 +1074,7 @@ function PythonWorkspace() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold">Build your Python practice plan</h2>
-                  <p className="text-sm text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
+                  <p className="text-sm text-muted-foreground">15 questions ramping every 5 — beginner → intermediate → advanced, capped at your target level.</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -1510,7 +1510,7 @@ function PythonWorkspace() {
           {
             target: "question",
             title: "1. The question",
-            body: "Each session gives you 50 questions, difficulty ramping every 5. Read the task, function signature, and sample cases here.",
+            body: "Each session gives you 15 questions, difficulty ramping every 5 to cover all levels. Read the task, function signature, and sample cases here.",
             placement: "bottom",
           },
           {
@@ -1562,7 +1562,7 @@ function PyPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PyPl
           <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
           <h2 className="text-3xl font-bold mt-1">🐍 Python · {concept}</h2>
           <p className="text-base text-muted-foreground mt-1">
-            50-question session ramping every 5 · starts at{" "}
+            15-question session ramping every 5 · starts at{" "}
             <span className="font-mono text-primary-glow">{diff}</span>
           </p>
         </div>

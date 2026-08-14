@@ -44,7 +44,7 @@ function PyLanding() {
         <p className="text-xs font-mono uppercase tracking-widest text-primary mb-3">Python practice</p>
         <h1 className="mb-4">Python Coding Practice — AI-Graded</h1>
         <p className="text-muted-foreground text-lg mb-8">
-          A 50-question adaptive Python session that ramps from beginner to advanced. The AI mentor mentally executes your code against hidden tests, calls out complexity issues, and offers targeted hints — without spoiling the answer.
+          A 15-question adaptive Python session that ramps from beginner to advanced. The AI mentor mentally executes your code against hidden tests, calls out complexity issues, and offers targeted hints — without spoiling the answer.
         </p>
         <div className="flex flex-wrap gap-3 mb-12">
           <Link to="/python" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90">

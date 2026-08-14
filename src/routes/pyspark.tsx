@@ -64,7 +64,7 @@ export const Route = createFileRoute("/pyspark")({
 });
 
 const LANG = "pyspark" as const;
-const TOTAL = 50;
+const TOTAL = 15;
 type Level = "beginner" | "intermediate" | "advanced";
 const LEVEL_ORDER: Level[] = ["beginner", "intermediate", "advanced"];
 
@@ -205,7 +205,7 @@ function conceptForDay(day: number, target: Level): string {
 function diffForIndex(i: number, target: Level = "advanced"): string {
   const cap = LEVEL_ORDER.indexOf(target);
   const stage = Math.floor((i - 1) / 5);
-  let tier: number; if (stage <= 1) tier = 0; else if (stage <= 5) tier = 1; else tier = 2;
+  let tier: number; if (stage <= 0) tier = 0; else if (stage <= 1) tier = 1; else tier = 2;
   return LEVEL_ORDER[Math.min(tier, cap)];
 }
 function pickConcept(i: number, covered: string[]): string {
@@ -779,7 +779,7 @@ function PySparkWorkspace() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold">Build your PySpark practice plan</h2>
-                  <p className="text-sm text-muted-foreground">50 questions ramping every 5 — capped at your target level.</p>
+                  <p className="text-sm text-muted-foreground">15 questions ramping every 5 — beginner → intermediate → advanced, capped at your target level.</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -1100,7 +1100,7 @@ function PsPlanDashboard({ plan, onStartToday, onReplan, loading }: { plan: PsPl
         <div>
           <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Today's focus</div>
           <h2 className="text-3xl font-bold mt-1">⚡ PySpark · {concept}</h2>
-          <p className="text-base text-muted-foreground mt-1">50-question session ramping every 5 · starts at <span className="font-mono text-primary-glow">{diff}</span></p>
+          <p className="text-base text-muted-foreground mt-1">15-question session ramping every 5 · starts at <span className="font-mono text-primary-glow">{diff}</span></p>
         </div>
         <button onClick={onStartToday} disabled={loading} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white px-4 py-2 rounded-md text-base font-semibold disabled:opacity-50">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}

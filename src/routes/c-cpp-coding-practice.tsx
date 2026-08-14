@@ -76,7 +76,7 @@ function CppLanding() {
         <p className="text-xs font-mono uppercase tracking-widest text-primary mb-3">C / C++ practice</p>
         <h1 className="mb-4">C &amp; C++ Coding Interview Practice — AI-Graded</h1>
         <p className="text-muted-foreground text-lg mb-8">
-          One adaptive 50-question playground for both C and C++. Toggle the language for any question, and the AI mentor generates idiomatic starter code, hidden tests, and complexity feedback for the language you picked — from pointers and manual memory to STL, templates and systems-style problems.
+          One adaptive 15-question playground for both C and C++. Toggle the language for any question, and the AI mentor generates idiomatic starter code, hidden tests, and complexity feedback for the language you picked — from pointers and manual memory to STL, templates and systems-style problems.
         </p>
         <div className="flex flex-wrap gap-3 mb-12">
           <Link to="/cpp" className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90">

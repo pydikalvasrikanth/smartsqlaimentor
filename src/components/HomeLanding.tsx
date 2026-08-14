@@ -36,7 +36,7 @@ const TABS: Array<{ icon: Icon; name: string; purpose: string; use: string }> = 
   {
     icon: Wrench,
     name: "Free practice",
-    purpose: "An open 50-question session on any business domain you type in (e-commerce, banking, logistics…). Difficulty ramps from beginner to advanced as you go.",
+    purpose: "An open 15-question session on any business domain you type in (e-commerce, banking, logistics…). Difficulty ramps from beginner to advanced as you go.",
     use: "Use it when you just want volume and variety.",
   },
   {
