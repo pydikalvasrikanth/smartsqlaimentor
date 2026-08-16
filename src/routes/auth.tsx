@@ -226,6 +226,10 @@ function AuthPage() {
             </span>
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
+          <p className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-primary">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            All-in-one AI playground · 6 subjects
+          </p>
           <h2 className="mt-8 text-4xl font-semibold leading-tight tracking-tight">
             <span className="shimmer-text">Practice like the interview is tomorrow.</span>
           </h2>
@@ -234,8 +238,21 @@ function AuthPage() {
             grades your reasoning, not just your output.
           </p>
 
+          <div className="mt-6 flex flex-wrap gap-2">
+            {["SQL", "Python", "Java", "C / C++", "PySpark", "GCP"].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-[11px] text-muted-foreground backdrop-blur"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
           {/* rotating 3D code cube */}
-          <div className="cube-stage mt-10 hidden h-40 place-items-center xl:grid" aria-hidden="true">
+          <div className="cube-stage relative mt-10 hidden h-40 place-items-center xl:grid" aria-hidden="true">
+            <span className="orbit-ring absolute h-36 w-36 rounded-full border border-dashed border-primary/30" />
+            <span className="orbit-ring absolute h-44 w-44 rounded-full border border-primary/15" style={{ animationDirection: "reverse" }} />
             <div className="cube h-28 w-28">
               {[
                 { t: "SELECT", s: "translateZ(56px)" },
@@ -260,7 +277,7 @@ function AuthPage() {
             ].map((f, i) => (
               <li
                 key={f.title}
-                className="fade-up flex gap-3 rounded-xl border border-transparent p-2 transition-colors hover:border-border hover:bg-card/50"
+                className="card-3d shine fade-up flex gap-3 rounded-xl border border-border/60 bg-card/50 p-3 backdrop-blur"
                 style={{ animationDelay: `${140 + i * 90}ms` }}
               >
                 <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-surface-2 transition-transform duration-300 hover:scale-110">
@@ -284,12 +301,15 @@ function AuthPage() {
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
 
-          <div className="shine rounded-2xl border border-border bg-card/80 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
+          <div className="relative rounded-2xl bg-gradient-to-br from-primary/40 via-primary-glow/20 to-transparent p-[1px] shadow-2xl shadow-primary/15">
+          <div className="shine rounded-2xl border border-border/60 bg-card/85 p-5 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
             <div>
               <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
-                {mode === "signup"
-                  ? "Create your free account"
-                  : "Sign in to Smart AI Code Playground"}
+                {mode === "signup" ? (
+                  <span className="shimmer-text">Create your free account</span>
+                ) : (
+                  <span className="shimmer-text">Welcome back</span>
+                )}
               </h1>
               <p className="mt-1 text-[11px] font-mono text-muted-foreground">
                 SQL · Python · Java · C/C++ · PySpark · GCP
@@ -465,6 +485,7 @@ function AuthPage() {
                 : "Resend verification email"}
             </button>
           )}
+          </div>
           </div>
 
           <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
