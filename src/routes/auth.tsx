@@ -301,12 +301,15 @@ function AuthPage() {
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
 
-          <div className="shine rounded-2xl border border-border bg-card/80 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
+          <div className="relative rounded-2xl bg-gradient-to-br from-primary/40 via-primary-glow/20 to-transparent p-[1px] shadow-2xl shadow-primary/15">
+          <div className="shine rounded-2xl border border-border/60 bg-card/85 p-5 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
             <div>
               <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
-                {mode === "signup"
-                  ? "Create your free account"
-                  : "Sign in to Smart AI Code Playground"}
+                {mode === "signup" ? (
+                  <span className="shimmer-text">Create your free account</span>
+                ) : (
+                  <span className="shimmer-text">Welcome back</span>
+                )}
               </h1>
               <p className="mt-1 text-[11px] font-mono text-muted-foreground">
                 SQL · Python · Java · C/C++ · PySpark · GCP
@@ -482,6 +485,7 @@ function AuthPage() {
                 : "Resend verification email"}
             </button>
           )}
+          </div>
           </div>
 
           <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
