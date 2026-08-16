@@ -592,3 +592,17 @@
   .card-3d:hover { transform: translateY(-3px); }
   .shine:hover::after { animation: none; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Auth page: pending-action pulse on submit/OAuth buttons.           */
+/* ------------------------------------------------------------------ */
+@keyframes auth-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 40%, transparent); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 0%, transparent); }
+}
+.auth-processing {
+  animation: auth-pulse 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-processing { animation: none; }
+}

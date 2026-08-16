@@ -199,25 +199,19 @@ function AuthPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-background">
       <Toaster position="top-right" richColors />
-      {/* ambient background */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            "radial-gradient(60rem 40rem at 10% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 60%), radial-gradient(50rem 35rem at 110% 110%, color-mix(in oklab, var(--primary-glow) 20%, transparent), transparent 60%)",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.15]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-          maskImage: "radial-gradient(70% 60% at 50% 40%, black, transparent)",
-        }}
-      />
+      {/* ambient 3D background */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <span className="aurora left-[-12%] top-[-14%] h-[26rem] w-[26rem] bg-primary/30" />
+        <span
+          className="aurora right-[-14%] top-[18%] h-[24rem] w-[24rem] bg-primary-glow/30"
+          style={{ animationDelay: "-6s" }}
+        />
+        <span
+          className="aurora bottom-[-16%] left-[28%] h-[22rem] w-[22rem] bg-primary/25"
+          style={{ animationDelay: "-11s" }}
+        />
+        <div className="perspective-grid absolute inset-x-0 bottom-0 h-[46vh] opacity-40" />
+      </div>
 
       <div className="absolute right-4 top-4 z-10">
         <ThemeToggle />
@@ -225,28 +219,51 @@ function AuthPage() {
 
       <div className="relative mx-auto grid min-h-screen w-full max-w-[1100px] items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-16">
         {/* brand panel */}
-        <section className="hidden lg:block">
+        <section className="fade-up hidden lg:block">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/25">
+            <span className="float-slow grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/25">
               <Sparkles className="h-5 w-5 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
-          <h2 className="mt-8 text-3xl font-semibold leading-tight tracking-tight">
-            Practice like the interview is tomorrow.
+          <h2 className="mt-8 text-4xl font-semibold leading-tight tracking-tight">
+            <span className="shimmer-text">Practice like the interview is tomorrow.</span>
           </h2>
           <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
             One workspace for SQL, Python, Java, C/C++, PySpark and GCP — with an AI mentor that
             grades your reasoning, not just your output.
           </p>
+
+          {/* rotating 3D code cube */}
+          <div className="cube-stage mt-10 hidden h-40 place-items-center xl:grid" aria-hidden="true">
+            <div className="cube h-28 w-28">
+              {[
+                { t: "SELECT", s: "translateZ(56px)" },
+                { t: "def()", s: "rotateY(90deg) translateZ(56px)" },
+                { t: "class", s: "rotateY(180deg) translateZ(56px)" },
+                { t: "spark", s: "rotateY(-90deg) translateZ(56px)" },
+                { t: "{ }", s: "rotateX(90deg) translateZ(56px)" },
+                { t: "AI", s: "rotateX(-90deg) translateZ(56px)" },
+              ].map((f) => (
+                <span key={f.t} className="cube-face" style={{ transform: f.s }}>
+                  {f.t}
+                </span>
+              ))}
+            </div>
+          </div>
+
           <ul className="mt-8 space-y-4">
             {[
               { icon: BrainCircuit, title: "AI-graded answers", body: "Semantic feedback on every query and function you write." },
               { icon: Gauge, title: "Adaptive difficulty", body: "Questions shift with your mastery, topic by topic." },
               { icon: Save, title: "Resume anywhere", body: "Your session, code buffers and progress follow you across devices." },
-            ].map((f) => (
-              <li key={f.title} className="flex gap-3">
-                <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-surface-2">
+            ].map((f, i) => (
+              <li
+                key={f.title}
+                className="fade-up flex gap-3 rounded-xl border border-transparent p-2 transition-colors hover:border-border hover:bg-card/50"
+                style={{ animationDelay: `${140 + i * 90}ms` }}
+              >
+                <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-surface-2 transition-transform duration-300 hover:scale-110">
                   <f.icon className="h-4 w-4 text-primary" />
                 </span>
                 <div>
@@ -259,18 +276,20 @@ function AuthPage() {
         </section>
 
         {/* auth card */}
-        <div className="mx-auto w-full max-w-[26rem] space-y-5">
-          <div className="flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow">
+        <div className="fade-up mx-auto w-full max-w-[26rem] space-y-5" style={{ animationDelay: "80ms" }}>
+          <div className="flex items-center justify-center gap-3 lg:hidden">
+            <span className="float-slow grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/25">
               <Sparkles className="h-5 w-5 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-xl shadow-primary/5 backdrop-blur space-y-5">
+          <div className="shine rounded-2xl border border-border bg-card/80 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
             <div>
-              <h1 className="text-lg font-semibold tracking-tight">
-                Sign in to Smart AI Code Playground
+              <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
+                {mode === "signup"
+                  ? "Create your free account"
+                  : "Sign in to Smart AI Code Playground"}
               </h1>
               <p className="mt-1 text-[11px] font-mono text-muted-foreground">
                 SQL · Python · Java · C/C++ · PySpark · GCP
