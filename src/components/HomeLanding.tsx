@@ -95,17 +95,20 @@ export function HomeLanding() {
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border">
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 -left-32 h-[26rem] w-[26rem] rounded-full bg-primary/15 blur-3xl" />
-          <div className="absolute -bottom-40 -right-24 h-[22rem] w-[22rem] rounded-full bg-primary-glow/15 blur-3xl" />
+          <div className="aurora -top-40 -left-32 h-[26rem] w-[26rem] bg-primary/25" />
+          <div className="aurora -bottom-40 -right-24 h-[22rem] w-[22rem] bg-primary-glow/25" style={{ animationDelay: "-6s" }} />
+          <div className="aurora top-10 left-1/2 h-[18rem] w-[18rem] bg-primary/15" style={{ animationDelay: "-11s" }} />
+          <div className="perspective-grid absolute inset-x-0 bottom-0 h-56 opacity-60" />
         </div>
-        <div className="relative mx-auto max-w-5xl px-4 py-16 sm:py-24">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="fade-up">
           <p className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             All-in-one AI playground · 6 subjects
           </p>
           <h1 className="max-w-3xl text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
             One AI playground for{" "}
-            <span className="text-primary">SQL, Python, Java, C/C++, PySpark &amp; GCP</span>
+            <span className="shimmer-text">SQL, Python, Java, C/C++, PySpark &amp; GCP</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Practice every coding interview subject in one place. The AI generates questions, grades your real code,
@@ -114,13 +117,13 @@ export function HomeLanding() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/auth"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="shine inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-glow px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-18px_var(--color-primary)] transition-transform hover:-translate-y-0.5"
             >
               Create your free account <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#tracks"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-card/60 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur transition-colors hover:border-primary/60 hover:bg-accent"
             >
               See all tracks
             </a>
@@ -139,7 +142,7 @@ export function HomeLanding() {
               <Link
                 key={t.to}
                 to={t.to}
-                className="inline-flex items-center rounded-full border border-border bg-surface-1/70 px-3 py-1 text-xs font-medium text-muted-foreground hover:border-primary/50 hover:text-primary"
+                className="inline-flex items-center rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
               >
                 {t.label}
               </Link>
@@ -153,6 +156,23 @@ export function HomeLanding() {
               </li>
             ))}
           </ul>
+          </div>
+
+          {/* 3D centerpiece */}
+          <div aria-hidden className="relative hidden h-[340px] place-items-center lg:grid">
+            <div className="orbit-ring absolute h-[300px] w-[300px] rounded-full border border-dashed border-primary/30" />
+            <div className="absolute h-[210px] w-[210px] rounded-full bg-primary/10 blur-2xl" />
+            <div className="cube-stage float-slow">
+              <div className="cube h-40 w-40">
+                <div className="cube-face" style={{ transform: "translateZ(80px)" }}>SELECT</div>
+                <div className="cube-face" style={{ transform: "rotateY(90deg) translateZ(80px)" }}>def()</div>
+                <div className="cube-face" style={{ transform: "rotateY(180deg) translateZ(80px)" }}>class</div>
+                <div className="cube-face" style={{ transform: "rotateY(-90deg) translateZ(80px)" }}>df.agg</div>
+                <div className="cube-face" style={{ transform: "rotateX(90deg) translateZ(80px)" }}>int*</div>
+                <div className="cube-face" style={{ transform: "rotateX(-90deg) translateZ(80px)" }}>BigQuery</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
