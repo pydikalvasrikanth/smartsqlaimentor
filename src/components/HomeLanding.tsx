@@ -192,7 +192,7 @@ export function HomeLanding() {
               return (
                 <div
                   key={t.name}
-                  className="rounded-2xl border border-border bg-surface-1/70 p-5 transition-colors hover:border-primary/50"
+                  className="card-3d shine rounded-2xl border border-border bg-card/70 p-5 backdrop-blur"
                 >
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Icon className="h-4.5 w-4.5" />
@@ -227,7 +227,7 @@ export function HomeLanding() {
             {INTERVIEW.map((f) => {
               const Icon = f.icon;
               return (
-                <div key={f.title} className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.07] to-transparent p-5">
+                <div key={f.title} className="card-3d shine rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.07] to-transparent p-5">
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
                     <Icon className="h-4.5 w-4.5" />
                   </div>
@@ -259,7 +259,7 @@ export function HomeLanding() {
                 <Link
                   key={s.to}
                   to={s.to}
-                  className="group rounded-2xl border border-border p-5 transition-all hover:-translate-y-0.5 hover:border-primary/50"
+                  className="card-3d shine group rounded-2xl border border-border bg-card/60 p-5 backdrop-blur"
                 >
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Icon className="h-4.5 w-4.5" />
@@ -325,7 +325,12 @@ export function HomeLanding() {
 
         {/* CTA */}
         <section className="py-14 sm:py-20">
-          <div className="rounded-3xl border border-border bg-surface-2 p-8 text-center sm:p-12">
+          <div className="shine relative overflow-hidden rounded-3xl border border-primary/25 bg-surface-2 p-8 text-center sm:p-12">
+            <div aria-hidden className="pointer-events-none absolute inset-0">
+              <div className="aurora -left-20 -top-24 h-72 w-72 bg-primary/20" />
+              <div className="aurora -bottom-24 -right-16 h-64 w-64 bg-primary-glow/20" style={{ animationDelay: "-8s" }} />
+            </div>
+            <div className="relative">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               Start practicing today — it's free
             </h2>
@@ -335,16 +340,17 @@ export function HomeLanding() {
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-glow px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_18px_40px_-18px_var(--color-primary)] transition-transform hover:-translate-y-0.5"
               >
                 Create your free account <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/faq"
-                className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent"
+                className="inline-flex items-center gap-2 rounded-lg border border-primary/30 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/60 hover:bg-accent"
               >
                 Read the FAQ
               </Link>
+            </div>
             </div>
           </div>
         </section>
