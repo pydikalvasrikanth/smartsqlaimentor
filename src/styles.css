@@ -448,3 +448,147 @@
 @media (prefers-reduced-motion: reduce) {
   .fade-up { animation: none; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Immersive landing visuals: aurora field, 3D tilt cards, shine,     */
+/* perspective grid, floating orbit ring. Pure CSS (no JS payload).   */
+/* ------------------------------------------------------------------ */
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(6%, -4%, 0) scale(1.12); }
+  66%  { transform: translate3d(-5%, 5%, 0) scale(0.95); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes grid-pan {
+  to { background-position: 0 40px, 40px 0; }
+}
+@keyframes shine-sweep {
+  0%   { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  35%  { opacity: 0.55; }
+  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+@keyframes text-shimmer {
+  to { background-position: 220% center; }
+}
+@keyframes cube-spin {
+  from { transform: rotateX(-22deg) rotateY(0deg); }
+  to   { transform: rotateX(-22deg) rotateY(360deg); }
+}
+
+@utility aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+  animation: aurora-drift 18s ease-in-out infinite;
+}
+
+@utility perspective-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-primary) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-primary) 22%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(700px) rotateX(62deg) scale(1.9);
+  transform-origin: center top;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+  animation: grid-pan 3.2s linear infinite;
+}
+
+@utility shimmer-text {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-primary) 0%,
+    var(--color-primary-glow) 35%,
+    var(--color-primary) 60%,
+    var(--color-primary-glow) 100%
+  );
+  background-size: 220% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: text-shimmer 6s linear infinite;
+}
+
+/* 3D tilt card: lifts and rotates in space on hover, with a light sweep. */
+@utility card-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease;
+  will-change: transform;
+}
+.card-3d:hover,
+.card-3d:focus-visible {
+  transform: perspective(900px) translateY(-8px) rotateX(6deg) rotateY(-6deg) scale(1.02);
+  box-shadow:
+    0 26px 50px -22px color-mix(in oklab, var(--color-primary) 45%, transparent),
+    0 2px 0 0 color-mix(in oklab, var(--color-primary) 18%, transparent) inset;
+  border-color: color-mix(in oklab, var(--color-primary) 55%, transparent);
+}
+.card-3d > * { transform: translateZ(24px); }
+
+@utility shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-primary) 28%, transparent),
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.shine:hover::after { animation: shine-sweep 0.9s ease-out; }
+
+@utility float-slow { animation: float-y 6s ease-in-out infinite; }
+@utility orbit-ring { animation: spin-slow 26s linear infinite; }
+
+/* Rotating wireframe cube used as the hero's 3D centerpiece. */
+.cube-stage { perspective: 900px; }
+.cube {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cube-spin 16s linear infinite;
+}
+.cube-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 55%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  backdrop-filter: blur(2px);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  box-shadow: 0 0 30px -12px color-mix(in oklab, var(--color-primary) 60%, transparent) inset;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .perspective-grid,
+  .shimmer-text,
+  .float-slow,
+  .orbit-ring,
+  .cube { animation: none; }
+  .card-3d:hover { transform: translateY(-3px); }
+  .shine:hover::after { animation: none; }
+}
