@@ -276,18 +276,20 @@ function AuthPage() {
         </section>
 
         {/* auth card */}
-        <div className="mx-auto w-full max-w-[26rem] space-y-5">
-          <div className="flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow">
+        <div className="fade-up mx-auto w-full max-w-[26rem] space-y-5" style={{ animationDelay: "80ms" }}>
+          <div className="flex items-center justify-center gap-3 lg:hidden">
+            <span className="float-slow grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/25">
               <Sparkles className="h-5 w-5 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight">Smart AI Code Playground</span>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-xl shadow-primary/5 backdrop-blur space-y-5">
+          <div className="shine rounded-2xl border border-border bg-card/80 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl transition-shadow duration-500 hover:shadow-primary/20 space-y-5 sm:p-6">
             <div>
-              <h1 className="text-lg font-semibold tracking-tight">
-                Sign in to Smart AI Code Playground
+              <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
+                {mode === "signup"
+                  ? "Create your free account"
+                  : "Sign in to Smart AI Code Playground"}
               </h1>
               <p className="mt-1 text-[11px] font-mono text-muted-foreground">
                 SQL · Python · Java · C/C++ · PySpark · GCP
