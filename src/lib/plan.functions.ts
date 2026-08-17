@@ -7,7 +7,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateCurriculum, type Tier } from "./topic-catalog";
-import { callEngineCommand } from "./sql-engine.functions";
+import { callEngineCommand } from "./sql-engine.server";
 
 const TIER = z.enum(["beginner", "intermediate", "advanced", "professional"]);
 
