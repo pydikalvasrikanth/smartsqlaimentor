@@ -533,7 +533,7 @@ const PayloadSchemas = {
   }),
 } as const;
 
-const InputSchema = z
+export const InputSchema = z
   .object({
     command: z.enum([
       "INIT_ENVIRONMENT",
