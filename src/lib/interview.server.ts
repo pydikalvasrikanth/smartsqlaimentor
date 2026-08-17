@@ -216,7 +216,7 @@ export async function interviewSpeakImpl(data: z.infer<typeof SpeakInput>) {
 // ---------------------------------------------------------------------------
 // Post-interview scorecard: second LLM pass over the full transcript.
 // ---------------------------------------------------------------------------
-export export const ReportInput = z.object({
+export const ReportInput = z.object({
   role: z.string().max(120).default("Data Engineer"),
   level: z.enum(["junior", "mid", "senior"]).default("mid"),
   experienceYears: z.number().int().min(0).max(40).default(3),
