@@ -417,7 +417,6 @@ export async function runJavaEngineImpl(
   data: { command: string; payload: any },
   userId: string,
 ) {
-    const { userId } = context;
     const command = data.command as keyof typeof PayloadSchemas;
     const payload: any = data.payload;
 
