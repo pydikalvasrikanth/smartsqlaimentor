@@ -1,0 +1,1 @@
+UPDATE public.rate_limits SET count = 20, window_start = now() WHERE bucket = 'chat';
