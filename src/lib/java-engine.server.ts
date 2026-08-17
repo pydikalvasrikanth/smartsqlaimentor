@@ -1,0 +1,518 @@
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { z } from "zod";
+import { normalizeStarterCode, normalizeSolutionCode } from "@/lib/starter-code";
+import {
+  callGatewayTool,
+  cacheKey,
+  getCached,
+  modelForCommand,
+  preCheckSubmission,
+  reconcileVerdict,
+  setCached,
+} from "@/lib/ai-gateway.server";
+
+const SYSTEM_PROMPT = `You are a Senior Java Engineer + interview mentor.
+You generate realistic Modern Java (17/21) coding interview questions (FAANG/MNC style) and grade user solutions semantically by mentally executing the code against the test cases (no real sandbox). Be terse, precise, and always reply by calling the supplied tool with valid arguments.
+
+Target Java 17/21 idioms: records, sealed classes, pattern matching for switch/instanceof, text blocks, var, Streams API, Optional, functional interfaces, CompletableFuture, virtual threads (Loom), the java.util.concurrent toolkit, and the Collections Framework (List, Map, Set, Deque, PriorityQueue). Also cover strings, recursion, two-pointers, sliding window, hashing, sorting, binary search, stacks/queues, trees, graphs, DP, greedy, bit manipulation, generics, exceptions, I/O (NIO.2), regex, and OOP/SOLID.
+
+Coding conventions: use public static methods on a class named Solution, standard Java imports, and idiomatic Streams/Optional where they read cleanly. Avoid Python-like syntax.
+
+Difficulty rules — beginner: single concept, ~10-15 lines; intermediate: multi-concept, 20-40 lines, edge cases; advanced: optimized algorithm, 40+ lines, time/space analysis required.
+
+When target_concept is provided, the question MUST exercise that concept as its primary teaching point.`;
+
+const FORMAT_RULES = `
+Starter-code quality contract (NON-NEGOTIABLE):
+- starter_code MUST compile as-is under javac: no syntax errors, balanced braces/parens/quotes, semicolons present, correct types.
+- starter_code MUST NOT restate the question: no comment banner, no description comments, no docstring copying the task. Code + a single short TODO only.
+- Include every needed import; declare a single top-level \`class Solution\` plus a \`public static void main(String[] args)\` that calls the method so the file runs immediately.
+- Indent with exactly 4 spaces per level, never tabs; standard Java brace style (opening brace on the same line).
+- No markdown fences, no backticks, no line numbers, no pseudo-code.
+- The only unfinished part is the method body: one TODO comment plus a compiling placeholder return.`;
+
+const SYSTEM_PROMPT_FULL = SYSTEM_PROMPT + "\n" + FORMAT_RULES;
+
+const TOOLS_BY_COMMAND: Record<string, any> = {
+  INIT_JAVA_ENVIRONMENT: {
+    name: "init_java_environment",
+    description: "Generate a complete Java practice question with starter code and tests.",
+    parameters: {
+      type: "object",
+      properties: {
+        topic_description: { type: "string", description: "Brief context for the question theme." },
+        question: {
+          type: "object",
+          properties: {
+            question_id: { type: "number" },
+            difficulty: { type: "string", enum: ["beginner", "intermediate", "advanced"] },
+            concept: { type: "string" },
+            business_context: { type: "string" },
+            task: { type: "string", description: "Clear problem statement with input/output spec." },
+            function_signature: { type: "string", description: "e.g. public static int[] twoSum(int[] nums, int target)" },
+            starter_code: { type: "string", description: "Complete compilable Java class skeleton (class Solution { ... }) with imports and a TODO body." },
+            test_cases: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  input_repr: { type: "string", description: "Java literal repr of the call args." },
+                  expected_repr: { type: "string", description: "Java literal repr of expected output." },
+                  explanation: { type: "string" },
+                },
+                required: ["input_repr", "expected_repr"],
+              },
+            },
+            expected_solution: { type: "string", description: "Reference Java solution." },
+            time_complexity: { type: "string" },
+            space_complexity: { type: "string" },
+          },
+          required: ["question_id", "difficulty", "task", "function_signature", "starter_code", "test_cases", "expected_solution"],
+        },
+      },
+      required: ["question"],
+    },
+  },
+  NEXT_JAVA_QUESTION: {
+    name: "next_java_question",
+    description: "Generate the next Java question, avoiding repeats.",
+    parameters: {
+      type: "object",
+      properties: {
+        question: {
+          type: "object",
+          properties: {
+            question_id: { type: "number" },
+            difficulty: { type: "string" },
+            concept: { type: "string" },
+            business_context: { type: "string" },
+            task: { type: "string" },
+            function_signature: { type: "string" },
+            starter_code: { type: "string" },
+            test_cases: { type: "array", items: { type: "object" } },
+            expected_solution: { type: "string" },
+            time_complexity: { type: "string" },
+            space_complexity: { type: "string" },
+          },
+          required: ["question_id", "difficulty", "task", "function_signature", "starter_code", "test_cases", "expected_solution"],
+        },
+      },
+      required: ["question"],
+    },
+  },
+  EVALUATE_JAVA: {
+    name: "evaluate_java",
+    description: "Mentally run user code against test cases and grade.",
+    parameters: {
+      type: "object",
+      properties: {
+        is_correct: { type: "boolean" },
+        passed: { type: "number" },
+        total: { type: "number" },
+        per_test: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              input_repr: { type: "string" },
+              expected_repr: { type: "string" },
+              actual_repr: { type: "string" },
+              passed: { type: "boolean" },
+              note: { type: "string" },
+            },
+          },
+        },
+        mistake_tag: { type: "string", description: "short slug: off-by-one, wrong-edge, complexity, etc." },
+        explanation: { type: "string" },
+        improvements: { type: "array", items: { type: "string" } },
+      },
+        required: ["is_correct", "passed", "total", "per_test", "explanation"],
+    },
+  },
+  JAVA_HINT: {
+    name: "java_hint",
+    description: "Give a single Socratic hint without revealing the solution.",
+    parameters: {
+      type: "object",
+      properties: {
+        hint: { type: "string" },
+        leading_question: { type: "string" },
+      },
+      required: ["hint"],
+    },
+  },
+  REVEAL_JAVA_SOLUTION: {
+    name: "reveal_java_solution",
+    description: "Reveal solution with line-by-line walkthrough.",
+    parameters: {
+      type: "object",
+      properties: {
+        solution: { type: "string" },
+        walkthrough: { type: "string" },
+        time_complexity: { type: "string" },
+        space_complexity: { type: "string" },
+      },
+      required: ["solution", "walkthrough"],
+    },
+  },
+  JAVA_DEBUG: {
+    name: "java_debug",
+    description: "Identify the bug in user code and educate without giving full solution.",
+    parameters: {
+      type: "object",
+      properties: {
+        error_analysis: { type: "string", description: "What's wrong, in plain English." },
+        suspected_line: { type: "string" },
+        educational_fix: { type: "string", description: "Concept they need to apply." },
+      },
+      required: ["error_analysis", "educational_fix"],
+    },
+  },
+  JAVA_VISUALIZE: {
+    name: "java_visualize",
+    description: "Trace execution step by step for a sample input.",
+    parameters: {
+      type: "object",
+      properties: {
+        sample_input: { type: "string" },
+        steps: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              line: { type: "string", description: "Code line being executed." },
+              action: { type: "string", description: "What happens conceptually." },
+              state: { type: "string", description: "Key variable values after this step." },
+            },
+            required: ["line", "action", "state"],
+          },
+        },
+        final_output: { type: "string" },
+        summary: { type: "string" },
+      },
+      required: ["steps", "summary"],
+    },
+  },
+  JAVA_OPTIMIZE: {
+    name: "java_optimize",
+    description: "Senior-engineer review: cleaner / faster idiomatic rewrite.",
+    parameters: {
+      type: "object",
+      properties: {
+        optimized_code: { type: "string" },
+        improvements: { type: "array", items: { type: "string" } },
+        time_complexity_before: { type: "string" },
+        time_complexity_after: { type: "string" },
+        idiomatic_notes: { type: "string" },
+      },
+      required: ["optimized_code", "improvements"],
+    },
+  },
+  JAVA_THEORY: {
+    name: "java_theory",
+    description: "Produce an in-depth Java theory guide tailored to a specific practice question.",
+    parameters: {
+      type: "object",
+      properties: {
+        theory_markdown: {
+          type: "string",
+          description: "Markdown theory guide with concept overview, syntax, mapping to the task, mental model, animated mermaid flow, worked mini-example, pitfalls and related concepts. Never reveal the final solution code.",
+        },
+      },
+      required: ["theory_markdown"],
+    },
+  },
+  JAVA_TO_SQL: {
+    name: "java_to_sql",
+    description: "Reframe the same problem as SQL and provide a MySQL 8 solution.",
+    parameters: {
+      type: "object",
+      properties: {
+        schema_ddl: { type: "string", description: "CREATE TABLE(s) needed to model the same problem in SQL." },
+        sample_seed: { type: "string", description: "A few INSERT statements matching the Java test cases so the SQL is directly verifiable." },
+        sql_solution: { type: "string", description: "MySQL 8 query (or short script) that solves the same task the Java function solves." },
+        walkthrough: { type: "string", description: "Line-by-line explanation of the SQL solution and the mapping from Java logic to SQL semantics." },
+        java_vs_sql: { type: "string", description: "Short comparison — when each approach is more idiomatic." },
+      },
+      required: ["schema_ddl", "sql_solution", "walkthrough"],
+    },
+  },
+};
+
+function buildUserPrompt(command: string, payload: any): string {
+  switch (command) {
+    case "INIT_JAVA_ENVIRONMENT":
+      return `Generate a Java interview question.\nDifficulty: ${payload.difficulty}\nTarget concept: ${payload.target_concept}\nContext theme: ${payload.topic || "general"}${payload.company ? `\nCompany style: write a question in the style commonly asked at ${payload.company} (FAANG/MNC interview rounds). Use a realistic ${payload.company}-flavoured business_context.` : ""}`;
+    case "NEXT_JAVA_QUESTION":
+      return `Generate the next Java question.\nDifficulty: ${payload.target_difficulty}\nTarget concept: ${payload.target_concept}\nAlready covered concepts (avoid same teaching point): ${(payload.covered_concepts || []).join(", ")}\nAlready asked IDs: ${(payload.previous_question_ids || []).join(", ")}${payload.company ? `\nCompany style: ${payload.company}-style interview question.` : ""}`;
+    case "EVALUATE_JAVA":
+      return `Question task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nTest cases:\n${JSON.stringify(payload.test_cases)}\n\nUser code:\n${payload.user_code}\n\nGrading procedure (follow exactly):\n1. Trace the user's code line by line for EVERY test case above — one per_test row per test case, in the same order, none skipped or invented.\n2. For each row set actual_repr to the value the user's code actually produces (as a Java literal). If it would not compile or would throw, put the compiler/exception message there and mark passed=false.\n3. In "note", state the one-line reason the row passed or failed (which computation produced actual_repr).\n4. passed = the count of rows with passed=true; total = the number of test cases; is_correct = true only when every row passed.\n5. Judge on observable output, not style. Different but correct approaches pass. Do not fail a correct solution for formatting, naming, or not matching the reference solution.\n6. If output ordering is not specified by the task, treat any valid ordering as correct.`;
+    case "JAVA_HINT":
+      return `Task:\n${payload.task}\n\nUser current code:\n${payload.user_code}\n\nGive ONE Socratic hint.`;
+    case "REVEAL_JAVA_SOLUTION":
+      return `Task:\n${payload.task}\n\nReference solution:\n${payload.expected_solution}\n\nProvide the solution with a clear line-by-line walkthrough.`;
+    case "JAVA_DEBUG":
+      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nIdentify the bug. Do NOT give the full solution — just explain what's wrong and the concept to apply.`;
+    case "JAVA_VISUALIZE":
+      return `Task:\n${payload.task}\n\nCode to trace:\n${payload.user_code}\n\nMentally execute the code on a representative sample input. Return concise step-by-step trace (max 12 steps) showing line, action, and the state of key variables.`;
+    case "JAVA_OPTIMIZE":
+      return `Task:\n${payload.task}\n\nUser code:\n${payload.user_code}\n\nReference:\n${payload.expected_solution}\n\nAct as a senior Java engineer reviewing this code. Provide a cleaner / more idiomatic / faster version with improvements list and complexity comparison.`;
+    case "JAVA_THEORY":
+      return `Practice question task: ${payload.task}
+Primary concept: ${payload.concept || "auto — infer the dominant Java concept from the task"}
+Difficulty: ${payload.difficulty || "n/a"}
+
+Write an IN-DEPTH Java theory guide in Markdown, directly relevant to the question above. A student must be able to solve the problem from this guide plus its examples alone (without being handed the answer). Use EXACTLY these 7 sections, with these headings:
+
+### 1. Core Concept & Mental Model
+What the concept is, why it exists, and the one-sentence mental model to hold while coding. Add a short analogy and name the invariant that must stay true at every step.
+
+### 2. Syntax & Optimal Design Patterns
+Canonical Java syntax in a \`\`\`java fenced block, plus the 2-3 patterns that fit this class of problem (e.g. HashMap counting vs. sorting, Streams vs. explicit loop, StringBuilder vs. concatenation), each with a one-line "use when" and its time/space cost.
+
+### 3. Data Structures & Traversal Strategy
+Which data structures the task pushes you toward, the shape/grain of the input, how to traverse it (single pass, two pointers, recursion, sliding window), and how state is stored and updated. Justify the choice over the obvious brute force.
+
+### 4. Problem Formulas vs. Native Library Functions
+Translate the wording of the task into precise formulas or rules (counts, ratios, index arithmetic, boundary conditions), then map each to the native Java function or construct that implements it. Present it as a markdown table: Requirement | Formula / rule | Java construct.
+
+### 5. End-to-End Trace (Input -> Steps -> Output)
+Use a TINY invented input (3-6 items, NOT the real test cases) and show the full trace: 1. **Input**, 2. **State after each step/iteration** as a markdown table (variables, accumulators, pointers), 3. **Final output**. One sentence of narration per stage explaining exactly what changed and why. Include a small \`\`\`java snippet illustrating the key step on this toy scenario only.
+Then emit ONE mermaid \`flowchart LR\` block (fenced with triple backticks and the language \`mermaid\`) showing how data moves for THIS task. 5-8 nodes max, short labels: "STEP\\nwhat it does". Example shape (do NOT copy verbatim):
+\`\`\`mermaid
+flowchart LR
+  A[Input] --> B[Init state\\nmap / pointers]
+  B --> C[Iterate\\nprocess element]
+  C --> D[Update\\nstate]
+  D --> E[Return result]
+\`\`\`
+The renderer animates arrows so the flow becomes intuitive.
+
+### 6. Edge Cases & Anti-Pattern Warnings
+Bullets: empty / single-element input, duplicates, ties, negative or zero values, overflow, off-by-one and boundary indices, mutation-while-iterating, recursion depth. Then a short "Anti-pattern -> Do this instead" list specific to this task.
+
+### 7. Step-by-Step Algorithm & Sanity Checklist
+A numbered plan (5-8 steps) the student can follow to build the solution themselves - each step naming the state it produces - WITHOUT writing the final answer code. End with a checklist (dry-run one example by hand, check the invariant, verify edge cases, confirm return type/shape, state the complexity).
+
+Rules:
+- Dense but readable: short paragraphs, bullets, small \`\`\`java snippets wherever they help.
+- Section 5 MUST contain exactly one \`\`\`mermaid flowchart LR block.
+- Never reveal the full solution code. Snippets and the trace must use a DIFFERENT toy scenario.`;
+    case "JAVA_TO_SQL":
+      return `The user just finished a Java problem. Reframe the SAME problem as a SQL problem and provide a MySQL 8 solution.
+
+Java task:
+${payload.task}
+
+Java function signature: ${payload.function_signature || "(n/a)"}
+
+Test cases (Java literals):
+${JSON.stringify(payload.test_cases || [])}
+
+Reference Java solution (for context only — do not restate it):
+${payload.expected_solution || "(n/a)"}
+
+Deliver:
+1. **schema_ddl** — minimal CREATE TABLE statements that model the inputs of this problem as one or more relational tables (pick sensible column names + types).
+2. **sample_seed** — INSERT statements that mirror the Java test-case inputs so the SQL is directly verifiable.
+3. **sql_solution** — a clean MySQL 8 query (window functions / CTEs allowed) that produces the same answer the Java function returns. If the Java function returns a scalar, return one row / one column. If it returns a list, return one row per element with a stable ORDER BY.
+4. **walkthrough** — plain-English, line-by-line explanation of the SQL and how each Java step maps to a SQL clause.
+5. **java_vs_sql** — 2–3 sentences on when each approach is more idiomatic for this shape of problem.
+
+Rules: MySQL 8 dialect only. Use CTEs (\`WITH\`) when it improves clarity. Never use vendor-specific extensions from other engines.`;
+    default:
+      return JSON.stringify(payload);
+  }
+}
+
+const PayloadSchemas = {
+  INIT_JAVA_ENVIRONMENT: z.object({
+    difficulty: z.string().max(50),
+    target_concept: z.string().max(200),
+    topic: z.string().max(500).optional(),
+    company: z.string().max(100).optional(),
+  }),
+  NEXT_JAVA_QUESTION: z.object({
+    target_difficulty: z.string().max(50),
+    target_concept: z.string().max(200),
+    covered_concepts: z.array(z.string().max(100)).max(200).optional(),
+    previous_question_ids: z.array(z.number()).max(500).optional(),
+    company: z.string().max(100).optional(),
+  }),
+  EVALUATE_JAVA: z.object({
+    session_question_id: z.string().uuid(),
+    user_code: z.string().max(10_000),
+  }),
+  JAVA_HINT: z.object({
+    task: z.string().max(10_000),
+    user_code: z.string().max(10_000),
+  }),
+  REVEAL_JAVA_SOLUTION: z.object({
+    session_question_id: z.string().uuid(),
+  }),
+  JAVA_DEBUG: z.object({
+    task: z.string().max(10_000),
+    user_code: z.string().max(10_000),
+  }),
+  JAVA_VISUALIZE: z.object({
+    task: z.string().max(10_000),
+    user_code: z.string().max(10_000),
+  }),
+  JAVA_OPTIMIZE: z.object({
+    session_question_id: z.string().uuid(),
+    user_code: z.string().max(10_000),
+  }),
+  JAVA_THEORY: z.object({
+    session_question_id: z.string().uuid(),
+  }),
+  JAVA_TO_SQL: z.object({
+    session_question_id: z.string().uuid(),
+  }),
+} as const;
+
+export const InputSchema = z
+  .object({ command: z.string(), payload: z.any() })
+  .superRefine((v, ctx) => {
+    const schema = (PayloadSchemas as any)[v.command];
+    if (!schema) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `Unknown command: ${v.command}` });
+    }
+  })
+  .transform((v) => {
+    const schema = (PayloadSchemas as any)[v.command];
+    return { command: v.command, payload: schema.parse(v.payload) };
+  });
+
+async function callJavaEngine(
+  command: keyof typeof PayloadSchemas,
+  payload: any,
+): Promise<{ data?: any; error?: string }> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return { error: "LOVABLE_API_KEY is not configured." };
+
+  const tool = TOOLS_BY_COMMAND[command];
+  const res = await callGatewayTool({
+    apiKey,
+    model: modelForCommand(command),
+    system: SYSTEM_PROMPT_FULL,
+    user: buildUserPrompt(command, payload),
+    tool,
+  });
+
+  // Grading: the per-test rows are the source of truth, not the model's
+  // self-reported counters.
+  if (command === "EVALUATE_JAVA" && res.data) {
+    res.data = reconcileVerdict(res.data, (payload?.test_cases ?? []).length);
+  }
+  return res;
+}
+
+// Remove the reference solution before anything is returned to the browser.
+function stripSolution(question: any) {
+  if (!question) return question;
+  const { expected_solution, ...rest } = question;
+  return rest;
+}
+export async function runJavaEngineImpl(
+  data: { command: string; payload: any },
+  userId: string,
+) {
+    const command = data.command as keyof typeof PayloadSchemas;
+    const payload: any = data.payload;
+
+    // Question generation: persist the answer key server-side and return only
+    // a session id + a sanitized question (no expected_solution) to the client.
+    if (command === "INIT_JAVA_ENVIRONMENT" || command === "NEXT_JAVA_QUESTION") {
+      const res = await callJavaEngine(command, payload);
+      if (res.error || !res.data) return res;
+      const q = res.data.question;
+      if (!q || typeof q.task !== "string" || !q.task.trim()) {
+        return { error: "AI returned an incomplete question. Try again." };
+      }
+      q.starter_code = normalizeStarterCode(q.starter_code, "java");
+      q.expected_solution = normalizeSolutionCode(q.expected_solution, "java") || q.expected_solution;
+      const difficulty =
+        q.difficulty ?? payload.difficulty ?? payload.target_difficulty ?? "beginner";
+      const { data: row, error } = await supabaseAdmin
+        .from("question_sessions")
+        .insert({
+          user_id: userId,
+          subject: "java",
+          topic_slug: String(q.concept || "java").slice(0, 100),
+          concept: q.concept ?? null,
+          difficulty,
+          task: q.task,
+          question_id_external: q.question_id ?? null,
+          payload: {
+            expected_solution: q.expected_solution ?? "",
+            test_cases: q.test_cases ?? [],
+            function_signature: q.function_signature ?? "",
+          },
+        })
+        .select("id")
+        .single();
+      if (error) return { error: error.message };
+      return {
+        data: { ...res.data, session_question_id: row.id, question: stripSolution(q) },
+      };
+    }
+
+    // Grading / reveal / optimize: never trust a client-supplied answer key.
+    // The answer key lives in question_sessions, a server-only table that the
+    // browser cannot read. We fetch it with the service-role client, scoped to
+    // the signed-in user's id so one user can never load another user's row.
+    if (
+      command === "EVALUATE_JAVA" ||
+      command === "REVEAL_JAVA_SOLUTION" ||
+      command === "JAVA_OPTIMIZE" ||
+      command === "JAVA_THEORY" ||
+      command === "JAVA_TO_SQL"
+    ) {
+      const { data: row, error } = await supabaseAdmin
+        .from("question_sessions")
+        .select("task, payload, concept, difficulty")
+        .eq("id", payload.session_question_id)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (error || !row) return { error: "Question session not found." };
+      const stored = (row.payload ?? {}) as { expected_solution?: string; test_cases?: any[]; function_signature?: string };
+      const enriched = {
+        ...payload,
+        task: row.task,
+        concept: (row as any).concept ?? undefined,
+        difficulty: (row as any).difficulty ?? undefined,
+        expected_solution: stored.expected_solution ?? "",
+        test_cases: stored.test_cases ?? [],
+        function_signature: stored.function_signature ?? "",
+      };
+
+      // Deterministic pre-check: an empty / unchanged / syntactically broken
+      // submission is graded locally, with no paid model call and no guessing.
+      if (command === "EVALUATE_JAVA") {
+        const pre = preCheckSubmission(
+          payload.user_code,
+          "java",
+          (stored.test_cases ?? []).length,
+        );
+        if (pre) return { data: pre };
+      }
+
+      // Identical resubmits and repeat theory opens are served from cache.
+      const key = cacheKey([
+        "java",
+        command,
+        userId,
+        payload.session_question_id,
+        (payload.user_code ?? "").trim(),
+      ]);
+      const cached = getCached(key);
+      if (cached) return { data: cached };
+
+      const res = await callJavaEngine(command, enriched);
+      if (res.data && !res.error) setCached(key, res.data);
+      return res;
+    }
+
+    // Non-sensitive commands (hint, debug, visualize) carry no answer key.
+    return callJavaEngine(command, payload);
+}
