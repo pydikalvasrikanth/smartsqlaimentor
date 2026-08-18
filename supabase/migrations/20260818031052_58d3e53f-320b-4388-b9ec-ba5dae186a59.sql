@@ -1,0 +1,1 @@
+DELETE FROM public.ai_cache WHERE cache_key = 't:phase7';
