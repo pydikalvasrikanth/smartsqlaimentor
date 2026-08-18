@@ -584,7 +584,7 @@ export async function callEngineCommand(
     ? cacheKey(["sql", command as string, userPrompt])
     : null;
   if (key) {
-    const hit = getCached(key);
+    const hit = await getCached(key);
     if (hit !== undefined) return { data: hit };
   }
 
@@ -595,6 +595,6 @@ export async function callEngineCommand(
     user: userPrompt,
     tool,
   });
-  if (key && res.data && !res.error) setCached(key, res.data);
+  if (key && res.data && !res.error) await setCached(key, res.data);
   return res;
 }
