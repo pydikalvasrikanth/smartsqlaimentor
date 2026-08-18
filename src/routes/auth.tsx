@@ -14,6 +14,7 @@ import {
   Save,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getAuthOrigin, getAuthRedirect } from "@/lib/site-url";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/hooks/use-theme";
@@ -39,15 +40,6 @@ function GoogleMark({ className = "h-4 w-4" }: { className?: string }) {
       />
     </svg>
   );
-}
-
-function getAuthOrigin() {
-  if (typeof window === "undefined") return "https://smartsqlaimentor.live";
-  return window.location.origin;
-}
-
-function getAuthRedirect(path = "/") {
-  return `${getAuthOrigin()}${path}`;
 }
 
 export const Route = createFileRoute("/auth")({

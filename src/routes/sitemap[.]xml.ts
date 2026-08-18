@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "https://smartsqlaimentor.live";
+import { CANONICAL_SITE_URL } from "@/lib/site-url";
+
+const BASE_URL = CANONICAL_SITE_URL;
 
 interface Entry {
   path: string;

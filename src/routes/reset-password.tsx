@@ -3,19 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Eye, EyeOff, Loader2, ShieldCheck, Terminal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getAuthOrigin } from "@/lib/site-url";
 
-const DEFAULT_LOVABLE_ORIGIN =
-  "https://project--93a75156-6283-48bf-a62b-5aa287cea47b-dev.lovable.app";
-
-function getAuthOrigin() {
-  if (typeof window === "undefined") return DEFAULT_LOVABLE_ORIGIN;
-  const { hostname, origin } = window.location;
-  if (hostname.endsWith(".lovable.app")) {
-    return hostname.startsWith("id-preview--") ? DEFAULT_LOVABLE_ORIGIN : origin;
-  }
-  if (hostname === "localhost" || hostname === "127.0.0.1") return origin;
-  return DEFAULT_LOVABLE_ORIGIN;
-}
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
