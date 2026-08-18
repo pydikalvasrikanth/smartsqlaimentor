@@ -14,6 +14,7 @@ import {
   Save,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getAuthOrigin, getAuthRedirect } from "@/lib/site-url";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/hooks/use-theme";
