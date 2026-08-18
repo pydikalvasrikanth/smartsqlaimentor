@@ -41,15 +41,6 @@ function GoogleMark({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-function getAuthOrigin() {
-  if (typeof window === "undefined") return "https://smartsqlaimentor.live";
-  return window.location.origin;
-}
-
-function getAuthRedirect(path = "/") {
-  return `${getAuthOrigin()}${path}`;
-}
-
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
