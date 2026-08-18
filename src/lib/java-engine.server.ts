@@ -505,11 +505,11 @@ export async function runJavaEngineImpl(
         payload.session_question_id,
         (payload.user_code ?? "").trim(),
       ]);
-      const cached = getCached(key);
+      const cached = await getCached(key);
       if (cached) return { data: cached };
 
       const res = await callJavaEngine(command, enriched);
-      if (res.data && !res.error) setCached(key, res.data);
+      if (res.data && !res.error) await setCached(key, res.data);
       return res;
     }
 

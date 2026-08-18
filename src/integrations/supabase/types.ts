@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          value: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at: string
+          value: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       attempts: {
         Row: {
           concept: string | null
@@ -468,6 +489,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_cache_get: { Args: { _key: string }; Returns: Json }
+      ai_cache_put: {
+        Args: { _key: string; _ttl_seconds: number; _value: Json }
+        Returns: undefined
+      }
       consume_rate_limit: {
         Args: {
           _bucket: string

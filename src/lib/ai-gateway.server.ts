@@ -275,11 +275,16 @@ export function preCheckSubmission(
 }
 
 /**
- * Short-lived in-process result cache. A user resubmitting byte-identical code
- * (or reopening the theory panel for the same question) gets the previous
- * answer instantly instead of paying for another generation.
+ * Two-tier result cache. A user resubmitting byte-identical code (or reopening
+ * the theory panel for the same question) gets the previous answer instantly
+ * instead of paying for another generation.
+ *
+ *  L1: in-process Map — free, but scoped to a single Worker isolate.
+ *  L2: Postgres (public.ai_cache via service-role RPCs) — shared by every
+ *      isolate and every user, so one generation warms the cache globally.
  */
 const CACHE_TTL_MS = 15 * 60_000;
+const SHARED_TTL_SECONDS = 24 * 60 * 60;
 const CACHE_MAX = 300;
 const resultCache = new Map<string, { at: number; value: any }>();
 
@@ -298,7 +303,7 @@ export function cacheKey(parts: Array<string | undefined>): string {
   return hashString(parts.map((p) => p ?? "").join("\u0000"));
 }
 
-export function getCached<T = any>(key: string): T | undefined {
+function getLocal<T = any>(key: string): T | undefined {
   const hit = resultCache.get(key);
   if (!hit) return undefined;
   if (Date.now() - hit.at > CACHE_TTL_MS) {
@@ -308,12 +313,47 @@ export function getCached<T = any>(key: string): T | undefined {
   return hit.value as T;
 }
 
-export function setCached(key: string, value: any): void {
+function setLocal(key: string, value: any): void {
   if (resultCache.size >= CACHE_MAX) {
     const oldest = resultCache.keys().next().value;
     if (oldest) resultCache.delete(oldest);
   }
   resultCache.set(key, { at: Date.now(), value });
+}
+
+/**
+ * Read-through: isolate-local first, then the shared Postgres cache. Any cache
+ * failure is swallowed — a cache outage must never break a generation.
+ */
+export async function getCached<T = any>(key: string): Promise<T | undefined> {
+  const local = getLocal<T>(key);
+  if (local !== undefined) return local;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("ai_cache_get", { _key: key });
+    if (error || data == null) return undefined;
+    setLocal(key, data);
+    return data as T;
+  } catch (e) {
+    console.error("ai cache read failed", e);
+    return undefined;
+  }
+}
+
+/** Write-through to both tiers. Never throws. */
+export async function setCached(key: string, value: any): Promise<void> {
+  setLocal(key, value);
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("ai_cache_put", {
+      _key: key,
+      _value: value,
+      _ttl_seconds: SHARED_TTL_SECONDS,
+    });
+    if (error) console.error("ai cache write failed", error.message);
+  } catch (e) {
+    console.error("ai cache write failed", e);
+  }
 }
 
 /**
