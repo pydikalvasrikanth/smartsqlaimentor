@@ -29,6 +29,7 @@ const FORMAT_RULES = `
 Starter-code quality contract (NON-NEGOTIABLE):
 - starter_code MUST compile/parse as-is: no syntax errors, no unbalanced braces/parens/quotes, no missing semicolons, no placeholder pseudo-code lines.
 - starter_code MUST NOT restate the question: no comment banner, no description comments, no docstring copying the task. Code + a single short TODO only.
+- EVERY instruction/guidance/hint line inside starter_code MUST be a real comment for the target language (\`#\` for Python/PySpark, \`//\` for Java/C/C++). NEVER emit bare prose lines — they are syntax errors.
 - Include every import/#include/using the skeleton itself needs, nothing more.
 - Indent with exactly 4 spaces per level, never tabs, consistent throughout; align braces to the standard style of the language.
 - No markdown fences, no backticks, no line numbers, no leading/trailing blank noise.

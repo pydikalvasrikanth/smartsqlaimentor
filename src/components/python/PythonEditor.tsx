@@ -93,7 +93,7 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
         {maximized ? "Minimize" : "Maximize"}
       </button>
       <div
-        className="bg-[#1e1e1e] text-sm font-mono overflow-auto resize-y"
+        className="bg-[#1e1e1e] text-[#e8eaf3] text-sm font-mono overflow-auto resize-y"
         style={{ minHeight: effectiveMin, height: effectiveMin }}
       >
         <Editor
@@ -112,6 +112,7 @@ export function PythonEditor({ value, onChange, minHeight = 420 }: Props) {
           fontSize: 14,
           lineHeight: 1.55,
           minHeight: effectiveMin,
+          color: "#e8eaf3",
           caretColor: "#fff",
         }}
         spellCheck={false}
