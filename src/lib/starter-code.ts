@@ -219,6 +219,73 @@ function stripQuestionText(code: string): string {
 }
 
 function ensureCMain(code: string, lang: "c" | "cpp"): string {
+  return ensureCMainImpl(code, lang);
+}
+
+const COMMENT_PREFIX: Record<CodeLang | "sql", string> = {
+  python: "#",
+  pyspark: "#",
+  java: "//",
+  c: "//",
+  cpp: "//",
+  sql: "--",
+};
+
+/**
+ * Comment out instruction/guidance prose that the model emitted as bare text.
+ *
+ * Any line that is not already a comment, carries no code punctuation, and
+ * reads like a sentence (2+ words) is invalid code, so it gets the language's
+ * comment token so the editor always opens with something that parses.
+ */
+export function commentOutProse(code: string, lang: CodeLang | "sql"): string {
+  const prefix = COMMENT_PREFIX[lang];
+  let inBlockComment = false;
+  let inTriple: string | null = null;
+
+  return code
+    .split("\n")
+    .map((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return line;
+
+      // Track multi-line comment / docstring regions and never touch them.
+      if (inTriple) {
+        if (trimmed.includes(inTriple)) inTriple = null;
+        return line;
+      }
+      if (inBlockComment) {
+        if (trimmed.includes("*/")) inBlockComment = false;
+        return line;
+      }
+      const tripleMatch = trimmed.match(/("""|''')/);
+      if (tripleMatch) {
+        const q = tripleMatch[1];
+        const occurrences = trimmed.split(q).length - 1;
+        if (occurrences % 2 === 1) inTriple = q;
+        return line;
+      }
+      if (trimmed.startsWith("/*")) {
+        if (!trimmed.includes("*/")) inBlockComment = true;
+        return line;
+      }
+
+      // Already a comment / directive / label.
+      if (/^(\/\/|#|--|\*)/.test(trimmed)) return line;
+
+      // Real code signals: any of these means leave the line alone.
+      if (/[=;(){}\[\]<>+\-*/%&|!,.:@"'`]/.test(trimmed)) return line;
+
+      const words = trimmed.split(/\s+/);
+      if (words.length < 2) return line;
+
+      const indent = line.match(/^ */)?.[0] ?? "";
+      return `${indent}${prefix} ${trimmed}`;
+    })
+    .join("\n");
+}
+
+function ensureCMainImpl(code: string, lang: "c" | "cpp"): string {
   if (/\bint\s+main\s*\(/.test(code)) return code;
   const main =
     lang === "c"
@@ -249,7 +316,10 @@ function ensureJavaShell(code: string): string {
  */
 export function normalizeStarterCode(raw: unknown, lang: CodeLang): string {
   if (typeof raw !== "string" || !raw.trim()) return "";
-  const cleaned = basicClean(stripQuestionText(basicClean(raw)));
+  const cleaned = commentOutProse(
+    basicClean(stripQuestionText(basicClean(raw))),
+    lang,
+  );
   if (!cleaned.trim()) return "";
 
   if (lang === "python" || lang === "pyspark") {
