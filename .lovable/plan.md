@@ -1,45 +1,55 @@
-# Secrets checklist for the new Lovable account
+# Fix light-mode editor text + uncommented starter instructions
 
-## 1. You paste only one secret: RESEND_API_KEY
+## Problem 1 — starter code words invisible in light mode
 
-- Where to get it: resend.com, sign in, API Keys, Create API Key with sending permission.
-- Format: starts with `re_`.
-- Used by: the feedback email sender, which emails submitted feedback to pydikalvasrikanth@gmail.com.
-- Note: sending from `onboarding@resend.dev` only delivers to the Resend account owner. To email other people, verify a domain in Resend and send from it.
+The Python / Java / PySpark / C-C++ editors render on a fixed dark
+background (`#1e1e1e`) but never set a text colour. Prism only colours
+recognised tokens (keywords, strings, numbers); everything else — variable
+names, function names, plain identifiers — inherits the page foreground.
+In dark mode that inherited colour is near-white, so it reads fine; in light
+mode it is near-black on the dark editor background, so those words disappear.
+The SQL editor is unaffected because it explicitly sets its own text colour.
 
-That is the key the new agent is asking for. Nothing else needs to be typed in by hand.
+Fix: give every code editor an explicit light-on-dark text colour, exactly
+like the SQL editor already does, so the editor look is identical in both
+themes.
 
-## 2. Auto-provisioned — do not paste, do not copy from this project
+Files:
+- `src/components/code/CodeEditor.tsx` (Python/Java/C/C++/PySpark shared editor)
+- `src/components/python/PythonEditor.tsx`
+- `src/components/java/JavaEditor.tsx`
 
-- `LOVABLE_API_KEY` — created automatically when Cloud is enabled on the new project. Powers all AI calls and the email queue.
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL`
-- `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`
+Change in each: set the editor text colour (`color: "#e8eaf3"`) on the editor
+style and a matching class on the wrapper, keeping the existing dark
+background and white caret. No theme-dependent colour left to inherit.
 
-Copying the old values across would point the new app at the old database. Let the new project generate its own.
+## Problem 2 — starter instructions are not commented
 
-## 3. Google sign-in: reuse your own OAuth client
+Generated starter templates sometimes contain guidance lines ("Write your
+solution here", "Return the result as a list", step hints) as bare prose
+lines, which is invalid code and shows up as syntax noise in the editor.
 
-Keeping your own client keeps "Lovable" off the consent screen, matching the current setup.
+Fix in two layers:
 
-- In Google Cloud Console, Credentials, your existing OAuth 2.0 Web client, copy the client ID and client secret.
-- Add these to the new account's Auth Settings, Google provider: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
-- In Google Cloud Console, add as authorized redirect URIs: the callback URL shown in the new account's Google provider settings, plus the new preview and published origins.
-- Add the new domains under Authorized domains on the consent screen.
+1. Prompt layer — in the engine server modules, state explicitly that every
+   instruction/guidance line inside starter code MUST be a language-correct
+   comment (`#` for Python/PySpark, `//` for Java/C/C++, `--` for SQL) and
+   never bare prose.
+2. Safety net in `src/lib/starter-code.ts` — after normalising, detect
+   remaining prose lines (lines that are not comments, contain no code
+   punctuation such as `=`, `(`, `;`, `:` at end, and read as a sentence) and
+   prefix them with the correct comment token for the target language. This
+   guarantees valid code even when the model ignores the prompt.
 
-## 4. Not a secret: VITE_SITE_URL
+Applies to all subjects: SQL, Python, PySpark, Java, C, C++.
 
-Set it in the new project's `.env` to the live site URL — the new `*.lovable.app` URL at first, then `https://smartsqlaimentor.live` after the custom domain is moved. Auth redirects and `sitemap.xml` derive from it.
+## Verification
 
-## 5. Optional / skip
+- Typecheck + production build.
+- Open a question in light mode for Python, Java, PySpark and C/C++ and
+  confirm all starter-code words are legible.
+- Confirm generated starter templates contain no uncommented prose lines.
 
-- `GOOGLE_SEARCH_CONSOLE_API_KEY` — came from a connector, not app code. Reconnect the connector only if you want Search Console data.
+## Out of scope
 
-## Order of operations on the new account
-
-1. Enable Cloud (this provisions `LOVABLE_API_KEY` and all Supabase values).
-2. Apply every file in `supabase/migrations/` in filename order.
-3. Set `VITE_SITE_URL`.
-4. Save `RESEND_API_KEY`.
-5. Configure the Google provider with your client ID and secret, then update redirect URIs in Google Cloud Console.
-6. Typecheck and production build; fix only migration-caused breakage.
-7. Publish, then move the custom domain and re-check the Google redirect URIs.
+No layout, routing, theme-token or AI-model changes.
