@@ -335,7 +335,7 @@ export function normalizeStarterCode(raw: unknown, lang: CodeLang): string {
 /** Same cleanup for reference/model solutions shown to the user. */
 export function normalizeSolutionCode(raw: unknown, lang: CodeLang): string {
   if (typeof raw !== "string" || !raw.trim()) return "";
-  const cleaned = basicClean(raw);
+  const cleaned = commentOutProse(basicClean(raw), lang);
   if (lang === "python" || lang === "pyspark") return reindentPython(cleaned) + "\n";
   return reindentBraceLang(cleaned, lang) + "\n";
 }
