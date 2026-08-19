@@ -11,6 +11,7 @@ import {
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import appCss from "../styles.css?url";
 
 // Defer always-mounted UI chrome so it doesn't block initial paint / TTI.
@@ -192,6 +193,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <AnnouncementBar />
           <Outlet />
           <DeferredChrome />
         </AuthProvider>
