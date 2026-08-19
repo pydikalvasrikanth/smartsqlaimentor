@@ -24,6 +24,7 @@ import { HeaderTimer } from "@/components/HeaderTimer";
 const SolvedLibrary = lazyPanel(() => import("@/components/sql/SolvedLibrary").then((m) => ({ default: m.SolvedLibrary })), PanelSkeleton);
 import { supabase } from "@/integrations/supabase/client";
 import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
+import { GeneratingOverlay } from "@/components/GeneratingOverlay";
 
 export const Route = createFileRoute("/pyspark")({
   head: () => ({
@@ -863,7 +864,7 @@ function PySparkWorkspace() {
                 <div className="px-3 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <span>{LANG_META[LANG].fileName}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] uppercase tracking-widest">PySpark</span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-600/40 text-amber-800 dark:bg-amber-500/15 dark:border-amber-500/30 dark:text-amber-300 text-[10px] uppercase tracking-widest">PySpark</span>
                   </span>
                   <span className="text-[10px] uppercase tracking-widest">Tab · 4 spaces · auto-indent</span>
                 </div>
@@ -1065,6 +1066,7 @@ function PySparkWorkspace() {
           "How does Structured Streaming handle late data?",
         ]}
       />
+      <GeneratingOverlay active={loading === "init" || loading === "next"} label={loading === "next" ? "Generating your next question" : "Generating your question"} />
       <ProductTour
         storageKey="sqlmentor:tour:pyspark-v1"
         open={tourOpen}

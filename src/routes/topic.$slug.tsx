@@ -19,6 +19,7 @@ import { FeedbackPanel, type FeedbackData } from "@/components/sql/FeedbackPanel
 import { PythonModePanel } from "@/components/sql/PythonModePanel";
 import { PythonToggle } from "@/components/sql/PythonToggle";
 import { AiAssistant } from "@/components/AiAssistant";
+import { GeneratingOverlay } from "@/components/GeneratingOverlay";
 
 
 const search = z.object({
@@ -653,6 +654,8 @@ function TopicPage() {
           </div>
         )}
       </main>
+
+      <GeneratingOverlay active={loading === "init" || loading === "next"} label={loading === "next" ? "Generating your next question" : "Generating your question"} />
 
       <AiAssistant
         context={`SQL daily-plan session — topic: ${topic.name} (${topic.description}). MySQL 8, tier: ${currentTier}.`}

@@ -606,3 +606,17 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-processing { animation: none; }
 }
+
+/* Announcement ticker: continuous right-to-left scroll */
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-rtl 34s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
