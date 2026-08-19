@@ -231,6 +231,18 @@ const COMMENT_PREFIX: Record<CodeLang | "sql", string> = {
   sql: "--",
 };
 
+/** Lines starting with one of these are code, never prose. */
+const CODE_LEAD = new Set([
+  "return","pass","break","continue","else","elif","try","except","finally","raise",
+  "yield","del","global","nonlocal","assert","import","from","with","as","in","is",
+  "not","and","or","lambda","await","async","def","class","if","for","while","case",
+  "match","goto","new","delete","throw","using","namespace","typedef","struct","union",
+  "enum","public","private","protected","static","final","void","int","long","short",
+  "char","float","double","bool","boolean","unsigned","signed","auto","const","template",
+  "typename","this","super","package","extends","implements","interface","record","switch",
+  "default","select","where","group","order","having","join","insert","update","delete",
+]);
+
 /**
  * Comment out instruction/guidance prose that the model emitted as bare text.
  *
