@@ -21,6 +21,7 @@ import { HeaderTimer } from "@/components/HeaderTimer";
 const SolvedLibrary = lazyPanel(() => import("@/components/sql/SolvedLibrary").then((m) => ({ default: m.SolvedLibrary })), PanelSkeleton);
 import { supabase } from "@/integrations/supabase/client";
 import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
+import { GeneratingOverlay } from "@/components/GeneratingOverlay";
 export const Route = createFileRoute("/python")({
   head: () => ({
     meta: [
@@ -1498,6 +1499,7 @@ function PythonWorkspace() {
           "How do Python decorators work?",
         ]}
       />
+      <GeneratingOverlay active={loading === "init" || loading === "next"} label={loading === "next" ? "Generating your next question" : "Generating your question"} />
       <ProductTour
         storageKey="sqlmentor:tour:python-v1"
         open={tourOpen}

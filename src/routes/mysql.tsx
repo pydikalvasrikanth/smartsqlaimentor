@@ -55,6 +55,7 @@ import {
 } from "@/lib/data-engineering";
 const SolvedLibrary = lazyPanel(() => import("@/components/sql/SolvedLibrary").then((m) => ({ default: m.SolvedLibrary })), PanelSkeleton);
 import { SubjectSeoShell, SUBJECT_SEO_CONTENT } from "@/components/SubjectSeoShell";
+import { GeneratingOverlay } from "@/components/GeneratingOverlay";
 
 export const Route = createFileRoute("/mysql")({
   head: () => ({
@@ -1452,6 +1453,7 @@ function Workspace() {
           "How do GRANT and REVOKE work?",
         ]}
       />
+      <GeneratingOverlay active={loading === "init" || loading === "next"} label={loading === "next" ? "Generating your next question" : "Generating your question"} />
       <ProductTour
         storageKey="sqlmentor:tour:sql-v1"
         open={tourOpen}
