@@ -290,6 +290,7 @@ export function commentOutProse(code: string, lang: CodeLang | "sql"): string {
 
       const words = trimmed.split(/\s+/);
       if (words.length < 2) return line;
+      if (CODE_LEAD.has(words[0].toLowerCase())) return line;
 
       const indent = line.match(/^ */)?.[0] ?? "";
       return `${indent}${prefix} ${trimmed}`;
