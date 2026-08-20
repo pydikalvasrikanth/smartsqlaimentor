@@ -22,12 +22,12 @@ export function AnnouncementBar() {
             This old URL will stop working soon. Please update your bookmarks.
           </span>
         </p>
-        <Link
-          to="https://aicodedost.com/"
+        <a
+          href="https://aicodedost.com/"
           className="hidden shrink-0 rounded-md bg-warning px-3 py-1 text-xs font-semibold text-warning-foreground transition-colors hover:bg-warning/80 sm:inline-flex"
         >
           Go to new site
-        </Link>
+        </a>
       </div>
     </div>
   );
