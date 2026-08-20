@@ -1,38 +1,33 @@
 import { Link } from "@tanstack/react-router";
-import { Megaphone } from "lucide-react";
-
-const MESSAGE = (
-  <>
-    <span className="font-semibold">Trial version</span>
-    <span className="opacity-60">•</span>
-    <span>
-      Found a bug? Please report it on the{" "}
-      <Link to="/feedback" className="underline underline-offset-2 font-medium">
-        feedback page
-      </Link>
-      .
-    </span>
-    <span className="opacity-60">•</span>
-    <span>
-      Our domain is moving to <span className="font-semibold">www.aicodedost.com</span> very soon —
-      same platform, an even better experience.
-    </span>
-  </>
-);
+import { AlertTriangle, ExternalLink } from "lucide-react";
 
 export function AnnouncementBar() {
   return (
-    <div className="relative w-full overflow-hidden border-b border-primary/25 bg-gradient-to-r from-primary/12 via-primary/5 to-primary/12 text-foreground">
-      <div className="flex items-center gap-2 py-1.5">
-        <span className="shrink-0 pl-3 pr-2">
-          <Megaphone className="h-3.5 w-3.5 text-primary" />
-        </span>
-        <div className="marquee-track flex min-w-max items-center gap-6 text-xs">
-          <span className="flex items-center gap-2 whitespace-nowrap">{MESSAGE}</span>
-          <span aria-hidden className="flex items-center gap-2 whitespace-nowrap">
-            {MESSAGE}
+    <div className="relative z-50 w-full border-b border-warning/30 bg-gradient-to-r from-warning/20 via-warning/10 to-warning/20 text-warning-foreground">
+      <div className="mx-auto flex max-w-[1400px] items-center justify-center gap-3 px-4 py-2.5 text-center">
+        <AlertTriangle className="hidden h-4 w-4 shrink-0 text-warning sm:block" />
+        <p className="text-xs font-medium leading-relaxed sm:text-sm">
+          <span className="font-semibold">We have moved to{" "}</span>
+          <a
+            href="https://aicodedost.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 font-bold underline underline-offset-2 hover:text-primary"
+          >
+            aicodedost.com
+            <ExternalLink className="h-3 w-3" />
+          </a>
+          <span className="mx-2 opacity-50">|</span>
+          <span className="font-semibold text-destructive">
+            This old URL will stop working soon. Please update your bookmarks.
           </span>
-        </div>
+        </p>
+        <Link
+          to="https://aicodedost.com/"
+          className="hidden shrink-0 rounded-md bg-warning px-3 py-1 text-xs font-semibold text-warning-foreground transition-colors hover:bg-warning/80 sm:inline-flex"
+        >
+          Go to new site
+        </Link>
       </div>
     </div>
   );
